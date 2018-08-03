@@ -5,10 +5,7 @@ import org.lwjgl.glfw.*;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import org.lwjgl.opengl.GL;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glEnable;
 import org.lwjgl.opengl.GLUtil;
 import org.lwjgl.system.MemoryStack;
@@ -39,8 +36,7 @@ public class Window {
         // bindings available for use.
         GL.createCapabilities();
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_DEPTH_TEST);
 
         GLUtil.setupDebugMessageCallback();
     }
@@ -70,6 +66,8 @@ public class Window {
         if (handle == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
+
+        glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         //glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         // Get the thread stack and push a new frame

@@ -3,10 +3,9 @@ package opengl;
 import engine.Activatable;
 import java.util.HashMap;
 import org.joml.Matrix4d;
-import org.joml.Vector3d;
-import org.joml.Vector3i;
-import org.joml.Vector4d;
 import static org.lwjgl.opengl.GL20.*;
+import util.vectors.Vec3d;
+import util.vectors.Vec4d;
 
 public class ShaderProgram implements Activatable {
 
@@ -74,19 +73,13 @@ public class ShaderProgram implements Activatable {
         glUniform1i(uniform, value);
     }
 
-    public void setUniform(String name, Vector3d value) {
+    public void setUniform(String name, Vec3d value) {
         activate();
         int uniform = getUniformLocation(name);
         glUniform3fv(uniform, new float[]{(float) value.x, (float) value.y, (float) value.z});
     }
 
-    public void setUniform(String name, Vector3i value) {
-        activate();
-        int uniform = getUniformLocation(name);
-        glUniform3fv(uniform, new float[]{value.x, value.y, value.z});
-    }
-
-    public void setUniform(String name, Vector4d value) {
+    public void setUniform(String name, Vec4d value) {
         activate();
         int uniform = getUniformLocation(name);
         glUniform4fv(uniform, new float[]{(float) value.x, (float) value.y, (float) value.z, (float) value.w});

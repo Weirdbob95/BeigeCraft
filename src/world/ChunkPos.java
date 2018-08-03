@@ -9,6 +9,10 @@ public class ChunkPos {
         this.y = y;
     }
 
+    public int distance(ChunkPos other) {
+        return Math.abs(x - other.x) + Math.abs(y - other.y);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

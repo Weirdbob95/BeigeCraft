@@ -16,12 +16,20 @@ public class Vec3d {
         return new Vec3d(x + other.x, y + other.y, z + other.z);
     }
 
+    public Vec3d cross(Vec3d other) {
+        return new Vec3d(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x);
+    }
+
+    public Vec3d div(double a) {
+        return new Vec3d(x / a, y / a, z / a);
+    }
+
     public Vec3d div(Vec3d other) {
         return new Vec3d(x / other.x, y / other.y, z / other.z);
     }
 
     public double dot(Vec3d other) {
-
+        return x * other.x + y * other.y + z * other.z;
     }
 
     @Override
@@ -57,8 +65,24 @@ public class Vec3d {
         return hash;
     }
 
+    public double length() {
+        return Math.sqrt(x * x + y * y + z * z);
+    }
+
+    public double lengthSquared() {
+        return x * x + y * y + z * z;
+    }
+
+    public Vec3d mult(double a) {
+        return new Vec3d(x * a, y * a, z * a);
+    }
+
     public Vec3d mult(Vec3d other) {
         return new Vec3d(x * other.x, y * other.y, z * other.z);
+    }
+
+    public Vec3d normalize() {
+        return div(length());
     }
 
     public Vec3d sub(Vec3d other) {

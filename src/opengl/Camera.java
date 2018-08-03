@@ -1,6 +1,8 @@
 package opengl;
 
+import org.joml.FrustumIntersection;
 import org.joml.Matrix4d;
+import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import util.vectors.Vec3d;
 
@@ -11,6 +13,13 @@ public class Camera {
     public Vec3d position = new Vec3d(0, 0, 0);
     public double horAngle, vertAngle;
     public Vec3d up = new Vec3d(0, 0, 1);
+
+    private final FrustumIntersection viewFrustum = new FrustumIntersection();
+
+    public FrustumIntersection getViewFrustum() {
+        viewFrustum.set(new Matrix4f(Camera.getProjectionMatrix().mul(Camera.camera.getWorldMatrix(new Vec3d(0, 0, 0)))));
+        return viewFrustum;
+    }
 
     private Matrix4d getViewMatrix() {
         return new Matrix4d()

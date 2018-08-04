@@ -7,7 +7,6 @@ import engine.Input;
 import game.Player;
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.stream.Stream;
 import opengl.Camera;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.opengl.GL11.*;
@@ -82,17 +81,18 @@ public abstract class Main {
                         .min(Comparator.comparingInt(camera::distance));
                 if (toRender.isPresent() && camera.distance(toRender.get()) <= RENDER_DISTANCE) {
                     world.renderedChunks.lazyGenerate(toRender.get());
-                } else {
-                    for (int i = 0; i < 2; i++) {
-                        Optional<ChunkPos> toPrerender = Stream.concat(world.renderedChunks.border.stream(), world.prerenderedChunks.border.stream())
-                                .filter(cp -> !world.renderedChunks.has(cp))
-                                .filter(cp -> !world.prerenderedChunks.has(cp))
-                                .min(Comparator.comparingInt(camera::distance));
-                        if (toPrerender.isPresent() && camera.distance(toPrerender.get()) <= 3 * RENDER_DISTANCE) {
-                            world.prerenderedChunks.lazyGenerate(toPrerender.get());
-                        }
-                    }
                 }
+//                else {
+//                    for (int i = 0; i < 2; i++) {
+//                        Optional<ChunkPos> toPrerender = Stream.concat(world.renderedChunks.border.stream(), world.prerenderedChunks.border.stream())
+//                                .filter(cp -> !world.renderedChunks.has(cp))
+//                                .filter(cp -> !world.prerenderedChunks.has(cp))
+//                                .min(Comparator.comparingInt(camera::distance));
+//                        if (toPrerender.isPresent() && camera.distance(toPrerender.get()) <= 3 * RENDER_DISTANCE) {
+//                            world.prerenderedChunks.lazyGenerate(toPrerender.get());
+//                        }
+//                    }
+//            }
             }
         });
 

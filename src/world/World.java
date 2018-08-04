@@ -13,8 +13,8 @@ import util.vectors.Vec3d;
 
 public class World {
 
-    public static final int CHUNK_SIZE = 32;
-    public static final int RENDER_DISTANCE = 4;
+    public static final int CHUNK_SIZE = 64;
+    public static final int RENDER_DISTANCE = 32;
 
     public final ChunkMap<ConstructedChunk> constructedChunks = new ChunkMap<>(this::generateConstructedChunk);
     public final ChunkMap<PlannedChunk> plannedChunks = new ChunkMap<>(this::generatePlannedChunk);

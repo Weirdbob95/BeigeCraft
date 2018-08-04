@@ -81,8 +81,7 @@ public class RenderedChunk extends Behavior {
                             if (world.getBlock(worldPos.add(dir)) == null) {
                                 Quad q = new Quad();
                                 q.positionDir(x, y, z, dir);
-                                q.texCoordFromBlockType(bt);
-                                //q.colorWhite();
+                                q.texCoordFromBlockType(bt, dir);
                                 q.colorAmbientOcclusion(getOccludingBlocks(worldPos, dir));
                                 quads.get(dir).add(q);
                             }
@@ -268,11 +267,17 @@ public class RenderedChunk extends Behavior {
             positions = new Vec3d[]{new Vec3d(x, y, z), new Vec3d(x + 1, y, z), new Vec3d(x + 1, y + 1, z), new Vec3d(x, y + 1, z)};
         }
 
-        private void texCoordFromBlockType(BlockType bt) {
+        private void texCoordFromBlockType(BlockType bt, Vec3d dir) {
             Vec2d pos, size;
             switch (bt) {
                 case GRASS:
-                    pos = new Vec2d(0, 0);
+                    if (dir.z > 0) {
+                        pos = new Vec2d(0, 0);
+                    } else if (dir.z < 0) {
+                        pos = new Vec2d(16, 0);
+                    } else {
+                        pos = new Vec2d(48, 0);
+                    }
                     size = new Vec2d(16, 16);
                     break;
                 case DIRT:
@@ -286,10 +291,14 @@ public class RenderedChunk extends Behavior {
                 default:
                     throw new RuntimeException("Unknown BlockType");
             }
-            Vec2d textureSize = new Vec2d(48, 16);
+            Vec2d textureSize = new Vec2d(64, 16);
             pos = pos.div(textureSize);
             size = size.div(textureSize);
-            texCoords = new Vec2d[]{pos, pos.add(size.setY(0)), pos.add(size), pos.add(size.setX(0))};
+            if (dir.x == 0) {
+                texCoords = new Vec2d[]{pos.add(size), pos.add(size.setY(0)), pos, pos.add(size.setX(0))};
+            } else {
+                texCoords = new Vec2d[]{pos.add(size.setX(0)), pos.add(size), pos.add(size.setY(0)), pos};
+            }
         }
     }
 }

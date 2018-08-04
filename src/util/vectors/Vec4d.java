@@ -11,6 +11,10 @@ public class Vec4d {
         this.w = w;
     }
 
+    public Vec4d div(double a) {
+        return new Vec4d(x / a, y / a, z / a, w / a);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -46,6 +50,10 @@ public class Vec4d {
         hash = 89 * hash + (int) (Double.doubleToLongBits(this.z) ^ (Double.doubleToLongBits(this.z) >>> 32));
         hash = 89 * hash + (int) (Double.doubleToLongBits(this.w) ^ (Double.doubleToLongBits(this.w) >>> 32));
         return hash;
+    }
+
+    public Vec4d mul(double a) {
+        return new Vec4d(x * a, y * a, z * a, w * a);
     }
 
     @Override

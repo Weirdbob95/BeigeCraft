@@ -73,16 +73,32 @@ public class Vec3d {
         return x * x + y * y + z * z;
     }
 
-    public Vec3d mult(double a) {
+    public Vec3d lerp(Vec3d other, double amt) {
+        return mul(1 - amt).add(other.mul(amt));
+    }
+
+    public Vec3d mul(double a) {
         return new Vec3d(x * a, y * a, z * a);
     }
 
-    public Vec3d mult(Vec3d other) {
+    public Vec3d mul(Vec3d other) {
         return new Vec3d(x * other.x, y * other.y, z * other.z);
     }
 
     public Vec3d normalize() {
         return div(length());
+    }
+
+    public Vec3d setX(double x) {
+        return new Vec3d(x, y, z);
+    }
+
+    public Vec3d setY(double y) {
+        return new Vec3d(x, y, z);
+    }
+
+    public Vec3d setZ(double z) {
+        return new Vec3d(x, y, z);
     }
 
     public Vec3d sub(Vec3d other) {

@@ -1,5 +1,6 @@
-package engine;
+package behaviors;
 
+import engine.Behavior;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.function.Consumer;
@@ -39,6 +40,7 @@ public abstract class MiscBehaviors {
 
         private final Queue<Double> dtList = new LinkedList();
         public double fps;
+        private double timeElapsed;
 
         @Override
         public void update(double dt) {
@@ -47,7 +49,11 @@ public abstract class MiscBehaviors {
                 dtList.remove();
             }
             fps = dtList.size() / dtList.stream().mapToDouble(x -> x).sum();
-            Window.window.setTitle("FPS: " + Math.round(fps));
+            timeElapsed += dt;
+            if (timeElapsed > .25) {
+                timeElapsed -= .25;
+                Window.window.setTitle("FPS: " + Math.round(fps));
+            }
         }
     }
 }

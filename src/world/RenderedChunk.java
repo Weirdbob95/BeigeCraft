@@ -42,14 +42,12 @@ public class RenderedChunk extends Behavior {
     public ChunkPos pos;
     private Map<Vec3d, Integer> numQuadsMap;
     private Map<Vec3d, VertexArrayObject> vaoMap;
-    private boolean ready;
 
     @Override
     public void destroyInner() {
         for (VertexArrayObject vao : vaoMap.values()) {
             vao.destroy();
         }
-        world.deleteRenderedChunk(pos);
     }
 
     public void generateAtPos(World world, ChunkPos pos) {
@@ -57,13 +55,12 @@ public class RenderedChunk extends Behavior {
         this.pos = pos;
         numQuadsMap = new HashMap();
         vaoMap = new HashMap();
-        ready = false;
 
         int maxZ = Integer.MIN_VALUE;
         int minZ = Integer.MAX_VALUE;
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
-                ConstructedChunk cc = world.getConstructedChunk(new ChunkPos(pos.x + x, pos.y + y));
+                ConstructedChunk cc = world.constructedChunks.get(new ChunkPos(pos.x + x, pos.y + y));
                 maxZ = Math.max(maxZ, cc.blockStorage.maxZ());
                 minZ = Math.min(minZ, cc.blockStorage.minZ());
             }
@@ -131,7 +128,7 @@ public class RenderedChunk extends Behavior {
                     glEnableVertexAttribArray(2);
                 }));
             }
-            ready = true;
+            create();
         });
     }
 
@@ -150,25 +147,25 @@ public class RenderedChunk extends Behavior {
         boolean[][] r = new boolean[3][3];
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                r[i + 1][j + 1] = world.getBlock(worldPos.add(dir).add(otherDir1.mult(i)).add(otherDir2.mult(j))) != null;
+                r[i + 1][j + 1] = world.getBlock(worldPos.add(dir).add(otherDir1.mul(i)).add(otherDir2.mul(j))) != null;
             }
         }
         return r;
     }
 
     private boolean intersectsFrustum() {
-        return Camera.camera.getViewFrustum().testAab(CHUNK_SIZE * pos.x, CHUNK_SIZE * pos.y, world.getConstructedChunk(pos).blockStorage.minZ(),
-                CHUNK_SIZE * (pos.x + 1), CHUNK_SIZE * (pos.y + 1), world.getConstructedChunk(pos).blockStorage.maxZ());
+        return Camera.camera.getViewFrustum().testAab(CHUNK_SIZE * pos.x, CHUNK_SIZE * pos.y, world.constructedChunks.get(pos).blockStorage.minZ(),
+                CHUNK_SIZE * (pos.x + 1), CHUNK_SIZE * (pos.y + 1), world.constructedChunks.get(pos).blockStorage.maxZ() + 1);
     }
 
     @Override
     public void render() {
-        if (numQuadsMap == null || !ready || !intersectsFrustum()) {
+        if (!intersectsFrustum()) {
             return;
         }
         Vec3d worldPos = new Vec3d(CHUNK_SIZE * pos.x, CHUNK_SIZE * pos.y, 0);
-        Vec3d min = worldPos.add(new Vec3d(0, 0, world.getConstructedChunk(pos).blockStorage.minZ()));
-        Vec3d max = worldPos.add(new Vec3d(CHUNK_SIZE, CHUNK_SIZE, world.getConstructedChunk(pos).blockStorage.maxZ()));
+        Vec3d min = worldPos.add(new Vec3d(0, 0, world.constructedChunks.get(pos).blockStorage.minZ()));
+        Vec3d max = worldPos.add(new Vec3d(CHUNK_SIZE, CHUNK_SIZE, world.constructedChunks.get(pos).blockStorage.maxZ()));
         SHADER.setUniform("projectionMatrix", Camera.getProjectionMatrix());
         SHADER.setUniform("modelViewMatrix", Camera.camera.getWorldMatrix(worldPos));
         SHADER.setUniform("color", new Vec4d(1, 1, 1, 1));
@@ -185,8 +182,8 @@ public class RenderedChunk extends Behavior {
 
     @Override
     public void update(double dt) {
-        if (world.getChunkPos(Camera.camera.position).distance(pos) > RENDER_DISTANCE) {
-            destroy();
+        if (world.getChunkPos(Camera.camera.position).distance(pos) > RENDER_DISTANCE + 2) {
+            world.renderedChunks.remove(pos);
         }
     }
 

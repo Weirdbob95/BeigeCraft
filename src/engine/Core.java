@@ -32,8 +32,12 @@ public abstract class Core {
         if (toRun == null) {
             throw new RuntimeException("toRun cannot be null");
         }
-        synchronized (TO_RUN) {
-            TO_RUN.add(toRun);
+        if (Thread.currentThread() != MAIN_THREAD) {
+            synchronized (TO_RUN) {
+                TO_RUN.add(toRun);
+            }
+        } else {
+            toRun.run();
         }
     }
 

@@ -32,7 +32,8 @@ import world.chunks.StructuredChunk;
 public class World extends Behavior {
 
     public static final int CHUNK_SIZE = 32;
-    public static final int RENDER_DISTANCE = 32;
+    public static final int RENDER_DISTANCE = 16;
+    public static final int UNLOAD_DISTANCE = RENDER_DISTANCE + 4;
 
     public static final ShaderProgram TERRAIN_SHADER = Resources.loadShaderProgram("terrain");
     public static final Texture TERRAIN_TEXTURE = new Texture("sprites/blockSpritesheet.png");
@@ -81,13 +82,15 @@ public class World extends Behavior {
             TERRAIN_SHADER.setUniform("projectionMatrix", Camera.getProjectionMatrix());
             TERRAIN_SHADER.setUniform("color", new Vec4d(1, 1, 1, 1));
             for (ChunkPos pos : renderedChunks.allGenerated()) {
-                if (getChunkPos(Camera.camera.position).distance(pos) > RENDER_DISTANCE + 2) {
-                    renderedChunks.remove(pos);
-                } else {
-                    renderedChunks.get(pos).render();
-                }
+                renderedChunks.get(pos).render();
             }
         });
+        ChunkPos camera = getChunkPos(Camera.camera.position);
+        constructedChunks.removeDistant(camera);
+        heightmappedChunks.removeDistant(camera);
+        plannedChunks.removeDistant(camera);
+        renderedChunks.removeDistant(camera);
+        structuredChunks.removeDistant(camera);
     }
 
     public void setBlock(Vec3d pos, BlockType bt) {
@@ -159,6 +162,14 @@ public class World extends Behavior {
                     T t = chunks.remove(pos);
                     updateBorder(pos);
                     t.cleanup();
+                }
+            }
+        }
+
+        public void removeDistant(ChunkPos camera) {
+            for (ChunkPos pos : chunks.keySet()) {
+                if (camera.distance(pos) > UNLOAD_DISTANCE) {
+                    remove(pos);
                 }
             }
         }

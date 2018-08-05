@@ -62,6 +62,15 @@ public abstract class Main {
             }
         });
 
+        // MEMORY ALLOCATION DEBUG INFO
+//        for (MemoryPoolMXBean mpBean : ManagementFactory.getMemoryPoolMXBeans()) {
+//            if (mpBean.getType() == MemoryType.HEAP) {
+//                System.out.printf(
+//                        "Name: %s: %s\n",
+//                        mpBean.getName(), mpBean.getUsage()
+//                );
+//            }
+//        }
         Core.run();
     }
 }

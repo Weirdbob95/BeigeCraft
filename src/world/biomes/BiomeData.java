@@ -15,16 +15,15 @@ public class BiomeData {
 
     public static BiomeData generate(World world, Vec3d pos) {
         BiomeData bd = new BiomeData();
-        double temp = world.noise.multi(pos.x, pos.y, 10000, 12, .001);
-        double hum = world.noise.multi(pos.x, pos.y, 20000, 12, .001);
+        double temp = world.noise.multi(pos.x, pos.y, 10000, 4, .001)
+                + world.noise.multi(pos.x, pos.y, 20000, 3, .1) * .02;
+        double hum = world.noise.multi(pos.x, pos.y, 30000, 4, .001)
+                + world.noise.multi(pos.x, pos.y, 40000, 3, .1) * .02;
 
-        double edge = .1;
+        double edge = .2;
         bd.set(Biome.FOREST, hum - .5 + edge);
         bd.set(Biome.PLAINS, Math.min(-hum + .5 + edge, -temp + .5 + edge));
         bd.set(Biome.DESERT, Math.min(-hum + .5 + edge, temp - .5 + edge));
-//        bd.set(Biome.PLAINS, world.noise.multi(pos.x, pos.y, 10000, 2, .001) - .5);
-//        bd.set(Biome.FOREST, world.noise.multi(pos.x, pos.y, 20000, 2, .001) - .5);
-//        bd.set(Biome.DESERT, world.noise.multi(pos.x, pos.y, 30000, 2, .001) - .5);
         return bd;
     }
 

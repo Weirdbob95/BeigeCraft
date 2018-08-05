@@ -6,9 +6,13 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class Multithreader {
 
-    private static final int NUM_THREADS = 1;
+    private static final int NUM_THREADS = 8;
     private static final int TIMEOUT = 60;
-    private static final ThreadPoolExecutor THREAD_POOL = new ThreadPoolExecutor(NUM_THREADS, NUM_THREADS, TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue());
+    private static final ThreadPoolExecutor THREAD_POOL = new ThreadPoolExecutor(NUM_THREADS, NUM_THREADS, TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue(), r -> {
+        Thread t = new Thread(r);
+        t.setPriority(1);
+        return t;
+    });
 
     static {
         THREAD_POOL.allowCoreThreadTimeOut(true);

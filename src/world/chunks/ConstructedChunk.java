@@ -34,5 +34,6 @@ public class ConstructedChunk extends AbstractChunk {
             StructuredChunk sc = world.structuredChunks.get(cp);
             sc.constructIn(this);
         }
+        world.heightmappedChunks.remove(pos);
     }
 }

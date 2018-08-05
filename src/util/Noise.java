@@ -16,8 +16,20 @@ public class Noise {
         return r / (2 - 1.0 / (1 << (octaves - 1)));
     }
 
+    public double multi(double x, double y, double z, int octaves, double frequency) {
+        double r = 0;
+        for (int i = 0; i < octaves; i++) {
+            r += perlin(x, y, z, frequency * (1 << i)) / (1 << i);
+        }
+        return r / (2 - 1.0 / (1 << (octaves - 1)));
+    }
+
     public double perlin(double x, double y, double frequency) {
         return SimplexNoise.noise(x * frequency, y * frequency, seed) * .5 + .5;
+    }
+
+    public double perlin(double x, double y, double z, double frequency) {
+        return SimplexNoise.noise(x * frequency, y * frequency, z * frequency, seed) * .5 + .5;
     }
 
     /*public double fbm(double x, double y, int octaves, double frequency) {

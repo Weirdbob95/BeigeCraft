@@ -6,9 +6,13 @@ import behaviors.PositionBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
 import engine.Input;
+import java.util.List;
+import opengl.Camera;
 import static opengl.Camera.camera;
 import static org.lwjgl.glfw.GLFW.*;
 import util.vectors.Vec3d;
+import world.BlockType;
+import static world.Raycast.raycastDistance;
 
 public class Player extends Behavior {
 
@@ -21,7 +25,7 @@ public class Player extends Behavior {
 
     public Player() {
         acceleration.acceleration = new Vec3d(0, 0, -32);
-        physics.hitboxSize = new Vec3d(.3, .3, .9);
+        physics.hitboxSize = new Vec3d(.3, .3, .8);
     }
 
     @Override
@@ -80,6 +84,27 @@ public class Player extends Behavior {
         if (Input.keyDown(GLFW_KEY_SPACE)) {
             if (physics.onGround || sprint) {
                 velocity.velocity = velocity.velocity.setZ(Math.sqrt(speed) * 5);
+            }
+        }
+
+        // Break block
+        if (Input.mouseJustPressed(0)) {
+            List<Vec3d> raycast = raycastDistance(Camera.camera.position, Camera.camera.facing(), 5);
+            for (int i = 0; i < raycast.size(); i++) {
+                if (physics.world.getBlock(raycast.get(i)) != null) {
+                    physics.world.setBlock(raycast.get(i), null);
+                    break;
+                }
+            }
+        }
+        // Place block
+        if (Input.mouseJustPressed(1)) {
+            List<Vec3d> raycast = raycastDistance(Camera.camera.position, Camera.camera.facing(), 5);
+            for (int i = 0; i < raycast.size() - 1; i++) {
+                if (physics.world.getBlock(raycast.get(i)) == null && physics.world.getBlock(raycast.get(i + 1)) != null) {
+                    physics.world.setBlock(raycast.get(i), BlockType.WOOD);
+                    break;
+                }
             }
         }
     }

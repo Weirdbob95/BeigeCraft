@@ -1,7 +1,6 @@
-package world;
+package world.chunks;
 
 import static engine.Activatable.using;
-import engine.Behavior;
 import engine.Core;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import opengl.BufferObject;
 import opengl.Camera;
-import opengl.ShaderProgram;
-import opengl.Texture;
 import opengl.VertexArrayObject;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -21,48 +18,52 @@ import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import util.Resources;
+import static util.MathUtils.floor;
+import static util.MathUtils.mod;
 import util.vectors.Vec2d;
 import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import world.BlockType;
+import world.ChunkPos;
+import world.World;
 import static world.World.CHUNK_SIZE;
-import static world.World.RENDER_DISTANCE;
+import static world.World.TERRAIN_SHADER;
 
-public class RenderedChunk extends Behavior {
-
-    private static final ShaderProgram SHADER = Resources.loadShaderProgram("sprite");
-    private static final Texture TEXTURE = new Texture("sprites/blockSpritesheet.png");
+public class RenderedChunk extends AbstractChunk {
 
     private static final List<Vec3d> DIRS = Arrays.asList(
             new Vec3d(-1, 0, 0), new Vec3d(1, 0, 0),
             new Vec3d(0, -1, 0), new Vec3d(0, 1, 0),
             new Vec3d(0, 0, -1), new Vec3d(0, 0, 1));
 
-    private World world;
-    public ChunkPos pos;
     private Map<Vec3d, Integer> numQuadsMap;
     private Map<Vec3d, VertexArrayObject> vaoMap;
+    private boolean ready;
+
+    public RenderedChunk(World world, ChunkPos pos) {
+        super(world, pos);
+    }
 
     @Override
-    public void destroyInner() {
+    public void cleanup() {
         for (VertexArrayObject vao : vaoMap.values()) {
             vao.destroy();
         }
     }
 
-    public void generateAtPos(World world, ChunkPos pos) {
-        this.world = world;
-        this.pos = pos;
+    @Override
+    protected void generate() {
         numQuadsMap = new HashMap();
         vaoMap = new HashMap();
+        ready = false;
 
+        ConstructedChunk[][] ccs = new ConstructedChunk[3][3];
         int maxZ = Integer.MIN_VALUE;
         int minZ = Integer.MAX_VALUE;
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
-                ConstructedChunk cc = world.constructedChunks.get(new ChunkPos(pos.x + x, pos.y + y));
-                maxZ = Math.max(maxZ, cc.blockStorage.maxZ());
-                minZ = Math.min(minZ, cc.blockStorage.minZ());
+                ccs[x + 1][y + 1] = world.constructedChunks.get(new ChunkPos(pos.x + x, pos.y + y));
+                maxZ = Math.max(maxZ, ccs[x + 1][y + 1].blockStorage.maxZ());
+                minZ = Math.min(minZ, ccs[x + 1][y + 1].blockStorage.minZ());
             }
         }
 
@@ -74,15 +75,15 @@ public class RenderedChunk extends Behavior {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    Vec3d worldPos = new Vec3d(x + CHUNK_SIZE * pos.x, y + CHUNK_SIZE * pos.y, z);
-                    BlockType bt = world.getBlock(worldPos);
+                    Vec3d worldPos = new Vec3d(x, y, z);
+                    BlockType bt = getBlock(ccs, worldPos);
                     if (bt != null) {
                         for (Vec3d dir : DIRS) {
-                            if (world.getBlock(worldPos.add(dir)) == null) {
+                            if (getBlock(ccs, worldPos.add(dir)) == null) {
                                 Quad q = new Quad();
                                 q.positionDir(x, y, z, dir);
                                 q.texCoordFromBlockType(bt, dir);
-                                q.colorAmbientOcclusion(getOccludingBlocks(worldPos, dir));
+                                q.colorAmbientOcclusion(getOccludingBlocks(ccs, worldPos, dir));
                                 quads.get(dir).add(q);
                             }
                         }
@@ -95,7 +96,7 @@ public class RenderedChunk extends Behavior {
         Map<Vec3d, int[]> indicesMap = new HashMap();
         for (Vec3d dir : DIRS) {
             numQuadsMap.put(dir, quads.get(dir).size());
-            float[] vertices = new float[8 * 4 * quads.get(dir).size()];
+            float[] vertices = new float[40 * quads.get(dir).size()];
             int[] indices = new int[6 * quads.get(dir).size()];
             for (int i = 0; i < quads.get(dir).size(); i++) {
                 Quad q = quads.get(dir).get(i);
@@ -103,8 +104,9 @@ public class RenderedChunk extends Behavior {
                     System.arraycopy(new float[]{
                         (float) q.positions[j].x, (float) q.positions[j].y, (float) q.positions[j].z,
                         (float) q.texCoords[j].x, (float) q.texCoords[j].y,
+                        (float) q.texPositions[j].x, (float) q.texPositions[j].y,
                         (float) q.colors[j].x, (float) q.colors[j].y, (float) q.colors[j].z // Vertex data for one vertex
-                    }, 0, vertices, 32 * i + 8 * j, 8);
+                    }, 0, vertices, 40 * i + 10 * j, 10);
                 }
                 System.arraycopy(new int[]{
                     4 * i, 4 * i + 1, 4 * i + 3,
@@ -119,19 +121,27 @@ public class RenderedChunk extends Behavior {
                 vaoMap.put(dir, VertexArrayObject.createVAO(() -> {
                     BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, verticesMap.get(dir));
                     BufferObject ebo = new BufferObject(GL_ELEMENT_ARRAY_BUFFER, indicesMap.get(dir));
-                    glVertexAttribPointer(0, 3, GL_FLOAT, false, 32, 0);
+                    glVertexAttribPointer(0, 3, GL_FLOAT, false, 40, 0);
                     glEnableVertexAttribArray(0);
-                    glVertexAttribPointer(1, 2, GL_FLOAT, false, 32, 12);
+                    glVertexAttribPointer(1, 2, GL_FLOAT, false, 40, 12);
                     glEnableVertexAttribArray(1);
-                    glVertexAttribPointer(2, 3, GL_FLOAT, false, 32, 20);
+                    glVertexAttribPointer(2, 2, GL_FLOAT, false, 40, 20);
                     glEnableVertexAttribArray(2);
+                    glVertexAttribPointer(3, 3, GL_FLOAT, false, 40, 28);
+                    glEnableVertexAttribArray(3);
                 }));
+                ready = true;
             }
-            create();
         });
     }
 
-    private boolean[][] getOccludingBlocks(Vec3d worldPos, Vec3d dir) {
+    private BlockType getBlock(ConstructedChunk[][] ccs, Vec3d worldPos) {
+        int ccx = 1 + floor(worldPos.x / CHUNK_SIZE), ccy = 1 + floor(worldPos.y / CHUNK_SIZE);
+        int x = mod(floor(worldPos.x), CHUNK_SIZE), y = mod(floor(worldPos.y), CHUNK_SIZE), z = floor(worldPos.z);
+        return ccs[ccx][ccy].blockStorage.get(x, y, z);
+    }
+
+    private boolean[][] getOccludingBlocks(ConstructedChunk[][] ccs, Vec3d worldPos, Vec3d dir) {
         Vec3d otherDir1, otherDir2;
         if (dir.x != 0) {
             otherDir1 = new Vec3d(0, 1, 0);
@@ -146,7 +156,7 @@ public class RenderedChunk extends Behavior {
         boolean[][] r = new boolean[3][3];
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                r[i + 1][j + 1] = world.getBlock(worldPos.add(dir).add(otherDir1.mul(i)).add(otherDir2.mul(j))) != null;
+                r[i + 1][j + 1] = getBlock(ccs, worldPos.add(dir).add(otherDir1.mul(i)).add(otherDir2.mul(j))) != null;
             }
         }
         return r;
@@ -157,32 +167,21 @@ public class RenderedChunk extends Behavior {
                 CHUNK_SIZE * (pos.x + 1), CHUNK_SIZE * (pos.y + 1), world.constructedChunks.get(pos).blockStorage.maxZ() + 1);
     }
 
-    @Override
+//    @Override
     public void render() {
-        if (!intersectsFrustum()) {
+        if (!ready || !intersectsFrustum()) {
             return;
         }
         Vec3d worldPos = new Vec3d(CHUNK_SIZE * pos.x, CHUNK_SIZE * pos.y, 0);
         Vec3d min = worldPos.add(new Vec3d(0, 0, world.constructedChunks.get(pos).blockStorage.minZ()));
         Vec3d max = worldPos.add(new Vec3d(CHUNK_SIZE, CHUNK_SIZE, world.constructedChunks.get(pos).blockStorage.maxZ()));
-        SHADER.setUniform("projectionMatrix", Camera.getProjectionMatrix());
-        SHADER.setUniform("modelViewMatrix", Camera.camera.getWorldMatrix(worldPos));
-        SHADER.setUniform("color", new Vec4d(1, 1, 1, 1));
-        using(Arrays.asList(TEXTURE, SHADER), () -> {
-            for (Vec3d dir : DIRS) {
-                if (Camera.camera.position.sub(min).dot(dir) > 0 || Camera.camera.position.sub(max).dot(dir) > 0) {
-                    using(Arrays.asList(vaoMap.get(dir)), () -> {
-                        glDrawElements(GL_TRIANGLES, 6 * numQuadsMap.get(dir), GL_UNSIGNED_INT, 0);
-                    });
-                }
+        TERRAIN_SHADER.setUniform("modelViewMatrix", Camera.camera.getWorldMatrix(worldPos));
+        for (Vec3d dir : DIRS) {
+            if (Camera.camera.position.sub(min).dot(dir) > 0 || Camera.camera.position.sub(max).dot(dir) > 0) {
+                using(Arrays.asList(vaoMap.get(dir)), () -> {
+                    glDrawElements(GL_TRIANGLES, 6 * numQuadsMap.get(dir), GL_UNSIGNED_INT, 0);
+                });
             }
-        });
-    }
-
-    @Override
-    public void update(double dt) {
-        if (world.getChunkPos(Camera.camera.position).distance(pos) > RENDER_DISTANCE + 2) {
-            world.renderedChunks.remove(pos);
         }
     }
 
@@ -190,6 +189,7 @@ public class RenderedChunk extends Behavior {
 
         public Vec3d[] positions;
         public Vec2d[] texCoords;
+        public Vec2d[] texPositions;
         public Vec3d[] colors;
 
         private void colorWhite() {
@@ -268,37 +268,13 @@ public class RenderedChunk extends Behavior {
         }
 
         private void texCoordFromBlockType(BlockType bt, Vec3d dir) {
-            Vec2d pos, size;
-            switch (bt) {
-                case GRASS:
-                    if (dir.z > 0) {
-                        pos = new Vec2d(0, 0);
-                    } else if (dir.z < 0) {
-                        pos = new Vec2d(16, 0);
-                    } else {
-                        pos = new Vec2d(48, 0);
-                    }
-                    size = new Vec2d(16, 16);
-                    break;
-                case DIRT:
-                    pos = new Vec2d(16, 0);
-                    size = new Vec2d(16, 16);
-                    break;
-                case STONE:
-                    pos = new Vec2d(32, 0);
-                    size = new Vec2d(16, 16);
-                    break;
-                default:
-                    throw new RuntimeException("Unknown BlockType");
-            }
-            Vec2d textureSize = new Vec2d(64, 16);
-            pos = pos.div(textureSize);
-            size = size.div(textureSize);
             if (dir.x == 0) {
-                texCoords = new Vec2d[]{pos.add(size), pos.add(size.setY(0)), pos, pos.add(size.setX(0))};
+                texCoords = new Vec2d[]{new Vec2d(1, 1), new Vec2d(1, 0), new Vec2d(0, 0), new Vec2d(0, 1)};
             } else {
-                texCoords = new Vec2d[]{pos.add(size.setX(0)), pos.add(size), pos.add(size.setY(0)), pos};
+                texCoords = new Vec2d[]{new Vec2d(0, 1), new Vec2d(1, 1), new Vec2d(1, 0), new Vec2d(0, 0)};
             }
+            Vec2d pos = BlockType.spritesheetPos(bt, dir);
+            texPositions = new Vec2d[]{pos, pos, pos, pos};
         }
     }
 }

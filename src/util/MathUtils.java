@@ -1,6 +1,9 @@
 package util;
 
 import java.util.List;
+import java.util.Random;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import util.vectors.Vec3d;
 
 public abstract class MathUtils {
@@ -27,6 +30,23 @@ public abstract class MathUtils {
 
     public static int mod(int x, int m) {
         return (x % m + m) % m;
+    }
+
+    public static Vec3d randomInSphere(Random random) {
+        while (true) {
+            Vec3d v = new Vec3d(random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1);
+            if (v.lengthSquared() <= 1) {
+                return v;
+            }
+        }
+    }
+
+    public static Vec3d vecMap(Vec3d v1, Function<Double, Double> f) {
+        return new Vec3d(f.apply(v1.x), f.apply(v1.y), f.apply(v1.z));
+    }
+
+    public static Vec3d vecMap(Vec3d v1, Vec3d v2, BiFunction<Double, Double, Double> f) {
+        return new Vec3d(f.apply(v1.x, v2.x), f.apply(v1.y, v2.y), f.apply(v1.z, v2.z));
     }
 
     public static float[] vecsToArray(List<Vec3d> vecs) {

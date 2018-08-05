@@ -64,9 +64,15 @@ public class RLEColumnStorage<T> {
     public void set(int x, int y, int z, T color) {
         if (get(x, y, z) != color) {
             T prevLowerColor = get(x, y, z - 1);
-            columns[x][y].put(z, color);
+            if (get(x, y, z + 1) == color) {
+                columns[x][y].remove(z);
+            } else {
+                columns[x][y].put(z, color);
+            }
             if (prevLowerColor != color) {
                 columns[x][y].put(z - 1, prevLowerColor);
+            } else {
+                columns[x][y].remove(z - 1);
             }
             recomputeMinMax = true;
         }

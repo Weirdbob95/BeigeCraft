@@ -9,8 +9,8 @@ public class ChunkPos {
         this.y = y;
     }
 
-    public int distance(ChunkPos other) {
-        return Math.abs(x - other.x) + Math.abs(y - other.y);
+    public double distance(ChunkPos other) {
+        return Math.sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
     }
 
     @Override

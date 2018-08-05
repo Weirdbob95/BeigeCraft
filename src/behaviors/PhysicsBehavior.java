@@ -5,13 +5,13 @@ import static util.MathUtils.ceil;
 import static util.MathUtils.floor;
 import static util.MathUtils.mod;
 import util.vectors.Vec3d;
-import world.ConstructedChunk;
+import world.chunks.ConstructedChunk;
 import world.World;
 import static world.World.CHUNK_SIZE;
 
 public class PhysicsBehavior extends Behavior {
 
-    private static final int DETAIL = 5;
+    private static final int DETAIL = 10;
 
     public final PositionBehavior position = require(PositionBehavior.class);
     public final PreviousPositionBehavior prevPos = require(PreviousPositionBehavior.class);
@@ -56,9 +56,9 @@ public class PhysicsBehavior extends Behavior {
 
                 // Step up walls
                 double z = position.position.z;
-                if (onGround) {
-                    moveToWall(new Vec3d(0, 0, 1));
-                }
+//                if (onGround) {
+//                    moveToWall(new Vec3d(0, 0, 1));
+//                }
 
                 if (moveToWall(new Vec3d(del.x, 0, 0))) {
                     velocity.velocity = velocity.velocity.setX(0);
@@ -67,9 +67,9 @@ public class PhysicsBehavior extends Behavior {
                     velocity.velocity = velocity.velocity.setY(0);
                 }
 
-                if (position.position.z != z) {
-                    moveToWall(new Vec3d(0, 0, z - position.position.z));
-                }
+//                if (position.position.z != z) {
+//                    moveToWall(new Vec3d(0, 0, z - position.position.z));
+//                }
             } else {
                 velocity.velocity = new Vec3d(0, 0, 0);
             }
@@ -85,7 +85,7 @@ public class PhysicsBehavior extends Behavior {
         for (int x = floor(pos.x - hitboxSize.x); x < pos.x + hitboxSize.x; x++) {
             for (int y = floor(pos.y - hitboxSize.y); y < pos.y + hitboxSize.y; y++) {
                 ConstructedChunk cc = world.constructedChunks.get(world.getChunkPos(new Vec3d(x, y, 0)));
-                if (!cc.blockStorage.rangeEquals(mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE), floor(pos.z - hitboxSize.z), ceil(pos.z + hitboxSize.z), null)) {
+                if (!cc.blockStorage.rangeEquals(mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE), floor(pos.z - hitboxSize.z), ceil(pos.z + hitboxSize.z) - 1, null)) {
                     return true;
                 }
             }

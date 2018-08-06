@@ -2,18 +2,11 @@ package world.chunks;
 
 import static engine.Activatable.using;
 import engine.Core;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import opengl.BufferObject;
 import opengl.Camera;
 import opengl.VertexArrayObject;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
@@ -167,7 +160,6 @@ public class RenderedChunk extends AbstractChunk {
                 CHUNK_SIZE * (pos.x + 1), CHUNK_SIZE * (pos.y + 1), world.constructedChunks.get(pos).blockStorage.maxZ() + 1);
     }
 
-//    @Override
     public void render() {
         if (!ready || !intersectsFrustum()) {
             return;
@@ -185,18 +177,18 @@ public class RenderedChunk extends AbstractChunk {
         }
     }
 
-    private static class Quad {
+    public static class Quad {
 
         public Vec3d[] positions;
         public Vec2d[] texCoords;
         public Vec2d[] texPositions;
         public Vec3d[] colors;
 
-        private void colorWhite() {
+        public void colorWhite() {
             colors = new Vec3d[]{new Vec3d(1, 1, 1), new Vec3d(1, 1, 1), new Vec3d(1, 1, 1), new Vec3d(1, 1, 1)};
         }
 
-        private void colorAmbientOcclusion(boolean[][] occluders) {
+        public void colorAmbientOcclusion(boolean[][] occluders) {
             double ao00 = getAmbientOcclusion(occluders, 0, 0);
             double ao10 = getAmbientOcclusion(occluders, 1, 0);
             double ao11 = getAmbientOcclusion(occluders, 1, 1);
@@ -204,7 +196,7 @@ public class RenderedChunk extends AbstractChunk {
             colors = new Vec3d[]{new Vec3d(ao00, ao00, ao00), new Vec3d(ao10, ao10, ao10), new Vec3d(ao11, ao11, ao11), new Vec3d(ao01, ao01, ao01)};
         }
 
-        private static double getAmbientOcclusion(boolean[][] a, int i, int j) {
+        public static double getAmbientOcclusion(boolean[][] a, int i, int j) {
 //        if (a[0][0] || a[1][0] || a[0][1] || a[1][1]) {
 //            return .75f;
 //        }
@@ -229,7 +221,7 @@ public class RenderedChunk extends AbstractChunk {
             }
         }
 
-        private void positionDir(int x, int y, int z, Vec3d dir) {
+        public void positionDir(int x, int y, int z, Vec3d dir) {
             int dirID = DIRS.indexOf(dir);
             switch (dirID) {
                 case 0:
@@ -255,19 +247,19 @@ public class RenderedChunk extends AbstractChunk {
             }
         }
 
-        private void positionNormalX(int x, int y, int z) {
+        public void positionNormalX(int x, int y, int z) {
             positions = new Vec3d[]{new Vec3d(x, y, z), new Vec3d(x, y + 1, z), new Vec3d(x, y + 1, z + 1), new Vec3d(x, y, z + 1)};
         }
 
-        private void positionNormalY(int x, int y, int z) {
+        public void positionNormalY(int x, int y, int z) {
             positions = new Vec3d[]{new Vec3d(x, y, z), new Vec3d(x, y, z + 1), new Vec3d(x + 1, y, z + 1), new Vec3d(x + 1, y, z)};
         }
 
-        private void positionNormalZ(int x, int y, int z) {
+        public void positionNormalZ(int x, int y, int z) {
             positions = new Vec3d[]{new Vec3d(x, y, z), new Vec3d(x + 1, y, z), new Vec3d(x + 1, y + 1, z), new Vec3d(x, y + 1, z)};
         }
 
-        private void texCoordFromBlockType(BlockType bt, Vec3d dir) {
+        public void texCoordFromBlockType(BlockType bt, Vec3d dir) {
             if (dir.x == 0) {
                 texCoords = new Vec2d[]{new Vec2d(1, 1), new Vec2d(1, 0), new Vec2d(0, 0), new Vec2d(0, 1)};
             } else {

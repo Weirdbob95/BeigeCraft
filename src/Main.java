@@ -4,11 +4,12 @@ import static behaviors.MiscBehaviors.onRender;
 import static behaviors.MiscBehaviors.onUpdate;
 import engine.Core;
 import engine.Input;
+import game.Hamster;
 import game.Player;
 import java.util.Comparator;
 import java.util.Optional;
 import opengl.Camera;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import util.Multithreader;
 import util.vectors.Vec3d;
@@ -59,6 +60,40 @@ public abstract class Main {
                 if (toRender.isPresent() && camera.distance(toRender.get()) <= RENDER_DISTANCE) {
                     world.renderedChunks.lazyGenerate(toRender.get());
                 }
+            }
+        });
+
+        onUpdate(0, dt -> {
+            if (Input.keyJustPressed(GLFW_KEY_H)) {
+                Hamster hammy = new Hamster();
+                hammy.model.position.position = p.position.position;
+                hammy.model.rotation = Camera.camera.horAngle;
+                hammy.physics.world = world;
+                hammy.create();
+            }
+            if (Input.keyJustPressed(GLFW_KEY_Y)) {
+                Hamster hammy = new Hamster();
+                hammy.model.position.position = p.position.position;
+                hammy.model.rotation = Camera.camera.horAngle;
+                hammy.physics.world = world;
+                hammy.create();
+                hammy.model.loadModel("skelelarge.vox");
+            }
+            if (Input.keyJustPressed(GLFW_KEY_U)) {
+                Hamster hammy = new Hamster();
+                hammy.model.position.position = p.position.position;
+                hammy.model.rotation = Camera.camera.horAngle;
+                hammy.physics.world = world;
+                hammy.create();
+                hammy.model.loadModel("skelesmall.vox");
+            }
+            if (Input.keyJustPressed(GLFW_KEY_J)) {
+                Hamster hammy = new Hamster();
+                hammy.model.position.position = p.position.position;
+                hammy.model.rotation = Camera.camera.horAngle;
+                hammy.physics.world = world;
+                hammy.create();
+                hammy.model.loadModel("ziggy2.vox");
             }
         });
 

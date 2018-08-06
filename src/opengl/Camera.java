@@ -34,6 +34,10 @@ public class Camera {
         return getViewMatrix().translate(translate.toJOML());
     }
 
+    public Matrix4d getWorldMatrix(Vec3d translate, double rotation, double scale) {
+        return getViewMatrix().translate(translate.toJOML()).rotate(rotation, up.toJOML()).scale(scale);
+    }
+
     public static Matrix4d getProjectionMatrix() {
         return getProjectionMatrix(Math.PI / 2, Window.WIDTH, Window.HEIGHT, .2f, 2000);
     }

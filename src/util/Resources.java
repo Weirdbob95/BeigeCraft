@@ -7,11 +7,19 @@ import opengl.ShaderProgram;
 
 public class Resources {
 
+    public static byte[] loadFileAsBytes(String path) {
+        try {
+            return Files.readAllBytes(Paths.get(path));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     public static String loadFileAsString(String path) {
         try {
-            return Files.readAllLines(Paths.get(path)).stream().reduce("", (a, b) -> a + "\n" + b);
+            return new String(Files.readAllBytes(Paths.get(path)));
         } catch (IOException ex) {
-            throw new RuntimeException("File not found: " + path);
+            throw new RuntimeException(ex);
         }
     }
 

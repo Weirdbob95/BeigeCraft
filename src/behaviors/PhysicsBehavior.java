@@ -5,9 +5,9 @@ import static util.MathUtils.ceil;
 import static util.MathUtils.floor;
 import static util.MathUtils.mod;
 import util.vectors.Vec3d;
-import world.chunks.ConstructedChunk;
 import world.World;
 import static world.World.CHUNK_SIZE;
+import world.chunks.ConstructedChunk;
 
 public class PhysicsBehavior extends Behavior {
 
@@ -19,6 +19,7 @@ public class PhysicsBehavior extends Behavior {
 
     public Vec3d hitboxSize = new Vec3d(0, 0, 0);
     public boolean onGround;
+    public boolean hitWall;
     public World world;
 
     private boolean moveToWall(Vec3d del) {
@@ -45,6 +46,7 @@ public class PhysicsBehavior extends Behavior {
     @Override
     public void update(double dt) {
         onGround = false;
+        hitWall = false;
         Vec3d del = position.position.sub(prevPos.prevPos);
         if (wouldCollideAt(position.position)) {
             if (!wouldCollideAt(prevPos.prevPos)) {
@@ -62,9 +64,11 @@ public class PhysicsBehavior extends Behavior {
 
                 if (moveToWall(new Vec3d(del.x, 0, 0))) {
                     velocity.velocity = velocity.velocity.setX(0);
+                    hitWall = true;
                 }
                 if (moveToWall(new Vec3d(0, del.y, 0))) {
                     velocity.velocity = velocity.velocity.setY(0);
+                    hitWall = true;
                 }
 
 //                if (position.position.z != z) {

@@ -4,6 +4,7 @@ import static behaviors.MiscBehaviors.onRender;
 import static behaviors.MiscBehaviors.onUpdate;
 import engine.Core;
 import engine.Input;
+import game.Doggo;
 import game.Hamster;
 import game.Player;
 import java.util.Comparator;
@@ -71,30 +72,37 @@ public abstract class Main {
                 hammy.physics.world = world;
                 hammy.create();
             }
-            if (Input.keyJustPressed(GLFW_KEY_Y)) {
-                Hamster hammy = new Hamster();
-                hammy.model.position.position = p.position.position;
-                hammy.model.rotation = Camera.camera.horAngle;
-                hammy.physics.world = world;
-                hammy.create();
-                hammy.model.loadModel("skelelarge.vox");
-            }
-            if (Input.keyJustPressed(GLFW_KEY_U)) {
-                Hamster hammy = new Hamster();
-                hammy.model.position.position = p.position.position;
-                hammy.model.rotation = Camera.camera.horAngle;
-                hammy.physics.world = world;
-                hammy.create();
-                hammy.model.loadModel("skelesmall.vox");
-            }
             if (Input.keyJustPressed(GLFW_KEY_J)) {
-                Hamster hammy = new Hamster();
-                hammy.model.position.position = p.position.position;
-                hammy.model.rotation = Camera.camera.horAngle;
-                hammy.physics.world = world;
-                hammy.create();
-                hammy.model.loadModel("ziggy2.vox");
+                Doggo ziggy = new Doggo();
+                ziggy.model.position.position = p.position.position;
+                ziggy.model.rotation = Camera.camera.horAngle;
+                ziggy.physics.world = world;
+                ziggy.create();
             }
+//            if (Input.keyJustPressed(GLFW_KEY_Y)) {
+//                Hamster hammy = new Hamster();
+//                hammy.model.position.position = p.position.position;
+//                hammy.model.rotation = Camera.camera.horAngle;
+//                hammy.physics.world = world;
+//                hammy.create();
+//                hammy.model.loadModel("skelelarge.vox");
+//            }
+//            if (Input.keyJustPressed(GLFW_KEY_U)) {
+//                Hamster hammy = new Hamster();
+//                hammy.model.position.position = p.position.position;
+//                hammy.model.rotation = Camera.camera.horAngle;
+//                hammy.physics.world = world;
+//                hammy.create();
+//                hammy.model.loadModel("skelesmall.vox");
+//            }
+//            if (Input.keyJustPressed(GLFW_KEY_J)) {
+//                Hamster hammy = new Hamster();
+//                hammy.model.position.position = p.position.position;
+//                hammy.model.rotation = Camera.camera.horAngle;
+//                hammy.physics.world = world;
+//                hammy.create();
+//                hammy.model.loadModel("ziggy2.vox");
+//            }
         });
 
         // MEMORY ALLOCATION DEBUG INFO

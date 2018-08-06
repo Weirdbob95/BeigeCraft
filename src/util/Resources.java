@@ -16,11 +16,7 @@ public class Resources {
     }
 
     public static String loadFileAsString(String path) {
-        try {
-            return new String(Files.readAllBytes(Paths.get(path)));
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        return new String(loadFileAsBytes(path));
     }
 
     public static ShaderProgram loadShaderProgram(String name) {

@@ -45,38 +45,41 @@ public class PhysicsBehavior extends Behavior {
 
     @Override
     public void update(double dt) {
+        boolean wasOnGround = onGround;
         onGround = false;
         hitWall = false;
         Vec3d del = position.position.sub(prevPos.prevPos);
         if (wouldCollideAt(position.position)) {
-            if (!wouldCollideAt(prevPos.prevPos)) {
-                position.position = prevPos.prevPos;
-                if (moveToWall(new Vec3d(0, 0, del.z))) {
+            if (wasOnGround && !wouldCollideAt(position.position.add(new Vec3d(0, 0, 1.1)))) {
+                position.position = position.position.add(new Vec3d(0, 0, 1.1));
+                if (moveToWall(new Vec3d(0, 0, -1.1))) {
                     velocity.velocity = velocity.velocity.setZ(0);
                     onGround = true;
                 }
-
-                // Step up walls
-                double z = position.position.z;
-//                if (onGround) {
-//                    moveToWall(new Vec3d(0, 0, 1));
-//                }
-
-                if (moveToWall(new Vec3d(del.x, 0, 0))) {
-                    velocity.velocity = velocity.velocity.setX(0);
-                    hitWall = true;
-                }
-                if (moveToWall(new Vec3d(0, del.y, 0))) {
-                    velocity.velocity = velocity.velocity.setY(0);
-                    hitWall = true;
-                }
-
-//                if (position.position.z != z) {
-//                    moveToWall(new Vec3d(0, 0, z - position.position.z));
-//                }
             } else {
-                velocity.velocity = new Vec3d(0, 0, 0);
+                if (!wouldCollideAt(prevPos.prevPos)) {
+                    position.position = prevPos.prevPos;
+                    if (moveToWall(new Vec3d(0, 0, del.z))) {
+                        velocity.velocity = velocity.velocity.setZ(0);
+                        if (del.z < 0) {
+                            onGround = true;
+                        }
+                    }
+                    if (moveToWall(new Vec3d(del.x, 0, 0))) {
+                        velocity.velocity = velocity.velocity.setX(0);
+                        hitWall = true;
+                    }
+                    if (moveToWall(new Vec3d(0, del.y, 0))) {
+                        velocity.velocity = velocity.velocity.setY(0);
+                        hitWall = true;
+                    }
+                } else {
+                    velocity.velocity = new Vec3d(0, 0, 0);
+                }
             }
+        }
+        if (!onGround && wouldCollideAt(position.position.add(new Vec3d(0, 0, -.01)))) {
+            onGround = true;
         }
     }
 

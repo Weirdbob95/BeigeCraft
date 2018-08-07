@@ -12,7 +12,7 @@ public class SpaceOccupierBehavior extends Behavior {
     public final PositionBehavior position = require(PositionBehavior.class);
 
     public double radius = .5;
-    public double lightness = 10;
+    public double lightness = 2;
 
     @Override
     public void update(double dt) {
@@ -21,7 +21,11 @@ public class SpaceOccupierBehavior extends Behavior {
                 Vec3d delta = other.position.position.sub(position.position);
                 double distance = delta.length();
                 if (distance < radius + other.radius) {
-                    delta.normalize();
+                    if (delta.setZ(0).length() == 0) {
+                        delta = new Vec3d(Math.random() - .5, Math.random() - .5, 0).normalize();
+                    } else {
+                        delta = delta.setZ(0).normalize();
+                    }
                     position.position = position.position.sub(delta.mul((radius + other.radius - distance) * lightness * dt));
                     other.position.position = other.position.position.add(delta.mul((radius + other.radius - distance) * other.lightness * dt));
                 }

@@ -30,6 +30,6 @@ public class HeightmappedChunk extends AbstractChunk {
         return 100 * world.noise.perlin(x, y, .003)
                 + 20 * world.noise.perlin(x, y, .015)
                 + 4 * world.noise.perlin(x, y, .075)
-                - 60;
+                - 40;
     }
 }

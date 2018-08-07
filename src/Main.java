@@ -5,6 +5,7 @@ import static behaviors.MiscBehaviors.onUpdate;
 import engine.Core;
 import engine.Input;
 import game.Doggo;
+import game.Goblin;
 import game.Hamster;
 import game.Player;
 import java.util.Comparator;
@@ -65,6 +66,13 @@ public abstract class Main {
         });
 
         onUpdate(0, dt -> {
+            if (Input.keyJustPressed(GLFW_KEY_G)) {
+                Goblin gobbo = new Goblin();
+                gobbo.model.position.position = p.position.position;
+                gobbo.model.rotation = Camera.camera.horAngle;
+                gobbo.physics.world = world;
+                gobbo.create();
+            }
             if (Input.keyJustPressed(GLFW_KEY_H)) {
                 Hamster hammy = new Hamster();
                 hammy.model.position.position = p.position.position;

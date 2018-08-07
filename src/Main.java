@@ -40,7 +40,7 @@ public abstract class Main {
         world.create();
 
         Player p = new Player();
-        p.position.position = new Vec3d(0, 0, 50);
+        p.position.position = new Vec3d(Math.random() - .5, Math.random() - .5, 150);
         p.physics.world = world;
         p.create();
 

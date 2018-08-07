@@ -1,9 +1,9 @@
 package opengl;
 
 import java.nio.IntBuffer;
+import org.lwjgl.glfw.*;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
-import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glEnable;
@@ -14,7 +14,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
 
-    public static boolean SHOW_DEBUG_INFO = false;
+    public static boolean SHOW_DEBUG_INFO = true;
 
     public static final int WIDTH = 1600;
     public static final int HEIGHT = 900;

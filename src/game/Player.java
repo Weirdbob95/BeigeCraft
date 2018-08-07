@@ -3,6 +3,7 @@ package game;
 import behaviors.AccelerationBehavior;
 import behaviors.PhysicsBehavior;
 import behaviors.PositionBehavior;
+import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
 import engine.Input;
@@ -16,10 +17,11 @@ import static world.Raycast.raycastDistance;
 
 public class Player extends Behavior {
 
-    public final AccelerationBehavior acceleration = require(AccelerationBehavior.class);
     public final PositionBehavior position = require(PositionBehavior.class);
     public final VelocityBehavior velocity = require(VelocityBehavior.class);
+    public final AccelerationBehavior acceleration = require(AccelerationBehavior.class);
     public final PhysicsBehavior physics = require(PhysicsBehavior.class);
+    public final SpaceOccupierBehavior spaceOccupier = require(SpaceOccupierBehavior.class);
 
     public boolean sprint;
 
@@ -32,7 +34,8 @@ public class Player extends Behavior {
     public void update(double dt) {
 
         Vec3d desCamPos = position.position.add(new Vec3d(0, 0, .6));
-        camera.position = camera.position.lerp(desCamPos, .3);
+        camera.position = desCamPos;
+        //camera.position = camera.position.lerp(desCamPos, 1 - Math.pow(.001, dt));
 
         // Look around
         camera.horAngle -= Input.mouseDelta().x / 500;

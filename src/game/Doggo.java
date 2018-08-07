@@ -2,6 +2,7 @@ package game;
 
 import behaviors.AccelerationBehavior;
 import behaviors.PhysicsBehavior;
+import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
 import graphics.Model;
@@ -14,12 +15,13 @@ public class Doggo extends Behavior {
     public final VelocityBehavior velocity = require(VelocityBehavior.class);
     public final AccelerationBehavior acceleration = require(AccelerationBehavior.class);
     public final PhysicsBehavior physics = require(PhysicsBehavior.class);
+    public final SpaceOccupierBehavior spaceOccupier = require(SpaceOccupierBehavior.class);
 
     @Override
     public void createInner() {
         model.model = Model.load("ziggy2.vox");
         acceleration.acceleration = new Vec3d(0, 0, -32);
-        physics.hitboxSize = new Vec3d(.3, .3, 13 / 32.);
+        physics.hitboxSize = new Vec3d(.3, .3, model.model.size().z / 32);
     }
 
     @Override

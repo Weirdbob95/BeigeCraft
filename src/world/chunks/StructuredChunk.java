@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import static util.MathUtils.ceil;
 import util.vectors.Vec3d;
 import world.BlockType;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
-import world.biomes.Biome;
 
 public class StructuredChunk extends AbstractChunk {
 
@@ -34,10 +34,11 @@ public class StructuredChunk extends AbstractChunk {
     @Override
     protected void generate() {
         HeightmappedChunk hc = world.heightmappedChunks.get(pos);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 20; i++) {
             int x = random.nextInt(CHUNK_SIZE);
             int y = random.nextInt(CHUNK_SIZE);
-            if (hc.biomemap[x][y].plurality() == Biome.FOREST && random.nextDouble() < hc.biomemap[x][y].get(Biome.FOREST)) {
+            if (hc.biomemap[x][y].plurality().vegetation > 0 && random.nextDouble() < hc.biomemap[x][y].averageVegetation() * .25) {
+                //System.out.println(hc.biomemap[x][y].averageVegetation());
                 structures.add(new Tree(new Vec3d(x, y, hc.heightmap[x][y] + 1)));
             }
         }
@@ -64,11 +65,12 @@ public class StructuredChunk extends AbstractChunk {
 
             int height = 2 + random.nextInt(5) + random.nextInt(5);
 
-            int size = 2 + height;
-            for (int x = -size; x <= size; x++) {
-                for (int y = -size; y <= size; y++) {
-                    for (int z = -size; z <= size; z++) {
-                        if (noise.multi(pos.x + x, pos.y + y, pos.z + z, 4, .7 / size) * size * .7 > new Vec3d(x, y, z).length()) {
+            double size = (2 + height) * .7;
+            int intSize = ceil(size);
+            for (int x = -intSize; x <= intSize; x++) {
+                for (int y = -intSize; y <= intSize; y++) {
+                    for (int z = -intSize; z <= intSize; z++) {
+                        if (noise.multi(pos.x + x, pos.y + y, pos.z + z, 4, .7 / size) * size > new Vec3d(x, y, z).length()) {
                             add(new BlockPlan(x, y, height + z, BlockType.LEAVES));
                         }
                     }

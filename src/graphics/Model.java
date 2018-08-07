@@ -1,12 +1,18 @@
 package graphics;
 
+import static game.ModelBehavior.MODEL_SHADER;
 import graphics.Quad.BasicQuad;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import opengl.Camera;
+import opengl.ShaderProgram;
 import static util.MathUtils.mod;
 import util.RLEColumnStorage;
 import util.Resources;
 import util.vectors.Vec3d;
+import util.vectors.Vec4d;
 
 public class Model extends VoxelRenderer<Integer> {
 
@@ -80,6 +86,9 @@ public class Model extends VoxelRenderer<Integer> {
         size = size.setZ(colors.maxZ() + 1);
 
         generate();
+
+        colors = null;
+        colorPalette = null;
     }
 
     @Override
@@ -112,13 +121,24 @@ public class Model extends VoxelRenderer<Integer> {
                 + (mod(bytes[pos + 3], 256) << 24);
     }
 
+    @Override
+    protected void setShaderUniforms() {
+        shader().setUniform("projectionMatrix", Camera.getProjectionMatrix());
+        shader().setUniform("color", new Vec4d(1, 1, 1, 1));
+    }
+
+    @Override
+    protected ShaderProgram shader() {
+        return MODEL_SHADER;
+    }
+
     public Vec3d size() {
         return size;
     }
 
     @Override
-    protected int vertexSize() {
-        return 6;
+    protected List<Integer> vertexAttribs() {
+        return Arrays.asList(3, 3);
     }
 
     @Override

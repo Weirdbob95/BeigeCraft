@@ -115,7 +115,12 @@ public abstract class Quad {
 
         @Override
         public float[] toData(int vertex) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            return new float[]{
+                (float) positions[vertex].x, (float) positions[vertex].y, (float) positions[vertex].z,
+                (float) texCoords[vertex].x, (float) texCoords[vertex].y,
+                (float) texPositions[vertex].x, (float) texPositions[vertex].y,
+                (float) colors[vertex].x, (float) colors[vertex].y, (float) colors[vertex].z
+            };
         }
     }
 }

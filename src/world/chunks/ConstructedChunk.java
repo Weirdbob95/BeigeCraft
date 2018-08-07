@@ -2,10 +2,10 @@ package world.chunks;
 
 import util.RLEColumnStorage;
 import world.BlockType;
+import static world.BlockType.*;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
-import world.biomes.Biome;
 
 public class ConstructedChunk extends AbstractChunk {
 
@@ -21,11 +21,31 @@ public class ConstructedChunk extends AbstractChunk {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 int elevation = hc.heightmap[x][y];
-                if (hc.biomemap[x][y].plurality() == Biome.DESERT) {
-                    blockStorage.setRangeInfinite(x, y, elevation, BlockType.SAND);
-                } else {
-                    blockStorage.setRangeInfinite(x, y, elevation, BlockType.GRASS);
-                    blockStorage.setRangeInfinite(x, y, elevation - 1, BlockType.DIRT);
+                switch (hc.biomemap[x][y].plurality()) {
+                    case FOREST:
+                    case PLAINS:
+                    case JUNGLE:
+                        blockStorage.setRangeInfinite(x, y, elevation, GRASS);
+                        blockStorage.setRangeInfinite(x, y, elevation - 1, DIRT);
+                        break;
+                    case TAIGA:
+                    case TUNDRA:
+                        blockStorage.setRangeInfinite(x, y, elevation, TUNDRA_GRASS);
+                        blockStorage.setRangeInfinite(x, y, elevation - 1, DIRT);
+                        break;
+                    case SNOW:
+                        blockStorage.setRangeInfinite(x, y, elevation, SNOWY_GRASS);
+                        blockStorage.setRangeInfinite(x, y, elevation - 1, DIRT);
+                        break;
+                    case DESERT:
+                        blockStorage.setRangeInfinite(x, y, elevation, SAND);
+                        break;
+                    case ARID:
+                        blockStorage.setRangeInfinite(x, y, elevation, SANDSTONE);
+                        break;
+                    case ROCK:
+                        blockStorage.setRangeInfinite(x, y, elevation, STONE);
+                        break;
                 }
                 blockStorage.setRangeInfinite(x, y, elevation - 3, BlockType.STONE);
             }

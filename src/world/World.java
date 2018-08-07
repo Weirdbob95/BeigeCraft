@@ -2,8 +2,13 @@ package world;
 
 import static engine.Activatable.using;
 import engine.Behavior;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.*;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -17,7 +22,12 @@ import util.Noise;
 import util.Resources;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
-import world.chunks.*;
+import world.chunks.AbstractChunk;
+import world.chunks.ConstructedChunk;
+import world.chunks.HeightmappedChunk;
+import world.chunks.PlannedChunk;
+import world.chunks.RenderedChunk;
+import world.chunks.StructuredChunk;
 
 public class World extends Behavior {
 

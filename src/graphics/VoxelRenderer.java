@@ -2,7 +2,6 @@ package graphics;
 
 import static engine.Activatable.using;
 import engine.Core;
-import static game.ModelBehavior.MODEL_SHADER;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,7 +9,10 @@ import java.util.List;
 import java.util.Map;
 import opengl.BufferObject;
 import opengl.Camera;
+import opengl.ShaderProgram;
 import opengl.VertexArrayObject;
+import org.joml.Matrix4d;
+import org.joml.Vector4d;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
@@ -20,7 +22,6 @@ import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import util.vectors.Vec3d;
-import util.vectors.Vec4d;
 
 public abstract class VoxelRenderer<T> {
 
@@ -32,6 +33,12 @@ public abstract class VoxelRenderer<T> {
     private Map<Vec3d, Integer> numQuadsMap;
     private Map<Vec3d, VertexArrayObject> vaoMap;
     private boolean ready;
+
+    public void cleanup() {
+        for (VertexArrayObject vao : vaoMap.values()) {
+            vao.destroy();
+        }
+    }
 
     protected abstract Quad createQuad(int x, int y, int z, T voxel, Vec3d dir);
 
@@ -63,16 +70,18 @@ public abstract class VoxelRenderer<T> {
             }
         }
 
+        int vertexSize = vertexAttribs().stream().mapToInt(i -> i).sum();
+
         Map<Vec3d, float[]> verticesMap = new HashMap();
         Map<Vec3d, int[]> indicesMap = new HashMap();
         for (Vec3d dir : DIRS) {
             numQuadsMap.put(dir, quads.get(dir).size());
-            float[] vertices = new float[24 * quads.get(dir).size()];
-            int[] indices = new int[vertexSize() * quads.get(dir).size()];
+            float[] vertices = new float[4 * vertexSize * quads.get(dir).size()];
+            int[] indices = new int[6 * quads.get(dir).size()];
             for (int i = 0; i < quads.get(dir).size(); i++) {
                 Quad q = quads.get(dir).get(i);
                 for (int j = 0; j < 4; j++) {
-                    System.arraycopy(q.toData(j), 0, vertices, 24 * i + vertexSize() * j, vertexSize());
+                    System.arraycopy(q.toData(j), 0, vertices, vertexSize * (4 * i + j), vertexSize);
                 }
                 System.arraycopy(new int[]{
                     4 * i, 4 * i + 1, 4 * i + 3,
@@ -87,10 +96,12 @@ public abstract class VoxelRenderer<T> {
                 vaoMap.put(dir, VertexArrayObject.createVAO(() -> {
                     BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, verticesMap.get(dir));
                     BufferObject ebo = new BufferObject(GL_ELEMENT_ARRAY_BUFFER, indicesMap.get(dir));
-                    glVertexAttribPointer(0, 3, GL_FLOAT, false, 24, 0);
-                    glEnableVertexAttribArray(0);
-                    glVertexAttribPointer(1, 3, GL_FLOAT, false, 24, 12);
-                    glEnableVertexAttribArray(1);
+                    int total = 0;
+                    for (int i = 0; i < vertexAttribs().size(); i++) {
+                        glVertexAttribPointer(i, vertexAttribs().get(i), GL_FLOAT, false, vertexSize * 4, total * 4);
+                        glEnableVertexAttribArray(i);
+                        total += vertexAttribs().get(i);
+                    }
                 }));
                 ready = true;
             }
@@ -126,18 +137,29 @@ public abstract class VoxelRenderer<T> {
         if (!ready) {
             return;
         }
-        MODEL_SHADER.setUniform("projectionMatrix", Camera.getProjectionMatrix());
-        MODEL_SHADER.setUniform("modelViewMatrix", Camera.camera.getWorldMatrix(position, rotation, scale).translate(origin.toJOML().mul(-1)));
-        MODEL_SHADER.setUniform("color", new Vec4d(1, 1, 1, 1));
+        setShaderUniforms();
+        Matrix4d worldMat = Camera.camera.getWorldMatrix(position, rotation, scale).translate(origin.toJOML().mul(-1));
+        shader().setUniform("modelViewMatrix", worldMat);
         for (Vec3d dir : DIRS) {
-            using(Arrays.asList(vaoMap.get(dir)), () -> {
-                glDrawElements(GL_TRIANGLES, 6 * numQuadsMap.get(dir), GL_UNSIGNED_INT, 0);
-            });
+            Vector4d newDir = new Vector4d(dir.x, dir.y, dir.z, 0).mul(worldMat);
+            boolean check = new Vector4d(min().x, min().y, min().z, 1).mul(worldMat).dot(newDir) < 0
+                    || new Vector4d(max().x, max().y, max().z, 1).mul(worldMat).dot(newDir) < 0;
+            if (check) {
+                using(Arrays.asList(vaoMap.get(dir)), () -> {
+                    glDrawElements(GL_TRIANGLES, 6 * numQuadsMap.get(dir), GL_UNSIGNED_INT, 0);
+                });
+            }
         }
     }
 
-    protected abstract int vertexSize();
+    protected abstract void setShaderUniforms();
 
+    //protected abstract void setVertexAttribs();
+    protected abstract ShaderProgram shader();
+
+    protected abstract List<Integer> vertexAttribs();
+
+    //protected abstract int vertexSize();
     protected abstract T voxelAt(int x, int y, int z);
 
     private T voxelAt(Vec3d pos) {

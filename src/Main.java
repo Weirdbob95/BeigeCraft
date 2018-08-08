@@ -41,7 +41,9 @@ public abstract class Main {
         world.create();
 
         Player p = new Player();
-        p.position.position = new Vec3d(Math.random() - .5, Math.random() - .5, 150);
+        p.position.position = new Vec3d(Math.random(), Math.random(),
+                world.heightmappedChunks.get(new ChunkPos(0, 0)).heightmap[0][0] + 2);
+        Camera.camera.position = p.position.position;
         p.physics.world = world;
         p.create();
 

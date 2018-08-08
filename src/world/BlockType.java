@@ -12,9 +12,9 @@ public enum BlockType {
     LOG,
     LEAVES,
     SAND,
-    SANDSTONE,
     SNOWY_GRASS,
-    TUNDRA_GRASS;
+    TUNDRA_GRASS,
+    CACTUS;
 
     public static Vec2d spritesheetPos(BlockType bt, Vec3d dir) {
         switch (bt) {
@@ -42,8 +42,6 @@ public enum BlockType {
                 return new Vec2d(32, 16);
             case SAND:
                 return new Vec2d(48, 16);
-            case SANDSTONE:
-                return new Vec2d(64, 16);
             case SNOWY_GRASS:
                 if (dir.z > 0) {
                     return new Vec2d(0, 32);
@@ -59,6 +57,12 @@ public enum BlockType {
                     return new Vec2d(16, 0);
                 } else {
                     return new Vec2d(48, 32);
+                }
+            case CACTUS:
+                if (dir.z == 0) {
+                    return new Vec2d(64, 16);
+                } else {
+                    return new Vec2d(64, 32);
                 }
             default:
                 throw new RuntimeException("Unknown BlockType: " + bt);

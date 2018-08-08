@@ -25,7 +25,7 @@ public class Raycast {
 
                 @Override
                 public Object next() {
-                    Vec3d c = vecMap(cp.o, Math::floor);
+                    Vec3d c = cp.o;//vecMap(cp.o, Math::floor);
                     Vec3d relPos = vecMap(cp.o, d -> mod(d, 1));
                     Vec3d time = vecMap(relPos, dir, timeToEdge);
                     double minTime = .001 + Math.min(time.x, Math.min(time.y, time.z));

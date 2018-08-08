@@ -40,9 +40,6 @@ public class ConstructedChunk extends AbstractChunk {
                     case DESERT:
                         blockStorage.setRangeInfinite(x, y, elevation, SAND);
                         break;
-                    case ARID:
-                        blockStorage.setRangeInfinite(x, y, elevation, SANDSTONE);
-                        break;
                     case ROCK:
                         blockStorage.setRangeInfinite(x, y, elevation, STONE);
                         break;

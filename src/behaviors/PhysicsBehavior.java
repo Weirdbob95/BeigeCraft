@@ -21,6 +21,7 @@ public class PhysicsBehavior extends Behavior {
     public boolean onGround;
     public boolean hitWall;
     public World world;
+    public boolean stepUp;
 
     private boolean moveToWall(Vec3d del) {
         if (!wouldCollideAt(position.position.add(del))) {
@@ -50,7 +51,7 @@ public class PhysicsBehavior extends Behavior {
         hitWall = false;
         Vec3d del = position.position.sub(prevPos.prevPos);
         if (wouldCollideAt(position.position)) {
-            if (wasOnGround && !wouldCollideAt(position.position.add(new Vec3d(0, 0, 1.1)))) {
+            if (stepUp && wasOnGround && !wouldCollideAt(position.position.add(new Vec3d(0, 0, 1.1)))) {
                 position.position = position.position.add(new Vec3d(0, 0, 1.1));
                 if (moveToWall(new Vec3d(0, 0, -1.1))) {
                     velocity.velocity = velocity.velocity.setZ(0);

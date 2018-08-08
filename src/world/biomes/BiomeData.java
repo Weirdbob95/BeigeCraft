@@ -19,7 +19,7 @@ public class BiomeData {
         {JUNGLE, FOREST, FOREST, TAIGA, SNOW},
         {JUNGLE, FOREST, FOREST, TUNDRA, SNOW},
         {PLAINS, PLAINS, PLAINS, TUNDRA, SNOW},
-        {DESERT, DESERT, ARID, ARID, ROCK}
+        {DESERT, DESERT, DESERT, TUNDRA, ROCK}
     };
 
     private final Map<Biome, Double> biomeStrengths = new HashMap();
@@ -64,10 +64,18 @@ public class BiomeData {
         return r / totalStrength;
     }
 
-    public double averageVegetation() {
+    public double averageTreeDensity() {
         double r = 0;
         for (Entry<Biome, Double> e : biomeStrengths.entrySet()) {
-            r += e.getKey().vegetation * e.getValue();
+            r += e.getKey().treeDensity * e.getValue();
+        }
+        return r / totalStrength;
+    }
+
+    public double averageTreeHeight() {
+        double r = 0;
+        for (Entry<Biome, Double> e : biomeStrengths.entrySet()) {
+            r += e.getKey().treeHeight * e.getValue();
         }
         return r / totalStrength;
     }

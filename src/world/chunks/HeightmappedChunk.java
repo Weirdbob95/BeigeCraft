@@ -27,9 +27,9 @@ public class HeightmappedChunk extends AbstractChunk {
     }
 
     private double heightAt(int x, int y) {
-        return 100 * world.noise.perlin(x, y, .003)
+        return (100 * world.noise.perlin(x, y, .003)
                 + 20 * world.noise.perlin(x, y, .015)
                 + 4 * world.noise.perlin(x, y, .075)
-                - 40;
+                - 40) * world.noise.perlin(x, y, .001) * 2;
     }
 }

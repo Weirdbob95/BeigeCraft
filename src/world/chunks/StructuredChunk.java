@@ -10,6 +10,7 @@ import world.BlockType;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
+import world.biomes.Biome;
 
 public class StructuredChunk extends AbstractChunk {
 
@@ -37,9 +38,12 @@ public class StructuredChunk extends AbstractChunk {
         for (int i = 0; i < 100; i++) {
             int x = random.nextInt(CHUNK_SIZE);
             int y = random.nextInt(CHUNK_SIZE);
-            if (hc.biomemap[x][y].plurality().vegetation > 0 && random.nextDouble() < hc.biomemap[x][y].averageVegetation() * .1) {
+            if (hc.biomemap[x][y].plurality().treeDensity > 0 && random.nextDouble() < hc.biomemap[x][y].averageTreeDensity() * .1) {
                 //System.out.println(hc.biomemap[x][y].averageVegetation());
-                structures.add(new Tree(new Vec3d(x, y, hc.heightmap[x][y] + 1)));
+                structures.add(new Tree(new Vec3d(x, y, hc.heightmap[x][y] + 1),
+                        (2 + random.nextInt(5) + random.nextInt(5)) * hc.biomemap[x][y].averageTreeHeight()));
+            } else if (hc.biomemap[x][y].plurality() == Biome.DESERT && random.nextDouble() < hc.biomemap[x][y].get(Biome.DESERT) * .01) {
+                structures.add(new Cactus(new Vec3d(x, y, hc.heightmap[x][y] + 1), 2 + random.nextInt(5)));
             }
         }
     }
@@ -60,10 +64,8 @@ public class StructuredChunk extends AbstractChunk {
 
     public class Tree extends Structure {
 
-        public Tree(Vec3d pos) {
+        public Tree(Vec3d pos, double height) {
             super(pos);
-
-            int height = 2 + random.nextInt(5) + random.nextInt(5);
 
             double size = (2 + height) * .7;
             int intSize = ceil(size);
@@ -71,28 +73,21 @@ public class StructuredChunk extends AbstractChunk {
                 for (int y = -intSize; y <= intSize; y++) {
                     for (int z = -intSize; z <= intSize; z++) {
                         if (noise.multi(pos.x + x, pos.y + y, pos.z + z, 4, .7 / size) * size > new Vec3d(x, y, z).length()) {
-                            add(new BlockPlan(x, y, height + z, BlockType.LEAVES));
+                            add(new BlockPlan(x, y, (int) height + z, BlockType.LEAVES));
                         }
                     }
                 }
             }
+            add(new BlockPlan(0, 0, 0, (int) height, BlockType.LOG));
+            add(new BlockPlan(0, 0, (int) height + 1, BlockType.LEAVES));
+        }
+    }
 
-//            for (int iter = 0; iter < 10; iter++) {
-//                Vec3d v = randomInSphere(random).mul(random.nextDouble() * size).add(new Vec3d(0, 0, height));
-//                //for (Vec3d v : raycastDistance(new Vec3d(0, 0, height), randomInSphere(random), random.nextDouble() * size)) {
-//                for (int i = -1; i <= 1; i++) {
-//                    for (int j = -1; j <= 1; j++) {
-//                        for (int k = -1; k <= 1; k++) {
-//                            add(new BlockPlan(floor(v.x) + i, floor(v.y) + j, floor(v.z) + k, BlockType.LEAVES));
-//                        }
-//                    }
-//                }
-//                //}
-//            }
-            add(new BlockPlan(0, 0, 0, height, BlockType.LOG));
-//            add(new BlockPlan(0, 1, 0, height, BlockType.LOG));
-//            add(new BlockPlan(1, 0, 0, height, BlockType.LOG));
-//            add(new BlockPlan(1, 1, 0, height, BlockType.LOG));
+    public class Cactus extends Structure {
+
+        public Cactus(Vec3d pos, int height) {
+            super(pos);
+            add(new BlockPlan(0, 0, 0, (int) height, BlockType.CACTUS));
         }
     }
 

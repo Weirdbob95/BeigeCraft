@@ -9,20 +9,31 @@ import engine.Behavior;
 import engine.Input;
 import graphics.Animation;
 import graphics.Sprite;
+import static graphics.VoxelRenderer.DIRS;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import opengl.Camera;
-import static opengl.Camera.camera;
-import static org.lwjgl.glfw.GLFW.*;
-import static util.MathUtils.vecMap;
+import static opengl.Camera.camera3d;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+import static util.MathUtils.ceil;
 import util.vectors.Vec2d;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
 import world.BlockType;
+import world.Raycast.RaycastHit;
 import static world.Raycast.raycastDistance;
 
 public class Player extends Behavior {
 
-    private static final double PLAYER_SCALE = 1;
+    private static final double PLAYER_SCALE = 2;
 
     public final PositionBehavior position = require(PositionBehavior.class);
     public final VelocityBehavior velocity = require(VelocityBehavior.class);
@@ -31,21 +42,51 @@ public class Player extends Behavior {
     public final SpaceOccupierBehavior spaceOccupier = require(SpaceOccupierBehavior.class);
 
     public boolean sprint;
-    public Vec3d blockToBreak;
-    public double breakTimer;
+//    public RaycastHit blockToBreak;
+//    public double breakTimer;
+    public Map<Vec3d, Double> blocksToBreak = new HashMap();
 
-    public Player() {
+    @Override
+    public void createInner() {
         acceleration.acceleration = new Vec3d(0, 0, -32).mul(PLAYER_SCALE);
         physics.hitboxSize = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
         physics.stepUp = true;
     }
 
+    private RaycastHit firstSolid() {
+        List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 5 * PLAYER_SCALE);
+        for (int i = 0; i < raycast.size(); i++) {
+            if (physics.world.getBlock(raycast.get(i).hitPos) != null) {
+                return raycast.get(i);
+            }
+        }
+        return null;
+    }
+
+    private RaycastHit lastEmpty() {
+        List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 5 * PLAYER_SCALE);
+        for (int i = 0; i < raycast.size() - 1; i++) {
+            if (physics.world.getBlock(raycast.get(i).hitPos) != null) {
+                return null;
+            }
+            if (physics.world.getBlock(raycast.get(i + 1).hitPos) != null) {
+                return raycast.get(i);
+            }
+        }
+        return null;
+    }
+
     @Override
     public void render() {
         Animation blockBreak = Animation.load("blockbreak_anim");
-        if (blockToBreak != null) {
-            Sprite s = blockBreak.getSpriteOrNull("", (int) (4 * breakTimer / .5));
-            s.draw(blockToBreak, new Vec3d(1, 0, 0), 0, new Vec2d(1, 1), new Vec4d(1, 1, 1, 1));
+        for (Entry<Vec3d, Double> e : blocksToBreak.entrySet()) {
+            if (e.getValue() > .05) {
+                Sprite s = blockBreak.getSpriteOrNull("", (int) (4 * (e.getValue() - .05) / .5));
+                for (Vec3d dir : DIRS) {
+                    Vec3d drawPos = e.getKey().floor().add(new Vec3d(.5, .5, .5)).sub(dir.mul(.501));
+                    s.draw3d(drawPos, dir, 0, new Vec2d(1, 1), new Vec4d(1, 1, 1, .5));
+                }
+            }
         }
     }
 
@@ -54,17 +95,17 @@ public class Player extends Behavior {
 
         Vec3d desCamPos = position.position.add(new Vec3d(0, 0, .6).mul(PLAYER_SCALE));
         //camera.position = desCamPos;
-        camera.position = camera.position.lerp(desCamPos, 1 - Math.pow(1e-6, dt));
+        camera3d.position = camera3d.position.lerp(desCamPos, 1 - Math.pow(1e-6, dt));
 
         // Look around
-        camera.horAngle -= Input.mouseDelta().x / 500;
-        camera.vertAngle += Input.mouseDelta().y / 500;
+        camera3d.horAngle -= Input.mouseDelta().x / 500;
+        camera3d.vertAngle += Input.mouseDelta().y / 500;
 
-        if (camera.vertAngle > 1.5) {
-            camera.vertAngle = 1.5f;
+        if (camera3d.vertAngle > 1.5) {
+            camera3d.vertAngle = 1.5f;
         }
-        if (camera.vertAngle < -1.5) {
-            camera.vertAngle = -1.5f;
+        if (camera3d.vertAngle < -1.5) {
+            camera3d.vertAngle = -1.5f;
         }
 
         // Move
@@ -73,11 +114,11 @@ public class Player extends Behavior {
         }
         double speed = (sprint ? 250 : 4.3) * PLAYER_SCALE;
 
-        Vec3d forwards = camera.facing();
+        Vec3d forwards = camera3d.facing();
         if (!sprint) {
             forwards = forwards.setZ(0).normalize();
         }
-        Vec3d sideways = camera.up.cross(forwards);
+        Vec3d sideways = camera3d.up.cross(forwards);
 
         Vec3d idealVel = new Vec3d(0, 0, 0);
         if (Input.keyDown(GLFW_KEY_W)) {
@@ -111,51 +152,63 @@ public class Player extends Behavior {
 
         // Break block
         if (Input.mouseDown(0)) {
-            Vec3d block = firstSolid();
+            RaycastHit block = firstSolid();
             if (block != null) {
-                if (blockToBreak == null || !vecMap(block, Math::floor).equals(vecMap(blockToBreak, Math::floor))) {
-                    breakTimer = 0;
+                int handSize = ceil(PLAYER_SCALE);
+                Vec3d origin = block.hitPos
+                        //.add(block.hitDir.mul(handSize / 2.))
+                        .sub(new Vec3d(1, 1, 1).mul(.5 * (handSize - 1)));
+                List<Vec3d> targets = new ArrayList();
+                for (int x = 0; x < handSize; x++) {
+                    for (int y = 0; y < handSize; y++) {
+                        for (int z = 0; z < handSize; z++) {
+                            if (physics.world.getBlock(origin.add(new Vec3d(x, y, z))) != null) {
+                                targets.add(origin.add(new Vec3d(x, y, z)).floor());
+                            }
+                        }
+                    }
                 }
-                blockToBreak = block;
-                breakTimer += dt;
-                if (breakTimer > .5) {
-                    physics.world.setBlock(block, null);
-                    blockToBreak = null;
-                    breakTimer = 0;
+                for (Vec3d v : new ArrayList<>(blocksToBreak.keySet())) {
+                    if (!targets.contains(v)) {
+                        blocksToBreak.remove(v);
+                    }
                 }
+                for (Vec3d v : targets) {
+                    blocksToBreak.putIfAbsent(v, 0.);
+                    blocksToBreak.put(v, blocksToBreak.get(v) + dt * 8 / targets.size());
+                    if (blocksToBreak.get(v) > .5) {
+                        physics.world.setBlock(v, null);
+                        blocksToBreak.remove(v);
+                    }
+                }
+            } else {
+                blocksToBreak.clear();
             }
         } else {
-            breakTimer = 0;
+            blocksToBreak.clear();
         }
+
+//            if (block != null) {
+//                if (blockToBreak == null || !block.hitPos.floor().equals(blockToBreak.hitPos.floor())) {
+//                    breakTimer = 0;
+//                }
+//                blockToBreak = block;
+//                breakTimer += dt;
+//                if (breakTimer > .5) {
+//                    physics.world.setBlock(block.hitPos, null);
+//                    blockToBreak = null;
+//                    breakTimer = 0;
+//                }
+//            }
+//        } else {
+//            breakTimer = 0;
+//        }
         // Place block
         if (Input.mouseJustPressed(1)) {
-            Vec3d block = lastEmpty();
+            RaycastHit block = lastEmpty();
             if (block != null) {
-                physics.world.setBlock(block, BlockType.WOOD);
+                physics.world.setBlock(block.hitPos, BlockType.WOOD);
             }
         }
-    }
-
-    private Vec3d firstSolid() {
-        List<Vec3d> raycast = raycastDistance(Camera.camera.position, Camera.camera.facing(), 5 * PLAYER_SCALE);
-        for (int i = 0; i < raycast.size(); i++) {
-            if (physics.world.getBlock(raycast.get(i)) != null) {
-                return raycast.get(i);
-            }
-        }
-        return null;
-    }
-
-    private Vec3d lastEmpty() {
-        List<Vec3d> raycast = raycastDistance(Camera.camera.position, Camera.camera.facing(), 5 * PLAYER_SCALE);
-        for (int i = 0; i < raycast.size() - 1; i++) {
-            if (physics.world.getBlock(raycast.get(i)) != null) {
-                return null;
-            }
-            if (physics.world.getBlock(raycast.get(i + 1)) != null) {
-                return raycast.get(i);
-            }
-        }
-        return null;
     }
 }

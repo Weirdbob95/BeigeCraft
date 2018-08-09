@@ -77,15 +77,15 @@ public class World extends Behavior {
 
     @Override
     public void render() {
-        renderedChunks.get(getChunkPos(Camera.camera.position));
+        renderedChunks.get(getChunkPos(Camera.camera3d.position));
         using(Arrays.asList(TERRAIN_TEXTURE, TERRAIN_SHADER), () -> {
-            TERRAIN_SHADER.setUniform("projectionMatrix", Camera.getProjectionMatrix());
+            TERRAIN_SHADER.setUniform("projectionMatrix", Camera.camera3d.getProjectionMatrix());
             TERRAIN_SHADER.setUniform("color", new Vec4d(1, 1, 1, 1));
             for (ChunkPos pos : renderedChunks.allGenerated()) {
                 renderedChunks.get(pos).render();
             }
         });
-        ChunkPos camera = getChunkPos(Camera.camera.position);
+        ChunkPos camera = getChunkPos(Camera.camera3d.position);
         constructedChunks.removeDistant(camera);
         heightmappedChunks.removeDistant(camera);
         plannedChunks.removeDistant(camera);
@@ -99,7 +99,8 @@ public class World extends Behavior {
 
             for (ChunkPos c : getChunksNearby(pos)) {
                 if (renderedChunks.has(c)) {
-                    renderedChunks.get(c).generateOuter();
+                    renderedChunks.get(c).shouldRegenerate = true;
+                    //renderedChunks.get(c).generateOuter();
                 }
             }
         }

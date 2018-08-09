@@ -56,6 +56,10 @@ public class Vec3d {
         return true;
     }
 
+    public Vec3d floor() {
+        return new Vec3d(Math.floor(x), Math.floor(y), Math.floor(z));
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;

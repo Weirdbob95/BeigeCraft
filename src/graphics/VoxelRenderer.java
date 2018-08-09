@@ -25,7 +25,7 @@ import util.vectors.Vec3d;
 
 public abstract class VoxelRenderer<T> {
 
-    static final List<Vec3d> DIRS = Arrays.asList(
+    public static final List<Vec3d> DIRS = Arrays.asList(
             new Vec3d(-1, 0, 0), new Vec3d(1, 0, 0),
             new Vec3d(0, -1, 0), new Vec3d(0, 1, 0),
             new Vec3d(0, 0, -1), new Vec3d(0, 0, 1));
@@ -138,7 +138,7 @@ public abstract class VoxelRenderer<T> {
             return;
         }
         setShaderUniforms();
-        Matrix4d worldMat = Camera.camera.getWorldMatrix(position, rotation, scale).translate(origin.toJOML().mul(-1));
+        Matrix4d worldMat = Camera.camera3d.getWorldMatrix(position, rotation, scale).translate(origin.toJOML().mul(-1));
         shader().setUniform("modelViewMatrix", worldMat);
         for (Vec3d dir : DIRS) {
             Vector4d newDir = new Vector4d(dir.x, dir.y, dir.z, 0).mul(worldMat);

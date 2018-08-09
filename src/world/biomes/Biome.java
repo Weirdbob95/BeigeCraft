@@ -17,7 +17,7 @@ public enum Biome {
 
     private Biome(double elevation, double treeDensity, double treeHeight) {
         this.elevation = elevation;
-        this.treeDensity = treeDensity;
-        this.treeHeight = treeHeight;
+        this.treeDensity = treeDensity / 4;
+        this.treeHeight = treeHeight * 2;
     }
 }

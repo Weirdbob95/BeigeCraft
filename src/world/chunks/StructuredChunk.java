@@ -78,8 +78,13 @@ public class StructuredChunk extends AbstractChunk {
                     }
                 }
             }
-            add(new BlockPlan(0, 0, 0, (int) height, BlockType.LOG));
             add(new BlockPlan(0, 0, (int) height + 1, BlockType.LEAVES));
+            add(new BlockPlan(0, 0, 0, (int) height, BlockType.LOG));
+            if (random.nextDouble() < (height - 10) / 5.) {
+                add(new BlockPlan(1, 0, 0, (int) height, BlockType.LOG));
+                add(new BlockPlan(0, 1, 0, (int) height, BlockType.LOG));
+                add(new BlockPlan(1, 1, 0, (int) height, BlockType.LOG));
+            }
         }
     }
 

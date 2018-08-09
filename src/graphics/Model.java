@@ -123,7 +123,7 @@ public class Model extends VoxelRenderer<Integer> {
 
     @Override
     protected void setShaderUniforms() {
-        shader().setUniform("projectionMatrix", Camera.getProjectionMatrix());
+        shader().setUniform("projectionMatrix", Camera.camera3d.getProjectionMatrix());
         shader().setUniform("color", new Vec4d(1, 1, 1, 1));
     }
 

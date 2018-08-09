@@ -27,8 +27,8 @@ public class Doggo extends Behavior {
     @Override
     public void update(double dt) {
         Vec3d idealVel = new Vec3d(0, 0, 0);
-        if (Camera.camera.position.sub(physics.position.position).setZ(0).length() > 2.5) {
-            idealVel = Camera.camera.position.sub(physics.position.position).setZ(0).normalize().mul(5);
+        if (Camera.camera3d.position.sub(physics.position.position).setZ(0).length() > 2.5) {
+            idealVel = Camera.camera3d.position.sub(physics.position.position).setZ(0).normalize().mul(5);
             if (physics.onGround && (physics.hitWall || Math.random() < dt)) {
                 velocity.velocity = velocity.velocity.setZ(9);
             }

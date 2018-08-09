@@ -1,6 +1,5 @@
 package util;
 
-import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -47,15 +46,5 @@ public abstract class MathUtils {
 
     public static Vec3d vecMap(Vec3d v1, Vec3d v2, BiFunction<Double, Double, Double> f) {
         return new Vec3d(f.apply(v1.x, v2.x), f.apply(v1.y, v2.y), f.apply(v1.z, v2.z));
-    }
-
-    public static float[] vecsToArray(List<Vec3d> vecs) {
-        float[] r = new float[3 * vecs.size()];
-        for (int i = 0; i < vecs.size(); i++) {
-            r[3 * i] = (float) vecs.get(i).x;
-            r[3 * i + 1] = (float) vecs.get(i).y;
-            r[3 * i + 2] = (float) vecs.get(i).z;
-        }
-        return r;
     }
 }

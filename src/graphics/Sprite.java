@@ -3,6 +3,7 @@ package graphics;
 import de.matthiasmann.twl.utils.PNGDecoder;
 import static engine.Activatable.using;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,12 +39,11 @@ public class Sprite {
 
     private static final VertexArrayObject SPRITE_VAO = VertexArrayObject.createVAO(() -> {
         BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{
-            0.5f, 0.5f, 0, 1, 0, // top right
-            0.5f, -0.5f, 0, 1, 1, // bottom right
-            -0.5f, -0.5f, 0, 0, 1, // bottom left
-            -0.5f, 0.5f, 0, 0, 0 // top left
+            0.5f, 0.5f, 0, 1, 0,
+            0.5f, -0.5f, 0, 1, 1,
+            -0.5f, -0.5f, 0, 0, 1,
+            -0.5f, 0.5f, 0, 0, 0
         });
-        //BufferObject ebo = new BufferObject(GL_ELEMENT_ARRAY_BUFFER, SPRITE_INDICES);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 20, 0);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, 2, GL_FLOAT, false, 20, 12);
@@ -60,16 +60,29 @@ public class Sprite {
             PNGDecoder decoder = new PNGDecoder(new FileInputStream("sprites/" + fileName));
             width = decoder.getWidth();
             height = decoder.getHeight();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
-    public void draw(Vec3d position, Vec3d normal, double rotation, Vec2d size, Vec4d color) {
-        SPRITE_SHADER.setUniform("projectionMatrix", Camera.getProjectionMatrix());
-//        SPRITE_SHADER.setUniform("modelViewMatrix", Camera.camera.getWorldMatrix(position));
-        SPRITE_SHADER.setUniform("modelViewMatrix", Camera.camera.getWorldMatrix(position)
-                .rotateTowards(normal.toJOML(), Camera.camera.up.toJOML()).rotate(rotation, normal.toJOML()).scale(new Vector3d(size.x, size.y, 1)));
+    public void draw2d(Vec2d position, double rotation, double scale, Vec4d color) {
+        SPRITE_SHADER.setUniform("projectionMatrix", Camera.camera2d.getProjectionMatrix());
+        SPRITE_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(position, rotation, scale * width, scale * height));
+        SPRITE_SHADER.setUniform("color", color);
+        using(Arrays.asList(texture, SPRITE_SHADER, SPRITE_VAO), () -> {
+            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        });
+    }
+
+    public void draw3d(Vec3d position, Vec3d normal, double rotation, Vec2d size, Vec4d color) {
+        SPRITE_SHADER.setUniform("projectionMatrix", Camera.camera3d.getProjectionMatrix());
+        if (normal.x != 0 || normal.y != 0) {
+            SPRITE_SHADER.setUniform("modelViewMatrix", Camera.camera3d.getWorldMatrix(position)
+                    .rotateTowards(normal.toJOML(), Camera.camera3d.up.toJOML()).rotate(rotation, normal.toJOML()).scale(new Vector3d(size.x, size.y, 1)));
+        } else {
+            SPRITE_SHADER.setUniform("modelViewMatrix", Camera.camera3d.getWorldMatrix(position)
+                    .rotate(rotation, normal.toJOML()).scale(new Vector3d(size.x, size.y, 1)));
+        }
         SPRITE_SHADER.setUniform("color", color);
         using(Arrays.asList(texture, SPRITE_SHADER, SPRITE_VAO), () -> {
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);

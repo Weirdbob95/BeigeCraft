@@ -8,13 +8,16 @@ import game.Doggo;
 import game.Goblin;
 import game.Hamster;
 import game.Player;
+import graphics.Sprite;
 import java.util.Comparator;
 import java.util.Optional;
 import opengl.Camera;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import util.Multithreader;
+import util.vectors.Vec2d;
 import util.vectors.Vec3d;
+import util.vectors.Vec4d;
 import world.ChunkPos;
 import world.World;
 import static world.World.RENDER_DISTANCE;
@@ -41,9 +44,9 @@ public abstract class Main {
         world.create();
 
         Player p = new Player();
-        p.position.position = new Vec3d(Math.random(), Math.random(),
+        p.position.position = new Vec3d(.4 + .2 * Math.random(), .4 + .2 * Math.random(),
                 world.heightmappedChunks.get(new ChunkPos(0, 0)).heightmap[0][0] + 2);
-        Camera.camera.position = p.position.position;
+        Camera.camera3d.position = p.position.position;
         p.physics.world = world;
         p.create();
 
@@ -51,14 +54,13 @@ public abstract class Main {
 
         for (int x = -initialWorldSize; x < initialWorldSize; x++) {
             for (int y = -initialWorldSize; y < initialWorldSize; y++) {
-                //world.prerenderedChunks.get(new ChunkPos(x, y));
                 world.renderedChunks.get(new ChunkPos(x, y));
             }
         }
 
         onUpdate(0, dt -> {
             if (Multithreader.isFree()) {
-                ChunkPos camera = world.getChunkPos(Camera.camera.position);
+                ChunkPos camera = world.getChunkPos(Camera.camera3d.position);
                 Optional<ChunkPos> toRender = world.renderedChunks.border().stream()
                         .min(Comparator.comparingDouble(camera::distance));
                 if (toRender.isPresent() && camera.distance(toRender.get()) <= RENDER_DISTANCE) {
@@ -71,48 +73,30 @@ public abstract class Main {
             if (Input.keyJustPressed(GLFW_KEY_G)) {
                 Goblin gobbo = new Goblin();
                 gobbo.model.position.position = p.position.position;
-                gobbo.model.rotation = Camera.camera.horAngle;
+                gobbo.model.rotation = Camera.camera3d.horAngle;
                 gobbo.physics.world = world;
                 gobbo.create();
             }
             if (Input.keyJustPressed(GLFW_KEY_H)) {
                 Hamster hammy = new Hamster();
                 hammy.model.position.position = p.position.position;
-                hammy.model.rotation = Camera.camera.horAngle;
+                hammy.model.rotation = Camera.camera3d.horAngle;
                 hammy.physics.world = world;
                 hammy.create();
             }
             if (Input.keyJustPressed(GLFW_KEY_J)) {
                 Doggo ziggy = new Doggo();
                 ziggy.model.position.position = p.position.position;
-                ziggy.model.rotation = Camera.camera.horAngle;
+                ziggy.model.rotation = Camera.camera3d.horAngle;
                 ziggy.physics.world = world;
                 ziggy.create();
             }
-//            if (Input.keyJustPressed(GLFW_KEY_Y)) {
-//                Hamster hammy = new Hamster();
-//                hammy.model.position.position = p.position.position;
-//                hammy.model.rotation = Camera.camera.horAngle;
-//                hammy.physics.world = world;
-//                hammy.create();
-//                hammy.model.loadModel("skelelarge.vox");
-//            }
-//            if (Input.keyJustPressed(GLFW_KEY_U)) {
-//                Hamster hammy = new Hamster();
-//                hammy.model.position.position = p.position.position;
-//                hammy.model.rotation = Camera.camera.horAngle;
-//                hammy.physics.world = world;
-//                hammy.create();
-//                hammy.model.loadModel("skelesmall.vox");
-//            }
-//            if (Input.keyJustPressed(GLFW_KEY_J)) {
-//                Hamster hammy = new Hamster();
-//                hammy.model.position.position = p.position.position;
-//                hammy.model.rotation = Camera.camera.horAngle;
-//                hammy.physics.world = world;
-//                hammy.create();
-//                hammy.model.loadModel("ziggy2.vox");
-//            }
+        });
+
+        onRender(10, () -> {
+            glDisable(GL_DEPTH_TEST);
+            Sprite.load("crosshares.png").draw2d(new Vec2d(0, 0), 0, 1, new Vec4d(1, 1, 1, .5));
+            glEnable(GL_DEPTH_TEST);
         });
 
         // MEMORY ALLOCATION DEBUG INFO

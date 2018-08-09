@@ -13,6 +13,10 @@ public class Vec2d {
         return new Vec2d(x + other.x, y + other.y);
     }
 
+    public Vec2d div(double a) {
+        return new Vec2d(x / a, y / a);
+    }
+
     public Vec2d div(Vec2d other) {
         return new Vec2d(x / other.x, y / other.y);
     }
@@ -46,7 +50,11 @@ public class Vec2d {
         return hash;
     }
 
-    public Vec2d mult(Vec2d other) {
+    public Vec2d mul(double a) {
+        return new Vec2d(x * a, y * a);
+    }
+
+    public Vec2d mul(Vec2d other) {
         return new Vec2d(x * other.x, y * other.y);
     }
 

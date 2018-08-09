@@ -14,7 +14,8 @@ void main() {
     vec2 finalTexCoord = (boundedTexCoord + outTexPosition) / textureSize(texture_sampler, 0);
     vec4 textureColor = texture(texture_sampler, finalTexCoord);
 
-    float fog = pow(.01, pow(length(viewSpace) * .001, 2));
+    float maxDist = 2000;
+    float fog = pow(.01, pow(length(viewSpace) / maxDist, 2));
     vec4 preFogColor = color * mix(vec4(1.), vec4(outColor, 1.), fog) * textureColor;
     fragColor = mix(vec4(.6, .8, 1., 1.), preFogColor, fog);
 }

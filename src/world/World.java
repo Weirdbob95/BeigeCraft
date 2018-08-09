@@ -32,7 +32,7 @@ import world.chunks.StructuredChunk;
 public class World extends Behavior {
 
     public static final int CHUNK_SIZE = 32;
-    public static final int RENDER_DISTANCE = 8;
+    public static final int RENDER_DISTANCE = 32;
     public static final int UNLOAD_DISTANCE = RENDER_DISTANCE + 4;
 
     public static final ShaderProgram TERRAIN_SHADER = Resources.loadShaderProgram("terrain");

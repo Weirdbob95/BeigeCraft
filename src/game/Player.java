@@ -54,7 +54,7 @@ public class Player extends Behavior {
     }
 
     private RaycastHit firstSolid() {
-        List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 5 * PLAYER_SCALE);
+        List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 4 * PLAYER_SCALE);
         for (int i = 0; i < raycast.size(); i++) {
             if (physics.world.getBlock(raycast.get(i).hitPos) != null) {
                 return raycast.get(i);
@@ -64,7 +64,7 @@ public class Player extends Behavior {
     }
 
     private RaycastHit lastEmpty() {
-        List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 5 * PLAYER_SCALE);
+        List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 4 * PLAYER_SCALE);
         for (int i = 0; i < raycast.size() - 1; i++) {
             if (physics.world.getBlock(raycast.get(i).hitPos) != null) {
                 return null;
@@ -101,11 +101,11 @@ public class Player extends Behavior {
         camera3d.horAngle -= Input.mouseDelta().x / 500;
         camera3d.vertAngle += Input.mouseDelta().y / 500;
 
-        if (camera3d.vertAngle > 1.5) {
-            camera3d.vertAngle = 1.5f;
+        if (camera3d.vertAngle > 1.55) {
+            camera3d.vertAngle = 1.55f;
         }
-        if (camera3d.vertAngle < -1.5) {
-            camera3d.vertAngle = -1.5f;
+        if (camera3d.vertAngle < -1.55) {
+            camera3d.vertAngle = -1.55f;
         }
 
         // Move

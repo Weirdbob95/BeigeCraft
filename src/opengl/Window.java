@@ -57,7 +57,7 @@ public class Window {
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        //glfwWindowHint(GLFW_SAMPLES, 16);
+        glfwWindowHint(GLFW_SAMPLES, 16);
 
         handle = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, mainWindow ? NULL : window.handle);
         if (handle == NULL) {

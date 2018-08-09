@@ -35,15 +35,14 @@ public class StructuredChunk extends AbstractChunk {
     @Override
     protected void generate() {
         HeightmappedChunk hc = world.heightmappedChunks.get(pos);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < CHUNK_SIZE * CHUNK_SIZE / 10.; i++) {
             int x = random.nextInt(CHUNK_SIZE);
             int y = random.nextInt(CHUNK_SIZE);
             if (hc.biomemap[x][y].plurality().treeDensity > 0 && random.nextDouble() < hc.biomemap[x][y].averageTreeDensity() * .1) {
-                //System.out.println(hc.biomemap[x][y].averageVegetation());
                 structures.add(new Tree(new Vec3d(x, y, hc.heightmap[x][y] + 1),
                         (2 + random.nextInt(5) + random.nextInt(5)) * hc.biomemap[x][y].averageTreeHeight()));
             } else if (hc.biomemap[x][y].plurality() == Biome.DESERT && random.nextDouble() < hc.biomemap[x][y].get(Biome.DESERT) * .01) {
-                structures.add(new Cactus(new Vec3d(x, y, hc.heightmap[x][y] + 1), 2 + random.nextInt(5)));
+                structures.add(new Cactus(new Vec3d(x, y, hc.heightmap[x][y] + 1), 2 + random.nextInt(6)));
             }
         }
     }

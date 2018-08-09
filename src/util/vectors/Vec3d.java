@@ -12,6 +12,10 @@ public class Vec3d {
         this.z = z;
     }
 
+    public Vec3d add(double a) {
+        return new Vec3d(x + a, y + a, z + a);
+    }
+
     public Vec3d add(Vec3d other) {
         return new Vec3d(x + other.x, y + other.y, z + other.z);
     }
@@ -103,6 +107,10 @@ public class Vec3d {
 
     public Vec3d setZ(double z) {
         return new Vec3d(x, y, z);
+    }
+
+    public Vec3d sub(double a) {
+        return new Vec3d(x - a, y - a, z - a);
     }
 
     public Vec3d sub(Vec3d other) {

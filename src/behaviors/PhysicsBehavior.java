@@ -17,11 +17,23 @@ public class PhysicsBehavior extends Behavior {
     public final PreviousPositionBehavior prevPos = require(PreviousPositionBehavior.class);
     public final VelocityBehavior velocity = require(VelocityBehavior.class);
 
-    public Vec3d hitboxSize = new Vec3d(0, 0, 0);
+    public Vec3d hitboxSize1 = new Vec3d(0, 0, 0);
+    public Vec3d hitboxSize2 = new Vec3d(0, 0, 0);
     public boolean onGround;
     public boolean hitWall;
     public World world;
     public boolean stepUp;
+
+    public boolean couldChangeHitboxSize(Vec3d newSize1, Vec3d newSize2) {
+        Vec3d oldSize1 = hitboxSize1;
+        Vec3d oldSize2 = hitboxSize2;
+        hitboxSize1 = newSize1;
+        hitboxSize2 = newSize2;
+        boolean r = !wouldCollideAt(position.position);
+        hitboxSize1 = oldSize1;
+        hitboxSize2 = oldSize2;
+        return r;
+    }
 
     private boolean moveToWall(Vec3d del) {
         if (!wouldCollideAt(position.position.add(del))) {
@@ -90,10 +102,10 @@ public class PhysicsBehavior extends Behavior {
     }
 
     public boolean wouldCollideAt(Vec3d pos) {
-        for (int x = floor(pos.x - hitboxSize.x); x < pos.x + hitboxSize.x; x++) {
-            for (int y = floor(pos.y - hitboxSize.y); y < pos.y + hitboxSize.y; y++) {
+        for (int x = floor(pos.x - hitboxSize1.x); x < pos.x + hitboxSize2.x; x++) {
+            for (int y = floor(pos.y - hitboxSize1.y); y < pos.y + hitboxSize2.y; y++) {
                 ConstructedChunk cc = world.constructedChunks.get(world.getChunkPos(new Vec3d(x, y, 0)));
-                if (!cc.blockStorage.rangeEquals(mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE), floor(pos.z - hitboxSize.z), ceil(pos.z + hitboxSize.z) - 1, null)) {
+                if (!cc.blockStorage.rangeEquals(mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE), floor(pos.z - hitboxSize1.z), ceil(pos.z + hitboxSize2.z) - 1, null)) {
                     return true;
                 }
             }

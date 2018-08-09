@@ -71,7 +71,7 @@ public class StructuredChunk extends AbstractChunk {
             for (int x = -intSize; x <= intSize; x++) {
                 for (int y = -intSize; y <= intSize; y++) {
                     for (int z = -intSize; z <= intSize; z++) {
-                        if (noise.multi(pos.x + x, pos.y + y, pos.z + z, 4, .7 / size) * size > new Vec3d(x, y, z).length()) {
+                        if (noise.fbm3d(pos.x + x, pos.y + y, pos.z + z, 4, .7 / size) * size > new Vec3d(x, y, z).length()) {
                             add(new BlockPlan(x, y, (int) height + z, BlockType.LEAVES));
                         }
                     }

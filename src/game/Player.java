@@ -20,6 +20,7 @@ import static opengl.Camera.camera3d;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
@@ -41,15 +42,15 @@ public class Player extends Behavior {
     public final PhysicsBehavior physics = require(PhysicsBehavior.class);
     public final SpaceOccupierBehavior spaceOccupier = require(SpaceOccupierBehavior.class);
 
-    public boolean sprint;
-//    public RaycastHit blockToBreak;
-//    public double breakTimer;
+    public boolean flying;
+    public boolean crouching;
     public Map<Vec3d, Double> blocksToBreak = new HashMap();
 
     @Override
     public void createInner() {
         acceleration.acceleration = new Vec3d(0, 0, -32).mul(PLAYER_SCALE);
-        physics.hitboxSize = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
+        physics.hitboxSize1 = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
+        physics.hitboxSize2 = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
         physics.stepUp = true;
     }
 
@@ -93,7 +94,7 @@ public class Player extends Behavior {
     @Override
     public void update(double dt) {
 
-        Vec3d desCamPos = position.position.add(new Vec3d(0, 0, .6).mul(PLAYER_SCALE));
+        Vec3d desCamPos = position.position.add(new Vec3d(0, 0, crouching ? .4 : .65).mul(PLAYER_SCALE));
         //camera.position = desCamPos;
         camera3d.position = camera3d.position.lerp(desCamPos, 1 - Math.pow(1e-6, dt));
 
@@ -110,12 +111,12 @@ public class Player extends Behavior {
 
         // Move
         if (Input.keyJustPressed(GLFW_KEY_LEFT_CONTROL)) {
-            sprint = !sprint;
+            flying = !flying;
         }
-        double speed = (sprint ? 250 : 4.3) * PLAYER_SCALE;
+        double speed = (flying ? 250 : crouching ? 3 : 4.3) * PLAYER_SCALE;
 
         Vec3d forwards = camera3d.facing();
-        if (!sprint) {
+        if (!flying) {
             forwards = forwards.setZ(0).normalize();
         }
         Vec3d sideways = camera3d.up.cross(forwards);
@@ -137,7 +138,7 @@ public class Player extends Behavior {
             idealVel = idealVel.normalize().mul(speed);
         }
 
-        if (!sprint) {
+        if (!flying) {
             idealVel = idealVel.setZ(velocity.velocity.z);
         }
 
@@ -145,8 +146,23 @@ public class Player extends Behavior {
 
         // Jump
         if (Input.keyDown(GLFW_KEY_SPACE)) {
-            if (physics.onGround || sprint) {
-                velocity.velocity = velocity.velocity.setZ((sprint ? 100 : Math.sqrt(4.3) * 5) * PLAYER_SCALE);
+            if (physics.onGround || flying) {
+                velocity.velocity = velocity.velocity.setZ((flying ? 100 : Math.sqrt(4.3) * 5) * PLAYER_SCALE);
+            }
+        }
+
+        // Crouch
+        if (Input.keyDown(GLFW_KEY_LEFT_SHIFT)) {
+            if (!crouching) {
+                crouching = true;
+                physics.hitboxSize2 = new Vec3d(.3, .3, .6).mul(PLAYER_SCALE);
+            }
+        } else {
+            if (crouching) {
+                if (physics.couldChangeHitboxSize(physics.hitboxSize1, new Vec3d(.3, .3, .8).mul(PLAYER_SCALE))) {
+                    crouching = false;
+                    physics.hitboxSize2 = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
+                }
             }
         }
 
@@ -188,21 +204,6 @@ public class Player extends Behavior {
             blocksToBreak.clear();
         }
 
-//            if (block != null) {
-//                if (blockToBreak == null || !block.hitPos.floor().equals(blockToBreak.hitPos.floor())) {
-//                    breakTimer = 0;
-//                }
-//                blockToBreak = block;
-//                breakTimer += dt;
-//                if (breakTimer > .5) {
-//                    physics.world.setBlock(block.hitPos, null);
-//                    blockToBreak = null;
-//                    breakTimer = 0;
-//                }
-//            }
-//        } else {
-//            breakTimer = 0;
-//        }
         // Place block
         if (Input.mouseJustPressed(1)) {
             RaycastHit block = lastEmpty();

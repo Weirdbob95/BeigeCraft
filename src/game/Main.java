@@ -1,3 +1,5 @@
+package game;
+
 
 import behaviors.MiscBehaviors.FPSBehavior;
 import static behaviors.MiscBehaviors.onRender;
@@ -23,6 +25,8 @@ import world.World;
 import static world.World.RENDER_DISTANCE;
 
 public abstract class Main {
+
+    public static final boolean LOW_GRAPHICS = true;
 
     public static void main(String[] args) {
         Core.init();

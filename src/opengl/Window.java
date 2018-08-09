@@ -1,5 +1,6 @@
 package opengl;
 
+import static game.Main.LOW_GRAPHICS;
 import java.nio.IntBuffer;
 import org.lwjgl.glfw.*;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -57,7 +58,9 @@ public class Window {
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        glfwWindowHint(GLFW_SAMPLES, 16);
+        if (!LOW_GRAPHICS) {
+            glfwWindowHint(GLFW_SAMPLES, 16);
+        }
 
         handle = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, mainWindow ? NULL : window.handle);
         if (handle == NULL) {

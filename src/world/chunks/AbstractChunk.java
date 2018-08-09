@@ -1,7 +1,7 @@
 package world.chunks;
 
 import java.util.Random;
-import util.Noise;
+import util.noise.Noise;
 import util.vectors.Vec3d;
 import world.ChunkPos;
 import world.World;
@@ -19,7 +19,7 @@ public abstract class AbstractChunk {
         this.world = world;
         this.pos = pos;
         this.random = new Random(pos.hashCode() + getClass().hashCode() + Double.hashCode(world.seed));
-        this.noise = new Noise(random.nextDouble() * 1e6);
+        this.noise = new Noise(random);
     }
 
     protected Vec3d center() {

@@ -32,10 +32,10 @@ public class BiomeData {
         BiomeData bd = new BiomeData();
 //        double temp = world.noise.perlin(pos.x, pos.y, 10000, .001 * freqMult) - .5;
 //        double hum = world.noise.perlin(pos.x, pos.y, 20000, .001 * freqMult) - .5;
-        double temp = world.noise.multi(pos.x, pos.y, 10000, 4, .001 * freqMult)
-                + world.noise.multi(pos.x, pos.y, 20000, 3, .1 * freqMult) * .02 - .501;
-        double hum = world.noise.multi(pos.x, pos.y, 30000, 4, .001 * freqMult)
-                + world.noise.multi(pos.x, pos.y, 40000, 3, .1 * freqMult) * .02 - .501;
+        double temp = world.noise("biomedata1").fbm3d(pos.x, pos.y, 10000, 4, .001 * freqMult)
+                + world.noise("biomedata2").fbm3d(pos.x, pos.y, 20000, 3, .1 * freqMult) * .02 - .501;
+        double hum = world.noise("biomedata3").fbm3d(pos.x, pos.y, 30000, 4, .001 * freqMult)
+                + world.noise("biomedata4").fbm3d(pos.x, pos.y, 40000, 3, .1 * freqMult) * .02 - .501;
 
         double ext = 8;
         temp = clamp(2 + temp * ext, 0, 4);

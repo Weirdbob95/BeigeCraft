@@ -1,104 +1,66 @@
-package util;
+package util.noise;
+
+import java.util.Random;
 
 public class Noise {
 
-    private final double seed;
+    private final SimplexNoise simplexNoise;
 
-    public Noise(double seed) {
-        this.seed = seed;
+    public Noise(Random random) {
+        simplexNoise = new SimplexNoise(random);
     }
 
-    public double multi(double x, double y, int octaves, double frequency) {
+    public double fbm2d(double x, double y, int octaves, double frequency) {
         double r = 0;
         for (int i = 0; i < octaves; i++) {
-            r += perlin(x, y, frequency * (1 << i)) / (1 << i);
+            r += noise2d(x, y, frequency * (1 << i)) / (1 << i);
         }
         return r / (2 - 1.0 / (1 << (octaves - 1)));
     }
 
-    public double multi(double x, double y, double z, int octaves, double frequency) {
+    public double fbm3d(double x, double y, double z, int octaves, double frequency) {
         double r = 0;
         for (int i = 0; i < octaves; i++) {
-            r += perlin(x, y, z, frequency * (1 << i)) / (1 << i);
+            r += noise3d(x, y, z, frequency * (1 << i)) / (1 << i);
         }
         return r / (2 - 1.0 / (1 << (octaves - 1)));
     }
 
-    public double perlin(double x, double y, double frequency) {
-        return SimplexNoise.noise(x * frequency, y * frequency, seed) * .5 + .5;
-    }
-
-    public double perlin(double x, double y, double z, double frequency) {
-        return SimplexNoise.noise(x * frequency, y * frequency, z * frequency, seed) * .5 + .5;
-    }
-
-    /*public double fbm(double x, double y, int octaves, double frequency) {
-        return multi(x, y, octaves, frequency) + multi(x, y, octaves, frequency * 20) / 20;
-    }
-
-    public double fbm(double x, double y, double z, int octaves, double frequency) {
-        return multi(x, y, z, octaves, frequency) + multi(x, y, z, octaves, frequency * 20) / 20;
-    }
-
-    public double fbmRidged(double x, double y, int octaves, double frequency) {
-        return ridged(x, y, octaves, frequency) + ridged(x, y, octaves, frequency * 20) / 20;
-    }
-
-    public double multi(double x, double y, int octaves, double frequency) {
+    public double fbm4d(double x, double y, double z, double w, int octaves, double frequency) {
         double r = 0;
         for (int i = 0; i < octaves; i++) {
-            r += perlin(x * Math.pow(2, i) * frequency, y * Math.pow(2, i) * frequency) / Math.pow(2, i);
+            r += noise4d(x, y, z, w, frequency * (1 << i)) / (1 << i);
         }
-        return r;
+        return r / (2 - 1.0 / (1 << (octaves - 1)));
     }
 
-    public double multi(double x, double y, double z, int octaves, double frequency) {
-        double r = 0;
-        for (int i = 0; i < octaves; i++) {
-            r += perlin(x * Math.pow(2, i) * frequency, y * Math.pow(2, i) * frequency, z * Math.pow(2, i) * frequency) / Math.pow(2, i);
-        }
-        return r;
+    public double noise2d(double x, double y, double frequency) {
+        return simplexNoise.noise(x * frequency, y * frequency) * .5 + .5;
     }
 
-    public double offset(double x, double y, int octaves, double frequency, double offset) {
-        double r = 0;
-        for (int i = 0; i < octaves; i++) {
-            r += SimplexNoise.noise(x * Math.pow(2, i) * frequency, y * Math.pow(2, i) * frequency, seed + offset) / Math.pow(2, i);
-        }
-        return r;
+    public double noise3d(double x, double y, double z, double frequency) {
+        return simplexNoise.noise(x * frequency, y * frequency, z * frequency) * .5 + .5;
     }
 
-    public double perlin(double x, double y) {
-        return SimplexNoise.noise(x, y, seed);
+    public double noise4d(double x, double y, double z, double w, double frequency) {
+        return simplexNoise.noise(x * frequency, y * frequency, z * frequency, w * frequency) * .5 + .5;
     }
 
-    public double perlin(double x, double y, double z) {
-        return SimplexNoise.noise(x, y, z, seed);
-    }
-
-    public double random(double x, double y) {
-        return multi(x, y, 1, 1000000);
-    }
-
-    public double ridged(double x, double y, int octaves, double frequency) {
-        return 1 - 2 * Math.abs(multi(x, y, octaves, frequency));
-    }*/
-
- /*
- * A speed-improved simplex noise algorithm for 2D, 3D and 4D in Java.
- *
- * Based on example code by Stefan Gustavson (stegu@itn.liu.se).
- * Optimisations by Peter Eastman (peastman@drizzle.stanford.edu).
- * Better rank ordering method by Stefan Gustavson in 2012.
- *
- * This could be speeded up even further, but it's useful as it is.
- *
- * Version 2012-03-09
- *
- * This code was placed in the public domain by its original author,
- * Stefan Gustavson. You may use it as you see fit, but
- * attribution is appreciated.
- *
+    /*
+     * A speed-improved simplex noise algorithm for 2D, 3D and 4D in Java.
+     *
+     * Based on example code by Stefan Gustavson (stegu@itn.liu.se).
+     * Optimisations by Peter Eastman (peastman@drizzle.stanford.edu).
+     * Better rank ordering method by Stefan Gustavson in 2012.
+     *
+     * This could be speeded up even further, but it's useful as it is.
+     *
+     * Version 2012-03-09
+     *
+     * This code was placed in the public domain by its original author,
+     * Stefan Gustavson. You may use it as you see fit, but
+     * attribution is appreciated.
+     *
      */
     private static class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
 
@@ -113,24 +75,35 @@ public class Noise {
             new Grad(-1, 1, 0, 1), new Grad(-1, 1, 0, -1), new Grad(-1, -1, 0, 1), new Grad(-1, -1, 0, -1),
             new Grad(1, 1, 1, 0), new Grad(1, 1, -1, 0), new Grad(1, -1, 1, 0), new Grad(1, -1, -1, 0),
             new Grad(-1, 1, 1, 0), new Grad(-1, 1, -1, 0), new Grad(-1, -1, 1, 0), new Grad(-1, -1, -1, 0)};
-        private static short p[] = {151, 160, 137, 91, 90, 15,
-            131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
-            190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33,
-            88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166,
-            77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244,
-            102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196,
-            135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123,
-            5, 202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42,
-            223, 183, 170, 213, 119, 248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9,
-            129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228,
-            251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107,
-            49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254,
-            138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180};
+//        private static short p[] = {151, 160, 137, 91, 90, 15,
+//            131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
+//            190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33,
+//            88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166,
+//            77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244,
+//            102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196,
+//            135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123,
+//            5, 202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42,
+//            223, 183, 170, 213, 119, 248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9,
+//            129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228,
+//            251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107,
+//            49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254,
+//            138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180};
         // To remove the need for index wrapping, double the permutation table length
-        private static short perm[] = new short[512];
-        private static short permMod12[] = new short[512];
+        private short perm[] = new short[512];
+        private short permMod12[] = new short[512];
 
-        static {
+        private SimplexNoise(Random random) {
+            short[] p = new short[256];
+            for (short i = 0; i < 256; i++) {
+                p[i] = i;
+            }
+            for (int i = 255; i > 0; i--) {
+                int index = random.nextInt(i + 1);
+                short temp = p[index];
+                p[index] = p[i];
+                p[i] = temp;
+            }
+
             for (int i = 0; i < 512; i++) {
                 perm[i] = p[i & 255];
                 permMod12[i] = (short) (perm[i] % 12);
@@ -163,7 +136,7 @@ public class Noise {
         }
 
         // 2D simplex noise
-        public static double noise(double xin, double yin) {
+        private double noise(double xin, double yin) {
             double n0, n1, n2; // Noise contributions from the three corners
             // Skew the input space to determine which simplex cell we're in
             double s = (xin + yin) * F2; // Hairy factor for 2D
@@ -226,7 +199,7 @@ public class Noise {
         }
 
         // 3D simplex noise
-        public static double noise(double xin, double yin, double zin) {
+        private double noise(double xin, double yin, double zin) {
             double n0, n1, n2, n3; // Noise contributions from the four corners
             // Skew the input space to determine which simplex cell we're in
             double s = (xin + yin + zin) * F3; // Very nice and simple skew factor for 3D
@@ -351,7 +324,7 @@ public class Noise {
         }
 
         // 4D simplex noise, better simplex rank ordering method 2012-03-09
-        public static double noise(double x, double y, double z, double w) {
+        private double noise(double x, double y, double z, double w) {
 
             double n0, n1, n2, n3, n4; // Noise contributions from the five corners
             // Skew the (x,y,z,w) space to determine which cell of 24 simplices we're in

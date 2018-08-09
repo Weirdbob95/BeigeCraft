@@ -2,12 +2,15 @@ package world;
 
 import static engine.Activatable.using;
 import engine.Behavior;
+import static game.Main.LOW_GRAPHICS;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
@@ -18,8 +21,8 @@ import opengl.Texture;
 import static util.MathUtils.floor;
 import static util.MathUtils.mod;
 import util.Multithreader;
-import util.Noise;
 import util.Resources;
+import util.noise.Noise;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
 import world.chunks.AbstractChunk;
@@ -32,7 +35,7 @@ import world.chunks.StructuredChunk;
 public class World extends Behavior {
 
     public static final int CHUNK_SIZE = 32;
-    public static final int RENDER_DISTANCE = 32;
+    public static final int RENDER_DISTANCE = LOW_GRAPHICS ? 8 : 32;
     public static final int UNLOAD_DISTANCE = RENDER_DISTANCE + 4;
 
     public static final ShaderProgram TERRAIN_SHADER = Resources.loadShaderProgram("terrain");
@@ -44,8 +47,9 @@ public class World extends Behavior {
     public final ChunkMap<RenderedChunk> renderedChunks = new ChunkMap<>(this, RenderedChunk::new);
     public final ChunkMap<StructuredChunk> structuredChunks = new ChunkMap<>(this, StructuredChunk::new);
 
-    public final double seed = Math.random() * 1e6;
-    public final Noise noise = new Noise(seed);
+    public final long seed = new Random().nextLong();
+
+    private final HashMap<String, Noise> noiseMap = new HashMap();
 
     public BlockType getBlock(Vec3d pos) {
         return constructedChunks.get(getChunkPos(pos)).blockStorage.get((int) mod(pos.x, CHUNK_SIZE), (int) mod(pos.y, CHUNK_SIZE), floor(pos.z));
@@ -73,6 +77,13 @@ public class World extends Behavior {
             }
         }
         return r;
+    }
+
+    public Noise noise(String id) {
+        if (!noiseMap.containsKey(id)) {
+            noiseMap.put(id, new Noise(new Random(seed + id.hashCode())));
+        }
+        return noiseMap.get(id);
     }
 
     @Override

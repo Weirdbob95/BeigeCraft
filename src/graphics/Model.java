@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import opengl.Camera;
 import opengl.ShaderProgram;
 import static util.MathUtils.mod;
@@ -89,6 +90,14 @@ public class Model extends VoxelRenderer<Integer> {
 
         colors = null;
         colorPalette = null;
+    }
+
+    @Override
+    protected TreeMap<Integer, Integer> columnAt(int x, int y) {
+        if (x < 0 || x >= size.x || y < 0 || y >= size.y) {
+            return new TreeMap();
+        }
+        return colors.columns[x][y];
     }
 
     @Override

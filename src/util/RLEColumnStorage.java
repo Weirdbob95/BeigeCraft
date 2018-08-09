@@ -5,7 +5,7 @@ import java.util.TreeMap;
 public class RLEColumnStorage<T> {
 
     public final int size;
-    private final TreeMap<Integer, T>[][] columns;
+    public final TreeMap<Integer, T>[][] columns;
     private boolean recomputeMinMax = true;
     private int minZ, maxZ;
 

@@ -5,8 +5,11 @@ import engine.Core;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import opengl.BufferObject;
 import opengl.Camera;
 import opengl.ShaderProgram;
@@ -40,6 +43,8 @@ public abstract class VoxelRenderer<T> {
         }
     }
 
+    protected abstract TreeMap<Integer, T> columnAt(int x, int y);
+
     protected abstract Quad createQuad(int x, int y, int z, T voxel, Vec3d dir);
 
     public void generate() {
@@ -57,16 +62,10 @@ public abstract class VoxelRenderer<T> {
 
         for (int x = minX; x < maxX; x++) {
             for (int y = minY; y < maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    T bt = voxelAt(x, y, z);
-                    if (bt != null) {
-                        for (Vec3d dir : DIRS) {
-                            if (voxelAt(x + (int) dir.x, y + (int) dir.y, z + (int) dir.z) == null) {
-                                quads.get(dir).add(createQuad(x, y, z, bt, dir));
-                            }
-                        }
-                    }
+                for (Vec3d dir : DIRS.subList(0, 4)) {
+                    generateExposedSideFaces(x, y, dir, quads.get(dir));
                 }
+                generateExposedFaces(x, y, quads.get(new Vec3d(0, 0, -1)), quads.get(new Vec3d(0, 0, 1)));
             }
         }
 
@@ -106,6 +105,64 @@ public abstract class VoxelRenderer<T> {
                 ready = true;
             }
         });
+    }
+
+    private void generateExposedFaces(int x, int y, List<Quad> quads1, List<Quad> quads2) {
+        TreeMap<Integer, T> column = columnAt(x, y);
+        Iterator<Entry<Integer, T>> i = column.entrySet().iterator();
+        if (!i.hasNext()) {
+            return;
+        }
+        Entry<Integer, T> e = i.next();
+        while (i.hasNext()) {
+            Entry<Integer, T> ne = i.next();
+            if (ne.getValue() == null && e.getValue() != null) {
+                quads2.add(createQuad(x, y, e.getKey(), e.getValue(), new Vec3d(0, 0, 1)));
+            } else if (ne.getValue() != null && e.getValue() == null) {
+                quads1.add(createQuad(x, y, e.getKey() + 1, ne.getValue(), new Vec3d(0, 0, -1)));
+            }
+            e = ne;
+        }
+        quads2.add(createQuad(x, y, e.getKey(), e.getValue(), new Vec3d(0, 0, 1)));
+    }
+
+    private void generateExposedSideFaces(int x, int y, Vec3d dir, List<Quad> quads) {
+        TreeMap<Integer, T> column1 = columnAt(x, y);
+        TreeMap<Integer, T> column2 = columnAt(x + (int) dir.x, y + (int) dir.y);
+        Iterator<Entry<Integer, T>> i1 = column1.entrySet().iterator();
+        Iterator<Entry<Integer, T>> i2 = column2.entrySet().iterator();
+        Entry<Integer, T> e1 = i1.hasNext() ? i1.next() : null;
+        Entry<Integer, T> e2 = i2.hasNext() ? i2.next() : null;
+        if (e1 == null) {
+            return;
+        }
+        int pos = Math.min(e1.getKey(), e2 == null ? Integer.MAX_VALUE : e2.getKey());
+        while (true) {
+            if (e2 != null && e2.getKey() < e1.getKey()) {
+                Entry<Integer, T> next_e2 = i2.hasNext() ? i2.next() : null;
+                int next_pos = Math.min(e1.getKey(), next_e2 == null ? Integer.MAX_VALUE : next_e2.getKey());
+                if (e1.getValue() != null && (next_e2 == null || next_e2.getValue() == null)) {
+                    for (int z = pos; z < next_pos; z++) {
+                        quads.add(createQuad(x, y, z + 1, e1.getValue(), dir));
+                    }
+                }
+                e2 = next_e2;
+                pos = next_pos;
+                continue;
+            } else if (i1.hasNext()) {
+                Entry<Integer, T> next_e1 = i1.next();
+                int next_pos = Math.min(next_e1.getKey(), e2 == null ? Integer.MAX_VALUE : e2.getKey());
+                if (next_e1.getValue() != null && (e2 == null || e2.getValue() == null)) {
+                    for (int z = pos; z < next_pos; z++) {
+                        quads.add(createQuad(x, y, z + 1, next_e1.getValue(), dir));
+                    }
+                }
+                e1 = next_e1;
+                pos = next_pos;
+                continue;
+            }
+            break;
+        }
     }
 
     protected boolean[][] getOccludingVoxels(int x, int y, int z, Vec3d dir) {

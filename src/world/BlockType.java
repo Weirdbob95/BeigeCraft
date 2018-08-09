@@ -14,7 +14,8 @@ public enum BlockType {
     SAND,
     SNOWY_GRASS,
     TUNDRA_GRASS,
-    CACTUS;
+    CACTUS,
+    IRON_ORE;
 
     public static Vec2d spritesheetPos(BlockType bt, Vec3d dir) {
         switch (bt) {
@@ -64,6 +65,8 @@ public enum BlockType {
                 } else {
                     return new Vec2d(64, 32);
                 }
+            case IRON_ORE:
+                return new Vec2d(0, 48);
             default:
                 throw new RuntimeException("Unknown BlockType: " + bt);
         }

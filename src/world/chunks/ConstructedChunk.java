@@ -47,11 +47,15 @@ public class ConstructedChunk extends AbstractChunk {
                 blockStorage.setRangeInfinite(x, y, elevation - 3, STONE);
 
                 // CAVES
-                double density = 1;
+                double caveDensity = 1;
+                double ironDensity = 1;
                 for (int z = -100; z <= elevation; z++) {
-                    if ((Math.abs(world.noise.multi(x + pos.x * CHUNK_SIZE, y + pos.y * CHUNK_SIZE, z * 1.5, 4, .005 * density) - .5))
-                            + (Math.abs(world.noise.multi(x + pos.x * CHUNK_SIZE, y + pos.y * CHUNK_SIZE, z * 1.5 + 1000, 4, .005 * density) - .5)) < .04 * density * (1 - 15 / (elevation - z + 20.))) {
+                    if ((Math.abs(world.noise.multi(x + pos.x * CHUNK_SIZE, y + pos.y * CHUNK_SIZE, z * 1.5, 6, .004 * caveDensity) - .5))
+                            + (Math.abs(world.noise.multi(x + pos.x * CHUNK_SIZE, y + pos.y * CHUNK_SIZE, z * 1.5 + 1000, 6, .004 * caveDensity) - .5))
+                            < .04 * caveDensity * (1 - 15 / (elevation - z + 20.))) {
                         blockStorage.set(x, y, z, null);
+                    } else if (world.noise.multi(x + pos.x * CHUNK_SIZE, y + pos.y * CHUNK_SIZE, z + 2000, 1, .05 * ironDensity) * (1 - 15 / (elevation - z + 20.)) > .5 + .25 / ironDensity) {
+                        blockStorage.set(x, y, z, IRON_ORE);
                     }
                 }
             }

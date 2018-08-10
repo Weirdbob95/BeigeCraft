@@ -1,7 +1,6 @@
 package graphics;
 
-import static game.ModelBehavior.MODEL_SHADER;
-import graphics.Quad.BasicQuad;
+import graphics.Quad.ColoredQuad;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +25,8 @@ public class Model extends VoxelRenderer<Integer> {
         }
         return MODEL_CACHE.get(fileName);
     }
+
+    public static final ShaderProgram MODEL_SHADER = Resources.loadShaderProgramGeom("model");
 
     // Copied from the MagickaVoxel documentation
     private static final int[] DEFAULT_COLOR_PALETTE = {
@@ -102,14 +103,13 @@ public class Model extends VoxelRenderer<Integer> {
 
     @Override
     protected Quad createQuad(int x, int y, int z, Integer voxel, Vec3d dir) {
-        BasicQuad q = new BasicQuad();
+        ColoredQuad q = new ColoredQuad();
         q.positionDir(x, y, z, dir);
         q.colorAmbientOcclusion(getOccludingVoxels(x, y, z, dir));
         int colorHex = colorPalette[voxel];
-        Vec3d color = new Vec3d(mod(colorHex, 256) / 255., mod(colorHex >> 8, 256) / 255., mod(colorHex >> 16, 256) / 255.);
-        for (int i = 0; i < 4; i++) {
-            //q.colors[i] = q.colors[i].mul(color);
-        }
+        q.r = mod(colorHex, 256) / 255.f;
+        q.g = mod(colorHex >> 8, 256) / 255.f;
+        q.b = mod(colorHex >> 16, 256) / 255.f;
         return q;
     }
 
@@ -147,7 +147,7 @@ public class Model extends VoxelRenderer<Integer> {
 
     @Override
     protected List<Integer> vertexAttribSizes() {
-        return Arrays.asList(3, 1, 4);
+        return Arrays.asList(3, 1, 3, 4);
     }
 
     @Override

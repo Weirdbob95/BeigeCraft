@@ -1,14 +1,17 @@
 #version 330
 
-layout (location=0) in vec3 position;
-layout (location=1) in vec3 color;
+layout (location=0) in vec3 position_in;
+layout (location=1) in float normal_in;
+layout (location=2) in vec3 color_in;
+layout (location=3) in vec4 occlusion_in;
 
-out vec3 outColor;
-
-uniform mat4 modelViewMatrix;
-uniform mat4 projectionMatrix;
+out int normal;
+out vec3 color;
+out vec4 occlusion;
 
 void main() {
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
-    outColor = color;
+    gl_Position = vec4(position_in, 1);
+    normal = int(normal_in);
+    color = color_in;
+    occlusion = occlusion_in;
 }

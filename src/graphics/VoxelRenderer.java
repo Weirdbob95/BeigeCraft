@@ -164,7 +164,7 @@ public abstract class VoxelRenderer<T> {
         } else if (dir.y != 0) {
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
-                    r[i + 1][j + 1] = voxelAt(x + j, y + (int) dir.y, z + i) != null;
+                    r[i + 1][j + 1] = voxelAt(x + i, y + (int) dir.y, z + j) != null;
                 }
             }
         } else {

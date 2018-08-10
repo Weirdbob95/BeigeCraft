@@ -11,7 +11,7 @@ public class SpaceOccupierBehavior extends Behavior {
 
     public final PositionBehavior position = require(PositionBehavior.class);
 
-    public double radius = .5;
+    public double radius = 1;
     public double lightness = 2;
 
     @Override

@@ -1,7 +1,6 @@
 package world.chunks;
 
 import static util.MathUtils.floor;
-import util.vectors.Vec3d;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
@@ -20,7 +19,7 @@ public class HeightmappedChunk extends AbstractChunk {
     protected void generate() {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
-                biomemap[x][y] = BiomeData.generate(world, new Vec3d(x + pos.x * CHUNK_SIZE, y + pos.y * CHUNK_SIZE, 0));
+                biomemap[x][y] = BiomeData.generate(world, worldPos(x, y, 0));
                 heightmap[x][y] = floor(heightAt(x + pos.x * CHUNK_SIZE, y + pos.y * CHUNK_SIZE) * biomemap[x][y].averageElevation());
             }
         }

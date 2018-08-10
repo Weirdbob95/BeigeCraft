@@ -2,6 +2,7 @@ package world.chunks;
 
 import util.RLEColumnStorage;
 import util.noise.NoiseInterpolator;
+import util.vectors.Vec3d;
 import world.BlockType;
 import static world.BlockType.*;
 import world.ChunkPos;
@@ -22,15 +23,15 @@ public class ConstructedChunk extends AbstractChunk {
         double ironDensity = 1;
         int minZ = -200;
 
-        NoiseInterpolator caves1 = new NoiseInterpolator(world.noise("caves1"), 8, 8, 256);
-        NoiseInterpolator caves2 = new NoiseInterpolator(world.noise("caves2"), 8, 8, 256);
-        caves1.setTransform(pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, 0, CHUNK_SIZE / 8.);
-        caves2.setTransform(pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, 0, CHUNK_SIZE / 8.);
+        NoiseInterpolator caves1 = new NoiseInterpolator(world.noise("constructedchunk1"), 8, 8, 128);
+        NoiseInterpolator caves2 = new NoiseInterpolator(world.noise("constructedchunk2"), 8, 8, 128);
+        caves1.setTransform(worldPos(), new Vec3d(1, 1, 2).mul(CHUNK_SIZE / 8.));
+        caves2.setTransform(worldPos(), new Vec3d(1, 1, 2).mul(CHUNK_SIZE / 8.));
         caves1.generate(6, .003 * caveDensity);
         caves2.generate(6, .003 * caveDensity);
 
-        NoiseInterpolator iron = new NoiseInterpolator(world.noise("constructedchunk3"), 8, 8, 256);
-        iron.setTransform(pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, 0, CHUNK_SIZE / 8.);
+        NoiseInterpolator iron = new NoiseInterpolator(world.noise("constructedchunk3"), 8, 8, 128);
+        iron.setTransform(worldPos(), new Vec3d(1, 1, 2).mul(CHUNK_SIZE / 8.));
         iron.generate(1, .05 * ironDensity);
 
         HeightmappedChunk hc = world.heightmappedChunks.get(pos);
@@ -64,12 +65,10 @@ public class ConstructedChunk extends AbstractChunk {
 
                 // CAVES
                 for (int z = minZ; z <= elevation; z++) {
-                    int worldX = x + pos.x * CHUNK_SIZE;
-                    int worldY = y + pos.y * CHUNK_SIZE;
-                    if (Math.abs(caves1.get(worldX, worldY, (z - minZ) * 2) - .5) + Math.abs(caves2.get(worldX, worldY, (z - minZ) * 2) - .5)
+                    if (Math.abs(caves1.get(worldPos(x, y, (z - minZ) * 2)) - .5) + Math.abs(caves2.get(worldPos(x, y, (z - minZ) * 2)) - .5)
                             < .04 * caveDensity * (1 - 15 / (elevation - z + 20.))) {
                         blockStorage.set(x, y, z, null);
-                    } else if (iron.get(worldX, worldY, (z - minZ) * 2) * (1 - 15 / (elevation - z + 20.))
+                    } else if (iron.get(worldPos(x, y, (z - minZ) * 2)) * (1 - 15 / (elevation - z + 20.))
                             > .5 + .25 / ironDensity) {
                         blockStorage.set(x, y, z, IRON_ORE);
                     }

@@ -40,4 +40,12 @@ public abstract class AbstractChunk {
     public boolean isGenerated() {
         return isGenerated;
     }
+
+    protected Vec3d worldPos() {
+        return new Vec3d(pos.x, pos.y, 0).mul(CHUNK_SIZE);
+    }
+
+    protected Vec3d worldPos(int x, int y, int z) {
+        return worldPos().add(new Vec3d(x, y, z));
+    }
 }

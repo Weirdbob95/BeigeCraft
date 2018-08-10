@@ -2,13 +2,14 @@ package util.noise;
 
 import static util.MathUtils.ceil;
 import static util.MathUtils.floor;
+import util.vectors.Vec3d;
 
 public class NoiseInterpolator {
 
     private final Noise noise;
     private final int xSize, ySize, zSize;
     private final double[][][] samples;
-    private double xTransform, yTransform, zTransform, scaleFactor;
+    private Vec3d translate, scale;
 
     public NoiseInterpolator(Noise noise, int xSize, int ySize, int zSize) {
         this.noise = noise;
@@ -22,16 +23,20 @@ public class NoiseInterpolator {
         for (int x = 0; x <= xSize; x++) {
             for (int y = 0; y <= ySize; y++) {
                 for (int z = 0; z <= zSize; z++) {
-                    samples[x][y][z] = noise.fbm3d(x * scaleFactor + xTransform, y * scaleFactor + yTransform, z * scaleFactor + zTransform, octaves, frequency);
+                    samples[x][y][z] = noise.fbm3d(x * scale.x + translate.x, y * scale.y + translate.y, z * scale.z + translate.z, octaves, frequency);
                 }
             }
         }
     }
 
+    public double get(Vec3d v) {
+        return get(v.x, v.y, v.z);
+    }
+
     public double get(double x, double y, double z) {
-        x = (x - xTransform) / scaleFactor;
-        y = (y - yTransform) / scaleFactor;
-        z = (z - zTransform) / scaleFactor;
+        x = (x - translate.x) / scale.x;
+        y = (y - translate.y) / scale.y;
+        z = (z - translate.z) / scale.z;
 
         int x0 = floor(x);
         int x1 = ceil(x);
@@ -59,10 +64,8 @@ public class NoiseInterpolator {
         return d0 * (1 - amt) + d1 * amt;
     }
 
-    public void setTransform(double xTransform, double yTransform, double zTransform, double scaleFactor) {
-        this.xTransform = xTransform;
-        this.yTransform = yTransform;
-        this.zTransform = zTransform;
-        this.scaleFactor = scaleFactor;
+    public void setTransform(Vec3d translate, Vec3d scale) {
+        this.translate = translate;
+        this.scale = scale;
     }
 }

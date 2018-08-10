@@ -23,10 +23,10 @@ public class StructuredChunk extends AbstractChunk {
     public void constructIn(ConstructedChunk cc) {
         for (Structure s : structures) {
             for (BlockPlan bp : s.blocks) {
-                int x = (int) s.pos.x + bp.x - (cc.pos.x - pos.x) * CHUNK_SIZE;
-                int y = (int) s.pos.y + bp.y - (cc.pos.y - pos.y) * CHUNK_SIZE;
+                int x = s.x + bp.x - (cc.pos.x - pos.x) * CHUNK_SIZE;
+                int y = s.y + bp.y - (cc.pos.y - pos.y) * CHUNK_SIZE;
                 if (x >= 0 && x < CHUNK_SIZE && y >= 0 && y < CHUNK_SIZE) {
-                    cc.blockStorage.setRange(x, y, (int) s.pos.z + bp.zMin, (int) s.pos.z + bp.zMax, bp.bt);
+                    cc.blockStorage.setRange(x, y, s.z + bp.zMin, s.z + bp.zMax, bp.bt);
                 }
             }
         }
@@ -39,21 +39,23 @@ public class StructuredChunk extends AbstractChunk {
             int x = random.nextInt(CHUNK_SIZE);
             int y = random.nextInt(CHUNK_SIZE);
             if (hc.biomemap[x][y].plurality().treeDensity > 0 && random.nextDouble() < hc.biomemap[x][y].averageTreeDensity() * .1) {
-                structures.add(new Tree(new Vec3d(x, y, hc.heightmap[x][y] + 1),
+                structures.add(new Tree(x, y, hc.heightmap[x][y] + 1,
                         (2 + random.nextInt(5) + random.nextInt(5)) * hc.biomemap[x][y].averageTreeHeight()));
             } else if (hc.biomemap[x][y].plurality() == Biome.DESERT && random.nextDouble() < hc.biomemap[x][y].get(Biome.DESERT) * .01) {
-                structures.add(new Cactus(new Vec3d(x, y, hc.heightmap[x][y] + 1), 2 + random.nextInt(6)));
+                structures.add(new Cactus(x, y, hc.heightmap[x][y] + 1, 2 + random.nextInt(6)));
             }
         }
     }
 
     public abstract class Structure {
 
-        private final Vec3d pos;
+        private final int x, y, z;
         private final List<BlockPlan> blocks = new LinkedList();
 
-        public Structure(Vec3d pos) {
-            this.pos = pos;
+        public Structure(int x, int y, int z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
         }
 
         protected final void add(BlockPlan... bp) {
@@ -63,15 +65,15 @@ public class StructuredChunk extends AbstractChunk {
 
     public class Tree extends Structure {
 
-        public Tree(Vec3d pos, double height) {
-            super(pos);
+        public Tree(int x1, int y1, int z1, double height) {
+            super(x1, y1, z1);
 
             double size = (2 + height) * .7;
             int intSize = ceil(size);
             for (int x = -intSize; x <= intSize; x++) {
                 for (int y = -intSize; y <= intSize; y++) {
                     for (int z = -intSize; z <= intSize; z++) {
-                        if (noise.fbm3d(pos.x + x, pos.y + y, pos.z + z, 4, .7 / size) * size > new Vec3d(x, y, z).length()) {
+                        if (noise.fbm3d(x1 + x, y1 + y, z1 + z, 4, .7 / size) * size > new Vec3d(x, y, z).length()) {
                             add(new BlockPlan(x, y, (int) height + z, BlockType.LEAVES));
                         }
                     }
@@ -89,8 +91,8 @@ public class StructuredChunk extends AbstractChunk {
 
     public class Cactus extends Structure {
 
-        public Cactus(Vec3d pos, int height) {
-            super(pos);
+        public Cactus(int x, int y, int z, int height) {
+            super(x, y, z);
             add(new BlockPlan(0, 0, 0, (int) height, BlockType.CACTUS));
         }
     }

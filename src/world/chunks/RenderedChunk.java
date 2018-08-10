@@ -29,8 +29,8 @@ public class RenderedChunk extends AbstractChunk {
     }
 
     private boolean intersectsFrustum() {
-        return Camera.camera3d.getViewFrustum().testAab(CHUNK_SIZE * pos.x, CHUNK_SIZE * pos.y, world.constructedChunks.get(pos).blockStorage.minZ(),
-                CHUNK_SIZE * (pos.x + 1), CHUNK_SIZE * (pos.y + 1), world.constructedChunks.get(pos).blockStorage.maxZ() + 1);
+        return Camera.camera3d.getViewFrustum().testAab(CHUNK_SIZE * pos.x, CHUNK_SIZE * pos.y, (float) chunkRenderer.min().z,
+                CHUNK_SIZE * (pos.x + 1), CHUNK_SIZE * (pos.y + 1), (float) chunkRenderer.max().z);
     }
 
     public void render() {

@@ -17,16 +17,20 @@ import world.chunks.ConstructedChunk;
 
 public class ChunkRenderer extends VoxelRenderer<BlockType> {
 
-    private final ConstructedChunk[][] ccs;
+    private ConstructedChunk[][] ccs;
+    private double maxZ, minZ;
 
     public ChunkRenderer(World world, ChunkPos pos) {
         ccs = new ConstructedChunk[3][3];
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 ccs[x + 1][y + 1] = world.constructedChunks.get(new ChunkPos(pos.x + x, pos.y + y));
+                maxZ = Math.max(maxZ, ccs[x + 1][y + 1].blockStorage.maxZ());
+                minZ = Math.min(minZ, ccs[x + 1][y + 1].blockStorage.minZ());
             }
         }
         generate();
+        ccs = null;
     }
 
     @Override
@@ -45,24 +49,24 @@ public class ChunkRenderer extends VoxelRenderer<BlockType> {
     }
 
     @Override
-    protected Vec3d max() {
-        int maxZ = Integer.MIN_VALUE;
-        for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 3; y++) {
-                maxZ = Math.max(maxZ, ccs[x][y].blockStorage.maxZ());
-            }
-        }
+    public Vec3d max() {
+//        int maxZ = Integer.MIN_VALUE;
+//        for (int x = 0; x < 3; x++) {
+//            for (int y = 0; y < 3; y++) {
+//                maxZ = Math.max(maxZ, ccs[x][y].blockStorage.maxZ());
+//            }
+//        }
         return new Vec3d(CHUNK_SIZE, CHUNK_SIZE, maxZ);
     }
 
     @Override
-    protected Vec3d min() {
-        int minZ = Integer.MAX_VALUE;
-        for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 3; y++) {
-                minZ = Math.min(minZ, ccs[x][y].blockStorage.minZ());
-            }
-        }
+    public Vec3d min() {
+//        int minZ = Integer.MAX_VALUE;
+//        for (int x = 0; x < 3; x++) {
+//            for (int y = 0; y < 3; y++) {
+//                minZ = Math.min(minZ, ccs[x][y].blockStorage.minZ());
+//            }
+//        }
         return new Vec3d(0, 0, minZ);
     }
 

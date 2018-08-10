@@ -57,8 +57,8 @@ public abstract class VoxelRenderer<T> {
             quads.put(dir, new ArrayList());
         }
 
-        int maxX = (int) max().x, maxY = (int) max().y, maxZ = (int) max().z;
-        int minX = (int) min().x, minY = (int) min().y, minZ = (int) min().z;
+        int maxX = (int) max().x, maxY = (int) max().y;
+        int minX = (int) min().x, minY = (int) min().y;
 
         for (int x = minX; x < maxX; x++) {
             for (int y = minY; y < maxY; y++) {
@@ -102,8 +102,8 @@ public abstract class VoxelRenderer<T> {
                         total += vertexAttribs().get(i);
                     }
                 }));
-                ready = true;
             }
+            ready = true;
         });
     }
 
@@ -166,21 +166,24 @@ public abstract class VoxelRenderer<T> {
     }
 
     protected boolean[][] getOccludingVoxels(int x, int y, int z, Vec3d dir) {
-        Vec3d otherDir1, otherDir2;
-        if (dir.x != 0) {
-            otherDir1 = new Vec3d(0, 1, 0);
-            otherDir2 = new Vec3d(0, 0, 1);
-        } else if (dir.y != 0) {
-            otherDir1 = new Vec3d(0, 0, 1);
-            otherDir2 = new Vec3d(1, 0, 0);
-        } else {
-            otherDir1 = new Vec3d(1, 0, 0);
-            otherDir2 = new Vec3d(0, 1, 0);
-        }
         boolean[][] r = new boolean[3][3];
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                r[i + 1][j + 1] = voxelAt(new Vec3d(x, y, z).add(dir).add(otherDir1.mul(i)).add(otherDir2.mul(j))) != null;
+        if (dir.x != 0) {
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    r[i + 1][j + 1] = voxelAt(x + (int) dir.x, y + i, z + j) != null;
+                }
+            }
+        } else if (dir.y != 0) {
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    r[i + 1][j + 1] = voxelAt(x + j, y + (int) dir.y, z + i) != null;
+                }
+            }
+        } else {
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    r[i + 1][j + 1] = voxelAt(x + i, y + j, z + (int) dir.z) != null;
+                }
             }
         }
         return r;

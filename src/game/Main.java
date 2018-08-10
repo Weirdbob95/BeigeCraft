@@ -1,15 +1,10 @@
 package game;
 
-
 import behaviors.MiscBehaviors.FPSBehavior;
 import static behaviors.MiscBehaviors.onRender;
 import static behaviors.MiscBehaviors.onUpdate;
 import engine.Core;
 import engine.Input;
-import game.Doggo;
-import game.Goblin;
-import game.Hamster;
-import game.Player;
 import graphics.Sprite;
 import java.util.Comparator;
 import java.util.Optional;
@@ -26,7 +21,7 @@ import static world.World.RENDER_DISTANCE;
 
 public abstract class Main {
 
-    public static final boolean LOW_GRAPHICS = true;
+    public static final boolean LOW_GRAPHICS = false;
 
     public static void main(String[] args) {
         Core.init();

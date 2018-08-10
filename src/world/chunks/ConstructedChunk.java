@@ -64,14 +64,27 @@ public class ConstructedChunk extends AbstractChunk {
                 blockStorage.setRangeInfinite(x, y, elevation - 3, STONE);
 
                 // CAVES
+                int caveStart = minZ;
                 for (int z = minZ; z <= elevation; z++) {
-                    if (Math.abs(caves1.get(worldPos(x, y, (z - minZ) * 2)) - .5) + Math.abs(caves2.get(worldPos(x, y, (z - minZ) * 2)) - .5)
+                    int wx = x + pos.x * CHUNK_SIZE;
+                    int wy = y + pos.y * CHUNK_SIZE;
+                    int wz = (z - minZ) * 2;
+                    if (Math.abs(caves1.get(wx, wy, wz) - .5) + Math.abs(caves2.get(wx, wy, wz) - .5)
                             < .04 * caveDensity * (1 - 15 / (elevation - z + 20.))) {
-                        blockStorage.set(x, y, z, null);
-                    } else if (iron.get(worldPos(x, y, (z - minZ) * 2)) * (1 - 15 / (elevation - z + 20.))
-                            > .5 + .25 / ironDensity) {
-                        blockStorage.set(x, y, z, IRON_ORE);
+                        // Is cave
+                    } else {
+                        if (caveStart < z) {
+                            blockStorage.setRange(x, y, caveStart, z - 1, null);
+                        }
+                        caveStart = z + 1;
+                        if (iron.get(wx, wy, wz) * (1 - 15 / (elevation - z + 20.))
+                                > .5 + .25 / ironDensity) {
+                            blockStorage.set(x, y, z, IRON_ORE);
+                        }
                     }
+                }
+                if (caveStart <= elevation) {
+                    blockStorage.setRange(x, y, caveStart, elevation, null);
                 }
             }
         }

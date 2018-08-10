@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.joml.Matrix4d;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
 
@@ -38,6 +39,47 @@ public class ShaderProgram implements Activatable {
 
         shaderProgram = glCreateProgram();
         glAttachShader(shaderProgram, vertexShader);
+        glAttachShader(shaderProgram, fragmentShader);
+        glLinkProgram(shaderProgram);
+        // TODO: Check for linking errors
+
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
+    }
+
+    /**
+     * Constructs a shader program with a vertex shader, a geometry shader, and
+     * a fragment shader.
+     *
+     * @param vertexShaderSource The source code of the vertex shader.
+     * @param geometryShaderSource The source code of the vertex shader.
+     * @param fragmentShaderSource The source code of the fragment shader.
+     */
+    public ShaderProgram(String vertexShaderSource, String geometryShaderSource, String fragmentShaderSource) {
+        int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertexShader, vertexShaderSource);
+        glCompileShader(vertexShader);
+        if (glGetShaderi(vertexShader, GL_COMPILE_STATUS) != GL_TRUE) {
+            throw new RuntimeException("Vertex shader doesn't compile:\n" + glGetShaderInfoLog(vertexShader));
+        }
+
+        int geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(geometryShader, geometryShaderSource);
+        glCompileShader(geometryShader);
+        if (glGetShaderi(geometryShader, GL_COMPILE_STATUS) != GL_TRUE) {
+            throw new RuntimeException("Geometry shader doesn't compile:\n" + glGetShaderInfoLog(geometryShader));
+        }
+
+        int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragmentShader, fragmentShaderSource);
+        glCompileShader(fragmentShader);
+        if (glGetShaderi(fragmentShader, GL_COMPILE_STATUS) != GL_TRUE) {
+            throw new RuntimeException("Fragment shader doesn't compile:\n" + glGetShaderInfoLog(fragmentShader));
+        }
+
+        shaderProgram = glCreateProgram();
+        glAttachShader(shaderProgram, vertexShader);
+        glAttachShader(shaderProgram, geometryShader);
         glAttachShader(shaderProgram, fragmentShader);
         glLinkProgram(shaderProgram);
         // TODO: Check for linking errors

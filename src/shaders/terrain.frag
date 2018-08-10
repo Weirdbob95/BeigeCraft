@@ -1,21 +1,20 @@
 #version 330
 
-in  vec2 outTexCoord;
-in  vec2 outTexPosition;
-in  vec3 outColor;
-in  vec4 viewSpace;
-out vec4 fragColor;
-
 uniform vec4 color;
 uniform sampler2D texture_sampler;
 
-void main() {
-    vec2 boundedTexCoord = clamp(outTexCoord, .001, .999) * 16;
-    vec2 finalTexCoord = (boundedTexCoord + outTexPosition) / textureSize(texture_sampler, 0);
-    vec4 textureColor = texture(texture_sampler, finalTexCoord);
+in vec2 texCoords;
+in float fragOcclusion;
+in float fog;
 
-    float maxDist = 2000;
-    float fog = pow(.01, pow(length(viewSpace) / maxDist, 2));
-    vec4 preFogColor = color * mix(vec4(1.), vec4(outColor, 1.), fog) * textureColor;
-    fragColor = mix(vec4(.6, .8, 1., 1.), preFogColor, fog);
+out vec4 fragColor;
+
+void main() {
+    vec4 textureColor = texture(texture_sampler, texCoords);
+
+    fragColor = textureColor * vec4(fragOcclusion, fragOcclusion, fragOcclusion, 1);
+    //float maxDist = 2000;
+    //float fog = pow(.01, pow(length(gViewSpace) / maxDist, 2));
+    //vec4 preFogColor = color * mix(1, fragOcclusion, fog) * textureColor;
+    //fragColor = mix(vec4(.6, .8, 1., 1.), preFogColor, fog);
 }

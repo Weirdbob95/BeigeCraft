@@ -80,8 +80,8 @@ public class ChunkRenderer extends VoxelRenderer<BlockType> {
     }
 
     @Override
-    protected List<Integer> vertexAttribs() {
-        return Arrays.asList(3, 2, 2, 3);
+    protected List<Integer> vertexAttribSizes() {
+        return Arrays.asList(3, 1, 1, 4);
     }
 
     @Override

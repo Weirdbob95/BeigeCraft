@@ -21,7 +21,7 @@ import static world.World.RENDER_DISTANCE;
 
 public abstract class Main {
 
-    public static final boolean LOW_GRAPHICS = false;
+    public static final boolean LOW_GRAPHICS = true;
 
     public static void main(String[] args) {
         Core.init();

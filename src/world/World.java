@@ -36,9 +36,9 @@ public class World extends Behavior {
 
     public static final int CHUNK_SIZE = 32;
     public static final int RENDER_DISTANCE = LOW_GRAPHICS ? 8 : 32;
-    public static final int UNLOAD_DISTANCE = RENDER_DISTANCE + 4;
+    public static final int UNLOAD_DISTANCE = LOW_GRAPHICS ? 12 : 40;
 
-    public static final ShaderProgram TERRAIN_SHADER = Resources.loadShaderProgram("terrain");
+    public static final ShaderProgram TERRAIN_SHADER = Resources.loadShaderProgramGeom("terrain");
     public static final Texture TERRAIN_TEXTURE = new Texture("sprites/blockSpritesheet.png");
 
     public final ChunkMap<ConstructedChunk> constructedChunks = new ChunkMap<>(this, ConstructedChunk::new);

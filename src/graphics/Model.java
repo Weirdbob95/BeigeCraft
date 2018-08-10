@@ -108,7 +108,7 @@ public class Model extends VoxelRenderer<Integer> {
         int colorHex = colorPalette[voxel];
         Vec3d color = new Vec3d(mod(colorHex, 256) / 255., mod(colorHex >> 8, 256) / 255., mod(colorHex >> 16, 256) / 255.);
         for (int i = 0; i < 4; i++) {
-            q.colors[i] = q.colors[i].mul(color);
+            //q.colors[i] = q.colors[i].mul(color);
         }
         return q;
     }
@@ -146,8 +146,8 @@ public class Model extends VoxelRenderer<Integer> {
     }
 
     @Override
-    protected List<Integer> vertexAttribs() {
-        return Arrays.asList(3, 3);
+    protected List<Integer> vertexAttribSizes() {
+        return Arrays.asList(3, 1, 4);
     }
 
     @Override

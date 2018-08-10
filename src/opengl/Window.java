@@ -19,7 +19,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
 
-    public static boolean SHOW_DEBUG_INFO = false;
+    public static boolean SHOW_DEBUG_INFO = true;
 
     public static final int WIDTH = 1600;
     public static final int HEIGHT = 900;

@@ -2,8 +2,9 @@ package graphics;
 
 import graphics.Quad.TexturedQuad;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map.Entry;
 import opengl.ShaderProgram;
 import static util.MathUtils.floor;
 import static util.MathUtils.mod;
@@ -34,9 +35,9 @@ public class ChunkRenderer extends VoxelRenderer<BlockType> {
     }
 
     @Override
-    protected TreeMap<Integer, BlockType> columnAt(int x, int y) {
+    protected Iterator<Entry<Integer, BlockType>> columnAt(int x, int y) {
         int ccx = 1 + floor((double) x / CHUNK_SIZE), ccy = 1 + floor((double) y / CHUNK_SIZE);
-        return ccs[ccx][ccy].blockStorage.columns[mod(x, CHUNK_SIZE)][mod(y, CHUNK_SIZE)];
+        return ccs[ccx][ccy].blockStorage.columnTree(mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE));
     }
 
     @Override

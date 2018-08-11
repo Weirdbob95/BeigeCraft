@@ -1,17 +1,24 @@
 package world.chunks;
 
 import util.RLEColumnStorage;
+import util.RLEColumnStorage.BlockTypeConverter;
 import util.noise.NoiseInterpolator;
 import util.vectors.Vec3d;
 import world.BlockType;
-import static world.BlockType.*;
+import static world.BlockType.DIRT;
+import static world.BlockType.GRASS;
+import static world.BlockType.IRON_ORE;
+import static world.BlockType.SAND;
+import static world.BlockType.SNOWY_GRASS;
+import static world.BlockType.STONE;
+import static world.BlockType.TUNDRA_GRASS;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
 
 public class ConstructedChunk extends AbstractChunk {
 
-    public final RLEColumnStorage<BlockType> blockStorage = new RLEColumnStorage(CHUNK_SIZE);
+    public final RLEColumnStorage<BlockType> blockStorage = new RLEColumnStorage(CHUNK_SIZE, new BlockTypeConverter());
 
     public ConstructedChunk(World world, ChunkPos pos) {
         super(world, pos);

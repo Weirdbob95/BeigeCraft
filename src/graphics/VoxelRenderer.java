@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import opengl.BufferObject;
 import opengl.Camera;
 import opengl.ShaderProgram;
@@ -41,7 +40,7 @@ public abstract class VoxelRenderer<T> {
         }
     }
 
-    protected abstract TreeMap<Integer, T> columnAt(int x, int y);
+    protected abstract Iterator<Entry<Integer, T>> columnAt(int x, int y);
 
     protected abstract Quad createQuad(int x, int y, int z, T voxel, Vec3d dir);
 
@@ -96,8 +95,7 @@ public abstract class VoxelRenderer<T> {
     }
 
     private void generateExposedFaces(int x, int y, List<Quad> quads1, List<Quad> quads2) {
-        TreeMap<Integer, T> column = columnAt(x, y);
-        Iterator<Entry<Integer, T>> i = column.entrySet().iterator();
+        Iterator<Entry<Integer, T>> i = columnAt(x, y);
         if (!i.hasNext()) {
             return;
         }
@@ -115,10 +113,8 @@ public abstract class VoxelRenderer<T> {
     }
 
     private void generateExposedSideFaces(int x, int y, Vec3d dir, List<Quad> quads) {
-        TreeMap<Integer, T> column1 = columnAt(x, y);
-        TreeMap<Integer, T> column2 = columnAt(x + (int) dir.x, y + (int) dir.y);
-        Iterator<Entry<Integer, T>> i1 = column1.entrySet().iterator();
-        Iterator<Entry<Integer, T>> i2 = column2.entrySet().iterator();
+        Iterator<Entry<Integer, T>> i1 = columnAt(x, y);
+        Iterator<Entry<Integer, T>> i2 = columnAt(x + (int) dir.x, y + (int) dir.y);
         Entry<Integer, T> e1 = i1.hasNext() ? i1.next() : null;
         Entry<Integer, T> e2 = i2.hasNext() ? i2.next() : null;
         if (e1 == null) {
@@ -207,8 +203,4 @@ public abstract class VoxelRenderer<T> {
     protected abstract List<Integer> vertexAttribSizes();
 
     protected abstract T voxelAt(int x, int y, int z);
-
-    private T voxelAt(Vec3d pos) {
-        return voxelAt((int) pos.x, (int) pos.y, (int) pos.z);
-    }
 }

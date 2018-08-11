@@ -26,9 +26,10 @@ public class HeightmappedChunk extends AbstractChunk {
     }
 
     private double heightAt(int x, int y) {
-        return (100 * world.noise("heightmappedchunk1").noise2d(x, y, .003)
-                + 20 * world.noise("heightmappedchunk2").noise2d(x, y, .015)
-                + 4 * world.noise("heightmappedchunk3").noise2d(x, y, .075)
-                - 40) * world.noise("heightmappedchunk4").noise2d(x, y, .001) * 2;
+        double spread = 2;
+        return (100 * world.noise("heightmappedchunk1").noise2d(x, y, .003 / spread)
+                + 20 * world.noise("heightmappedchunk2").noise2d(x, y, .015 / spread)
+                + 4 * world.noise("heightmappedchunk3").noise2d(x, y, .075 / spread)
+                - 40) * world.noise("heightmappedchunk4").noise2d(x, y, .001 / spread) * 2;
     }
 }

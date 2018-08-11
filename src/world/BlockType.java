@@ -17,6 +17,8 @@ public enum BlockType {
     CACTUS,
     IRON_ORE;
 
+    public static final BlockType[] VALUES = BlockType.values();
+
     public static int getTexID(BlockType bt, Vec3d dir) {
         Vec2d pos = spritesheetPos(bt, dir);
         return (int) pos.x + (int) pos.y * 256;

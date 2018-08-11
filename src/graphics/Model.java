@@ -1,15 +1,18 @@
 package graphics;
 
 import graphics.Quad.ColoredQuad;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Map.Entry;
 import opengl.Camera;
 import opengl.ShaderProgram;
 import static util.MathUtils.mod;
 import util.RLEColumnStorage;
+import util.RLEColumnStorage.IntegerConverter;
 import util.Resources;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
@@ -64,7 +67,7 @@ public class Model extends VoxelRenderer<Integer> {
             int chunkSize = readInt(bytes, pos + 4);
             if (chunkName.equals("SIZE")) {
                 size = new Vec3d(readInt(bytes, pos + 12), readInt(bytes, pos + 16), readInt(bytes, pos + 20));
-                colors = new RLEColumnStorage(Math.max((int) size.x, (int) size.y));
+                colors = new RLEColumnStorage(Math.max((int) size.x, (int) size.y), new IntegerConverter());
             }
             if (chunkName.equals("XYZI")) {
                 int numBlocks = readInt(bytes, pos + 12);
@@ -94,11 +97,11 @@ public class Model extends VoxelRenderer<Integer> {
     }
 
     @Override
-    protected TreeMap<Integer, Integer> columnAt(int x, int y) {
+    protected Iterator<Entry<Integer, Integer>> columnAt(int x, int y) {
         if (x < 0 || x >= size.x || y < 0 || y >= size.y) {
-            return new TreeMap();
+            return new ArrayList().iterator();
         }
-        return colors.columns[x][y];
+        return colors.columnTree(x, y);
     }
 
     @Override

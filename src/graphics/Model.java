@@ -11,9 +11,9 @@ import java.util.Map.Entry;
 import opengl.Camera;
 import opengl.ShaderProgram;
 import static util.MathUtils.mod;
-import util.RLEColumnStorage;
-import util.RLEColumnStorage.IntegerConverter;
 import util.Resources;
+import util.rlestorage.IntConverter.IntegerConverter;
+import util.rlestorage.RLEArrayStorage;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
 
@@ -52,7 +52,7 @@ public class Model extends VoxelRenderer<Integer> {
     };
 
     private Vec3d size;
-    private RLEColumnStorage<Integer> colors;
+    private RLEArrayStorage<Integer> colors;
     private int[] colorPalette = DEFAULT_COLOR_PALETTE;
 
     private Model(String fileName) {
@@ -67,7 +67,7 @@ public class Model extends VoxelRenderer<Integer> {
             int chunkSize = readInt(bytes, pos + 4);
             if (chunkName.equals("SIZE")) {
                 size = new Vec3d(readInt(bytes, pos + 12), readInt(bytes, pos + 16), readInt(bytes, pos + 20));
-                colors = new RLEColumnStorage(Math.max((int) size.x, (int) size.y), new IntegerConverter());
+                colors = new RLEArrayStorage(Math.max((int) size.x, (int) size.y), new IntegerConverter());
             }
             if (chunkName.equals("XYZI")) {
                 int numBlocks = readInt(bytes, pos + 12);
@@ -101,7 +101,7 @@ public class Model extends VoxelRenderer<Integer> {
         if (x < 0 || x >= size.x || y < 0 || y >= size.y) {
             return new ArrayList().iterator();
         }
-        return colors.columnTree(x, y);
+        return colors.columnIterator(x, y);
     }
 
     @Override

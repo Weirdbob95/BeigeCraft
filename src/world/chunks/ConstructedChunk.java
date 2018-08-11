@@ -1,13 +1,14 @@
 package world.chunks;
 
-import util.RLEColumnStorage;
-import util.RLEColumnStorage.BlockTypeConverter;
 import util.noise.NoiseInterpolator;
+import util.rlestorage.IntConverter.BlockTypeConverter;
+import util.rlestorage.RLEArrayStorage;
 import util.vectors.Vec3d;
 import world.BlockType;
 import static world.BlockType.DIRT;
 import static world.BlockType.GRASS;
 import static world.BlockType.IRON_ORE;
+import static world.BlockType.LAVA;
 import static world.BlockType.SAND;
 import static world.BlockType.SNOWY_GRASS;
 import static world.BlockType.STONE;
@@ -18,7 +19,7 @@ import static world.World.CHUNK_SIZE;
 
 public class ConstructedChunk extends AbstractChunk {
 
-    public final RLEColumnStorage<BlockType> blockStorage = new RLEColumnStorage(CHUNK_SIZE, new BlockTypeConverter());
+    public final RLEArrayStorage<BlockType> blockStorage = new RLEArrayStorage(CHUNK_SIZE, new BlockTypeConverter());
 
     public ConstructedChunk(World world, ChunkPos pos) {
         super(world, pos);
@@ -62,6 +63,7 @@ public class ConstructedChunk extends AbstractChunk {
                         blockStorage.setRangeInfinite(x, y, elevation - 1, DIRT);
                         break;
                     case DESERT:
+                    case COLD_DESERT:
                         blockStorage.setRangeInfinite(x, y, elevation, SAND);
                         break;
                     case ROCK:
@@ -71,19 +73,21 @@ public class ConstructedChunk extends AbstractChunk {
                 blockStorage.setRangeInfinite(x, y, elevation - 3, STONE);
 
                 // CAVES
-                int caveStart = minZ;
+                int caveStart = minZ + 3;
                 for (int z = minZ; z <= elevation; z++) {
                     int wx = x + pos.x * CHUNK_SIZE;
                     int wy = y + pos.y * CHUNK_SIZE;
                     int wz = (z - minZ) * 2;
                     if (Math.abs(caves1.get(wx, wy, wz) - .5) + Math.abs(caves2.get(wx, wy, wz) - .5)
-                            < .04 * caveDensity * (1 - 15 / (elevation - z + 20.))) {
-                        // Is cave
+                            < .04 * caveDensity * (1 - 17 / (elevation - z + 20.))) {
+                        if (z < caveStart) {
+                            blockStorage.set(x, y, z, LAVA);
+                        }
                     } else {
                         if (caveStart < z) {
                             blockStorage.setRange(x, y, caveStart, z - 1, null);
                         }
-                        caveStart = z + 1;
+                        caveStart = Math.max(caveStart, z + 1);
                         if (iron.get(wx, wy, wz) * (1 - 15 / (elevation - z + 20.))
                                 > .5 + .25 / ironDensity) {
                             blockStorage.set(x, y, z, IRON_ORE);

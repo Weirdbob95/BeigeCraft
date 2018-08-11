@@ -5,6 +5,7 @@ public enum Biome {
     PLAINS(1, .05, .8),
     FOREST(1, 1, 1),
     DESERT(.5, 0, 0),
+    COLD_DESERT(.5, 0, 0),
     JUNGLE(1.5, 5, 1),
     TAIGA(1, 1, 1),
     SNOW(1.5, 0, 0),

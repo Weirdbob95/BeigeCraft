@@ -4,6 +4,9 @@ import java.util.Random;
 
 public class Noise {
 
+    // Avoids all the octaves of FBM agreeing with each other at the origin
+    private static final double OFFSET = 1e4;
+
     private final SimplexNoise simplexNoise;
 
     public Noise(Random random) {
@@ -35,15 +38,15 @@ public class Noise {
     }
 
     public double noise2d(double x, double y, double frequency) {
-        return simplexNoise.noise(x * frequency, y * frequency) * .5 + .5;
+        return simplexNoise.noise(x * frequency + OFFSET, y * frequency + OFFSET) * .5 + .5;
     }
 
     public double noise3d(double x, double y, double z, double frequency) {
-        return simplexNoise.noise(x * frequency, y * frequency, z * frequency) * .5 + .5;
+        return simplexNoise.noise(x * frequency + OFFSET, y * frequency + OFFSET, z * frequency + OFFSET) * .5 + .5;
     }
 
     public double noise4d(double x, double y, double z, double w, double frequency) {
-        return simplexNoise.noise(x * frequency, y * frequency, z * frequency, w * frequency) * .5 + .5;
+        return simplexNoise.noise(x * frequency + OFFSET, y * frequency + OFFSET, z * frequency + OFFSET, w * frequency + OFFSET) * .5 + .5;
     }
 
     /*

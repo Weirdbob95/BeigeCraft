@@ -37,7 +37,7 @@ public class ChunkRenderer extends VoxelRenderer<BlockType> {
     @Override
     protected Iterator<Entry<Integer, BlockType>> columnAt(int x, int y) {
         int ccx = 1 + floor((double) x / CHUNK_SIZE), ccy = 1 + floor((double) y / CHUNK_SIZE);
-        return ccs[ccx][ccy].blockStorage.columnTree(mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE));
+        return ccs[ccx][ccy].blockStorage.columnIterator(mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE));
     }
 
     @Override

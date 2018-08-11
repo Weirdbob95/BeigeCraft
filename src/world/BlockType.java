@@ -15,7 +15,8 @@ public enum BlockType {
     SNOWY_GRASS,
     TUNDRA_GRASS,
     CACTUS,
-    IRON_ORE;
+    IRON_ORE,
+    LAVA;
 
     public static final BlockType[] VALUES = BlockType.values();
 
@@ -74,6 +75,8 @@ public enum BlockType {
                 }
             case IRON_ORE:
                 return new Vec2d(0, 3);
+            case LAVA:
+                return new Vec2d(1, 3);
             default:
                 throw new RuntimeException("Unknown BlockType: " + bt);
         }

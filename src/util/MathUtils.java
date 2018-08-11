@@ -40,6 +40,10 @@ public abstract class MathUtils {
         }
     }
 
+    public static int round(double x) {
+        return (int) Math.round(x);
+    }
+
     public static Vec3d vecMap(Vec3d v1, Function<Double, Double> f) {
         return new Vec3d(f.apply(v1.x), f.apply(v1.y), f.apply(v1.z));
     }

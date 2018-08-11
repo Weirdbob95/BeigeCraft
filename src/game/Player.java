@@ -113,7 +113,7 @@ public class Player extends Behavior {
         if (Input.keyJustPressed(GLFW_KEY_LEFT_CONTROL)) {
             flying = !flying;
         }
-        double speed = (flying ? 250 : crouching ? 2 : 4) * PLAYER_SCALE;
+        double speed = (flying ? 100 : crouching ? 2 : 4) * PLAYER_SCALE;
 
         Vec3d forwards = camera3d.facing();
         if (!flying) {

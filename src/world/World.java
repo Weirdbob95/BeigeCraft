@@ -2,7 +2,7 @@ package world;
 
 import static engine.Activatable.using;
 import engine.Behavior;
-import static game.Main.LOW_GRAPHICS;
+import static game.Settings.RENDER_DISTANCE;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +35,6 @@ import world.chunks.StructuredChunk;
 public class World extends Behavior {
 
     public static final int CHUNK_SIZE = 32;
-    public static int RENDER_DISTANCE = LOW_GRAPHICS ? 8 : 32;
     public static final int UNLOAD_DISTANCE = 4;
 
     public static final ShaderProgram TERRAIN_SHADER = Resources.loadShaderProgramGeom("terrain");

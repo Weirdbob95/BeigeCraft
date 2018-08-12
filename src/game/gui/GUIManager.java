@@ -15,8 +15,8 @@ public class GUIManager extends Behavior {
     public final MenuRoot menuRoot = new MenuRoot(this);
     public final OptionsRoot optionsRoot = new OptionsRoot(this);
     public final InventoryRoot inventoryRoot = new InventoryRoot(this);
+    public final HUD hud = new HUD();
 
-    private final GUIItem hud = new HUD();
     private GUIItem root;
     private GUIItem selected;
 

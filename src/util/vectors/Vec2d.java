@@ -1,5 +1,7 @@
 package util.vectors;
 
+import org.joml.Vector2d;
+
 public class Vec2d {
 
     public final double x, y;
@@ -7,6 +9,10 @@ public class Vec2d {
     public Vec2d(double x, double y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Vec2d add(double a) {
+        return new Vec2d(x + a, y + a);
     }
 
     public Vec2d add(Vec2d other) {
@@ -19,6 +25,10 @@ public class Vec2d {
 
     public Vec2d div(Vec2d other) {
         return new Vec2d(x / other.x, y / other.y);
+    }
+
+    public double dot(Vec2d other) {
+        return x * other.x + y * other.y;
     }
 
     @Override
@@ -42,6 +52,10 @@ public class Vec2d {
         return true;
     }
 
+    public Vec2d floor() {
+        return new Vec2d(Math.floor(x), Math.floor(y));
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;
@@ -52,6 +66,14 @@ public class Vec2d {
 
     public double length() {
         return Math.sqrt(x * x + y * y);
+    }
+
+    public double lengthSquared() {
+        return x * x + y * y;
+    }
+
+    public Vec2d lerp(Vec2d other, double amt) {
+        return mul(1 - amt).add(other.mul(amt));
     }
 
     public Vec2d mul(double a) {
@@ -74,8 +96,16 @@ public class Vec2d {
         return new Vec2d(x, y);
     }
 
+    public Vec2d sub(double a) {
+        return new Vec2d(x - a, y - a);
+    }
+
     public Vec2d sub(Vec2d other) {
         return new Vec2d(x - other.x, y - other.y);
+    }
+
+    public Vector2d toJOML() {
+        return new Vector2d(x, y);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package opengl;
 
-import static game.Main.LOW_GRAPHICS;
+import static game.Settings.ANTI_ALIASING;
 import java.nio.IntBuffer;
 import org.lwjgl.glfw.*;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -58,7 +58,7 @@ public class Window {
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        if (!LOW_GRAPHICS) {
+        if (ANTI_ALIASING) {
             glfwWindowHint(GLFW_SAMPLES, 16);
         }
 

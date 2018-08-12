@@ -18,22 +18,28 @@ public class GUIText extends GUIItem {
 
     @Override
     protected void render() {
-        if (centered) {
-            if (outlineColor == null) {
-                text.draw2dCentered(center(), 0, scale, color);
+        if (text != null) {
+            if (centered) {
+                if (outlineColor == null) {
+                    text.draw2dCentered(center(), 0, scale, color);
+                } else {
+                    text.draw2dCentered(center(), 0, scale, color, outlineColor);
+                }
             } else {
-                text.draw2dCentered(center(), 0, scale, color, outlineColor);
-            }
-        } else {
-            if (outlineColor == null) {
-                text.draw2d(center(), 0, scale, color);
-            } else {
-                text.draw2d(center(), 0, scale, color, outlineColor);
+                if (outlineColor == null) {
+                    text.draw2d(center(), 0, scale, color);
+                } else {
+                    text.draw2d(center(), 0, scale, color, outlineColor);
+                }
             }
         }
     }
 
     public final void setText(String s) {
-        text = Font.load("arial_outline").renderText(s);
+        if (s != null && !s.isEmpty()) {
+            text = Font.load("arial_outline").renderText(s);
+        } else {
+            text = null;
+        }
     }
 }

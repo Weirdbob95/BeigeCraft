@@ -5,6 +5,7 @@ import static behaviors.MiscBehaviors.onRender;
 import static behaviors.MiscBehaviors.onUpdate;
 import engine.Core;
 import engine.Input;
+import static game.Settings.RENDER_DISTANCE;
 import game.gui.GUIManager;
 import java.util.Comparator;
 import java.util.Optional;
@@ -15,11 +16,8 @@ import util.Multithreader;
 import util.vectors.Vec3d;
 import world.ChunkPos;
 import world.World;
-import static world.World.RENDER_DISTANCE;
 
 public abstract class Main {
-
-    public static final boolean LOW_GRAPHICS = false;
 
     public static void main(String[] args) {
         Core.init();

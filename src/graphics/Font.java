@@ -150,6 +150,9 @@ public class Font {
                 cursor = cursor.add(new Vec2d(prev.getAdvance(c), 0));
             }
             FontChar fc = charMap.get(c);
+            if (fc == null) {
+                throw new RuntimeException("Missing character: " + (char) c);
+            }
             if (data[fc.page] == null) {
                 data[fc.page] = new LinkedList();
             }

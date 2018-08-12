@@ -9,7 +9,7 @@ public abstract class RLEStorage<T> {
     private int maxZ, minZ;
     private boolean recomputeMinMax = true;
 
-    protected abstract Stream<RLEColumn<T>> allColumns();
+    public abstract Stream<RLEColumn<T>> allColumns();
 
     protected abstract RLEColumn<T> columnAt(int x, int y);
 

@@ -1,7 +1,7 @@
 package game;
 
 import behaviors.AccelerationBehavior;
-import behaviors.PhysicsBehavior;
+import behaviors.PlayerPhysicsBehavior;
 import behaviors.PositionBehavior;
 import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
@@ -26,12 +26,14 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
 import static util.MathUtils.ceil;
+import static util.MathUtils.mod;
 import util.vectors.Vec2d;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
 import world.BlockType;
 import world.Raycast.RaycastHit;
 import static world.Raycast.raycastDistance;
+import static world.World.CHUNK_SIZE;
 
 public class Player extends Behavior {
 
@@ -40,20 +42,20 @@ public class Player extends Behavior {
     public final PositionBehavior position = require(PositionBehavior.class);
     public final VelocityBehavior velocity = require(VelocityBehavior.class);
     public final AccelerationBehavior acceleration = require(AccelerationBehavior.class);
-    public final PhysicsBehavior physics = require(PhysicsBehavior.class);
+    public final PlayerPhysicsBehavior physics = require(PlayerPhysicsBehavior.class);
     public final SpaceOccupierBehavior spaceOccupier = require(SpaceOccupierBehavior.class);
 
     public GUIManager gui;
     public boolean flying;
-    public boolean crouching;
     public Map<Vec3d, Double> blocksToBreak = new HashMap();
 
     @Override
     public void createInner() {
         acceleration.acceleration = new Vec3d(0, 0, -32).mul(PLAYER_SCALE);
-        physics.hitboxSize1 = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
-        physics.hitboxSize2 = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
-        physics.stepUp = true;
+        physics.hitboxSize1Stand = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
+        physics.hitboxSize2Stand = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
+        physics.hitboxSize1Crouch = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
+        physics.hitboxSize2Crouch = new Vec3d(.3, .3, .6).mul(PLAYER_SCALE);
     }
 
     private RaycastHit firstSolid() {
@@ -84,7 +86,7 @@ public class Player extends Behavior {
         Animation blockBreak = Animation.load("blockbreak_anim");
         for (Entry<Vec3d, Double> e : blocksToBreak.entrySet()) {
             if (e.getValue() > .05) {
-                Sprite s = blockBreak.getSpriteOrNull("", (int) (4 * (e.getValue() - .05) / .5));
+                Sprite s = blockBreak.getSpriteOrNull("", (int) (4 * (e.getValue() - .05)));
                 for (Vec3d dir : DIRS) {
                     Vec3d drawPos = e.getKey().floor().add(new Vec3d(.5, .5, .5)).sub(dir.mul(.501));
                     s.draw3d(drawPos, dir, 0, new Vec2d(1, 1), new Vec4d(1, 1, 1, .5));
@@ -96,7 +98,11 @@ public class Player extends Behavior {
     @Override
     public void update(double dt) {
 
-        Vec3d desCamPos = position.position.add(new Vec3d(0, 0, crouching ? .4 : .7).mul(PLAYER_SCALE));
+        gui.hud.setBiome(physics.world.heightmappedChunks
+                .get(physics.world.getChunkPos(position.position)).biomemap[(int) mod(position.position.x, CHUNK_SIZE)][(int) mod(position.position.y, CHUNK_SIZE)].plurality());
+        gui.hud.setPos(position.position);
+
+        Vec3d desCamPos = position.position.add(new Vec3d(0, 0, physics.crouch ? .4 : .7).mul(PLAYER_SCALE));
         //camera.position = desCamPos;
         camera3d.position = camera3d.position.lerp(desCamPos, 1 - Math.pow(1e-6, dt));
 
@@ -119,7 +125,7 @@ public class Player extends Behavior {
             if (Input.keyJustPressed(GLFW_KEY_LEFT_CONTROL)) {
                 flying = !flying;
             }
-            double speed = (flying ? 100 : crouching ? 2 : 4) * PLAYER_SCALE;
+            double speed = (flying ? 100 : physics.crouch ? 2 : 4) * PLAYER_SCALE;
 
             Vec3d forwards = camera3d.facing();
             if (!flying) {
@@ -150,24 +156,12 @@ public class Player extends Behavior {
             // Jump
             if (Input.keyDown(GLFW_KEY_SPACE)) {
                 if (physics.onGround || flying) {
-                    velocity.velocity = velocity.velocity.setZ((flying ? 100 : Math.sqrt(4.3) * 5) * PLAYER_SCALE);
+                    velocity.velocity = velocity.velocity.setZ((flying ? 100 : 11.5) * PLAYER_SCALE);
                 }
             }
 
             // Crouch
-            if (Input.keyDown(GLFW_KEY_LEFT_SHIFT)) {
-                if (!crouching) {
-                    crouching = true;
-                    physics.hitboxSize2 = new Vec3d(.3, .3, .6).mul(PLAYER_SCALE);
-                }
-            } else {
-                if (crouching) {
-                    if (physics.couldChangeHitboxSize(physics.hitboxSize1, new Vec3d(.3, .3, .8).mul(PLAYER_SCALE))) {
-                        crouching = false;
-                        physics.hitboxSize2 = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
-                    }
-                }
-            }
+            physics.shouldCrouch = Input.keyDown(GLFW_KEY_LEFT_SHIFT);
 
             // Break block
             if (Input.mouseDown(0)) {
@@ -195,7 +189,7 @@ public class Player extends Behavior {
                     for (Vec3d v : targets) {
                         blocksToBreak.putIfAbsent(v, 0.);
                         blocksToBreak.put(v, blocksToBreak.get(v) + dt * 8 / targets.size());
-                        if (blocksToBreak.get(v) > .5) {
+                        if (blocksToBreak.get(v) > 1) {
                             physics.world.setBlock(v, null);
                             blocksToBreak.remove(v);
                         }
@@ -216,6 +210,6 @@ public class Player extends Behavior {
             }
         }
 
-        velocity.velocity = velocity.velocity.lerp(idealVel, 1 - Math.pow(.005, dt));
+        velocity.velocity = velocity.velocity.lerp(idealVel, 1 - Math.pow(1e-4, dt));
     }
 }

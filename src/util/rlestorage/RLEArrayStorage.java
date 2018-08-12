@@ -6,21 +6,19 @@ import java.util.stream.Stream;
 public class RLEArrayStorage<T> extends RLEStorage<T> {
 
     private final int size;
-    private final RLEColumn<T>[][] columns;
+    private final RLEColumn<T>[] columns;
 
     public RLEArrayStorage(int size, IntConverter<T> ic) {
         this.size = size;
-        columns = new RLEColumn[size][size];
-        for (int x = 0; x < size; x++) {
-            for (int y = 0; y < size; y++) {
-                columns[x][y] = new RLEColumn(x, y, ic);
-            }
+        columns = new RLEColumn[size * size];
+        for (int i = 0; i < size * size; i++) {
+            columns[i] = new RLEColumn(i / size, i % size, ic);
         }
     }
 
     @Override
-    protected Stream<RLEColumn<T>> allColumns() {
-        return Arrays.stream(columns).flatMap(Arrays::stream);
+    public Stream<RLEColumn<T>> allColumns() {
+        return Arrays.stream(columns);
     }
 
     @Override
@@ -28,6 +26,6 @@ public class RLEArrayStorage<T> extends RLEStorage<T> {
         if (x < 0 || x >= size || y < 0 || y >= size) {
             return null;
         }
-        return columns[x][y];
+        return columns[size * x + y];
     }
 }

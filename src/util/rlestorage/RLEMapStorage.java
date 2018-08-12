@@ -13,7 +13,7 @@ public class RLEMapStorage<T> extends RLEStorage<T> {
     }
 
     @Override
-    protected Stream<RLEColumn<T>> allColumns() {
+    public Stream<RLEColumn<T>> allColumns() {
         return columnMap.values().stream();
     }
 

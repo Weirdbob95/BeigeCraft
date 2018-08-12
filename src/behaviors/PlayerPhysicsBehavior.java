@@ -9,7 +9,7 @@ import world.World;
 import static world.World.CHUNK_SIZE;
 import world.chunks.ConstructedChunk;
 
-public class PhysicsBehavior extends Behavior {
+public class PlayerPhysicsBehavior extends Behavior {
 
     private static final int DETAIL = 10;
 
@@ -17,22 +17,16 @@ public class PhysicsBehavior extends Behavior {
     public final PreviousPositionBehavior prevPos = require(PreviousPositionBehavior.class);
     public final VelocityBehavior velocity = require(VelocityBehavior.class);
 
-    public Vec3d hitboxSize1 = new Vec3d(0, 0, 0);
-    public Vec3d hitboxSize2 = new Vec3d(0, 0, 0);
+    public Vec3d hitboxSize1Crouch = new Vec3d(0, 0, 0);
+    public Vec3d hitboxSize2Crouch = new Vec3d(0, 0, 0);
+    public Vec3d hitboxSize1Stand = new Vec3d(0, 0, 0);
+    public Vec3d hitboxSize2Stand = new Vec3d(0, 0, 0);
     public boolean onGround;
     public boolean hitWall;
+    public boolean crouch;
+    public boolean shouldCrouch;
+    public double stepUp = 1.05;
     public World world;
-
-    public boolean couldChangeHitboxSize(Vec3d newSize1, Vec3d newSize2) {
-        Vec3d oldSize1 = hitboxSize1;
-        Vec3d oldSize2 = hitboxSize2;
-        hitboxSize1 = newSize1;
-        hitboxSize2 = newSize2;
-        boolean r = !wouldCollideAt(position.position);
-        hitboxSize1 = oldSize1;
-        hitboxSize2 = oldSize2;
-        return r;
-    }
 
     private boolean moveToWall(Vec3d del) {
         if (!wouldCollideAt(position.position.add(del))) {
@@ -55,19 +49,52 @@ public class PhysicsBehavior extends Behavior {
         return true;
     }
 
+    private double potentialMoveDist(Vec3d del) {
+        Vec3d oldPos = position.position;
+        moveToWall(new Vec3d(del.x, 0, 0));
+        moveToWall(new Vec3d(0, del.y, 0));
+        moveToWall(new Vec3d(0, 0, del.z));
+        double dist = position.position.sub(oldPos).length();
+        position.position = oldPos;
+        return dist;
+    }
+
     @Override
     public void update(double dt) {
+        // Useful vars
         boolean wasOnGround = onGround;
+        Vec3d del = position.position.sub(prevPos.prevPos);
+
+        // Reset all vars
         onGround = false;
         hitWall = false;
-        Vec3d del = position.position.sub(prevPos.prevPos);
+        crouch = true;
+
+        // Check collision
         if (wouldCollideAt(position.position)) {
-            if (!wouldCollideAt(prevPos.prevPos)) {
+            if (wouldCollideAt(prevPos.prevPos)) {
+                // Give up
+                velocity.velocity = new Vec3d(0, 0, 0);
+            } else {
                 position.position = prevPos.prevPos;
+
+                // Move in Z dir
                 if (moveToWall(new Vec3d(0, 0, del.z))) {
                     velocity.velocity = velocity.velocity.setZ(0);
                     if (del.z < 0) {
                         onGround = true;
+                    }
+                }
+                // Try step up
+                boolean steppingUp = false;
+                if (wasOnGround || onGround) {
+                    double moveDist1 = potentialMoveDist(del.setZ(0));
+                    position.position = position.position.add(new Vec3d(0, 0, stepUp));
+                    double moveDist2 = potentialMoveDist(del.setZ(0));
+                    if (moveDist1 >= moveDist2) {
+                        position.position = position.position.sub(new Vec3d(0, 0, stepUp));
+                    } else {
+                        steppingUp = true;
                     }
                 }
                 if (moveToWall(new Vec3d(del.x, 0, 0))) {
@@ -78,10 +105,21 @@ public class PhysicsBehavior extends Behavior {
                     velocity.velocity = velocity.velocity.setY(0);
                     hitWall = true;
                 }
-            } else {
-                velocity.velocity = new Vec3d(0, 0, 0);
+                if (steppingUp) {
+                    moveToWall(new Vec3d(0, 0, -stepUp));
+                }
             }
         }
+
+        // Try to stand up
+        if (!shouldCrouch) {
+            crouch = false;
+            if (wouldCollideAt(position.position)) {
+                crouch = true;
+            }
+        }
+
+        // Set onGround
         if (!onGround && wouldCollideAt(position.position.add(new Vec3d(0, 0, -.01)))) {
             onGround = true;
         }
@@ -93,6 +131,8 @@ public class PhysicsBehavior extends Behavior {
     }
 
     public boolean wouldCollideAt(Vec3d pos) {
+        Vec3d hitboxSize1 = crouch ? hitboxSize1Crouch : hitboxSize1Stand;
+        Vec3d hitboxSize2 = crouch ? hitboxSize2Crouch : hitboxSize2Stand;
         for (int x = floor(pos.x - hitboxSize1.x); x < pos.x + hitboxSize2.x; x++) {
             for (int y = floor(pos.y - hitboxSize1.y); y < pos.y + hitboxSize2.y; y++) {
                 ConstructedChunk cc = world.constructedChunks.get(world.getChunkPos(new Vec3d(x, y, 0)));

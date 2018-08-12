@@ -64,7 +64,7 @@ public class RLEColumn<T> implements Iterable<Entry<Integer, T>> {
         }
     }
 
-    boolean isEmpty() {
+    public boolean isEmpty() {
         return data.length == 0;
     }
 

@@ -25,18 +25,26 @@ public class GUIButton extends GUIRectangle {
 //            text.draw2dCentered(center, 0, 2, new Vec4d(1, 1, 1, 1), new Vec4d(0, 0, 0, 1));
 //        }
 //    }
-    private final Runnable onClick;
+    public GUIText text;
+    public Runnable onClick;
+
+    public GUIButton(String s) {
+        this(s, null);
+    }
 
     public GUIButton(String s, Runnable onClick) {
         if (s != null && !s.isEmpty()) {
-            add(new GUIText(s));
+            text = new GUIText(s);
+            add(text);
         }
         this.onClick = onClick;
     }
 
     @Override
     protected void onClick() {
-        onClick.run();
+        if (onClick != null) {
+            onClick.run();
+        }
     }
 
     @Override

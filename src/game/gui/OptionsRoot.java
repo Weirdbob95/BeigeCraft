@@ -1,5 +1,7 @@
 package game.gui;
 
+import static game.Settings.RENDER_DISTANCE;
+import static game.Settings.SHOW_DEBUG_HUD;
 import java.util.function.Supplier;
 import util.vectors.Vec2d;
 import world.World;
@@ -13,26 +15,35 @@ public class OptionsRoot extends GUIRoot {
         title.offset = new Vec2d(0, 250);
         title.scale = 3;
 
-        Supplier<String> renderDistText = () -> "Render distance: " + World.RENDER_DISTANCE + "  (" + World.RENDER_DISTANCE * World.CHUNK_SIZE + " blocks)";
+        Supplier<String> renderDistText = () -> "Render distance: " + RENDER_DISTANCE + "  (" + RENDER_DISTANCE * World.CHUNK_SIZE + " blocks)";
         GUIText renderDist = new GUIText(renderDistText.get());
-        renderDist.offset = new Vec2d(-300, 0);
+        renderDist.offset = new Vec2d(-300, -25);
         renderDist.centered = false;
 
         GUIButton renderDistPlus = new GUIButton("+", () -> {
-            World.RENDER_DISTANCE += 1;
+            RENDER_DISTANCE += 1;
             renderDist.setText(renderDistText.get());
         });
-        renderDistPlus.offset = new Vec2d(250, 0);
+        renderDistPlus.offset = new Vec2d(250, -25);
         renderDistPlus.size = new Vec2d(40, 40);
 
         GUIButton renderDistMinus = new GUIButton("-", () -> {
-            if (World.RENDER_DISTANCE > 1) {
-                World.RENDER_DISTANCE -= 1;
+            if (RENDER_DISTANCE > 1) {
+                RENDER_DISTANCE -= 1;
                 renderDist.setText(renderDistText.get());
             }
         });
-        renderDistMinus.offset = new Vec2d(300, 0);
+        renderDistMinus.offset = new Vec2d(300, -25);
         renderDistMinus.size = new Vec2d(40, 40);
+
+        Supplier<String> showDebugInfo = () -> "Show debug info: " + (SHOW_DEBUG_HUD ? "On" : "Off");
+        GUIButton showPos = new GUIButton(showDebugInfo.get());
+        showPos.onClick = () -> {
+            SHOW_DEBUG_HUD = !SHOW_DEBUG_HUD;
+            showPos.text.setText(showDebugInfo.get());
+        };
+        showPos.offset = new Vec2d(0, -150);
+        showPos.size = new Vec2d(800, 100);
 
         GUIButton back = new GUIButton("Back", () -> {
             manager.setRoot(manager.menuRoot);
@@ -40,6 +51,6 @@ public class OptionsRoot extends GUIRoot {
         back.offset = new Vec2d(0, -275);
         back.size = new Vec2d(800, 100);
 
-        add(title, renderDist, renderDistPlus, renderDistMinus, back);
+        add(title, renderDist, renderDistPlus, renderDistMinus, showPos, back);
     }
 }

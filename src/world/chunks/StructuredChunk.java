@@ -1,7 +1,14 @@
 package world.chunks;
 
+import static graphics.VoxelRenderer.DIRS;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.Set;
 import static util.MathUtils.ceil;
 import util.rlestorage.IntConverter.BlockTypeConverter;
 import util.rlestorage.RLEMapStorage;
@@ -51,6 +58,46 @@ public class StructuredChunk extends AbstractChunk {
             this.y = y;
             this.z = z;
         }
+
+        public void removeDisconnected(Vec3d start) {
+            Set<Vec3d> connectedComponent = new HashSet();
+            connectedComponent.add(start);
+            Queue<Vec3d> toCheck = new LinkedList();
+            toCheck.add(start);
+            while (!toCheck.isEmpty()) {
+                Vec3d v = toCheck.poll();
+                for (Vec3d dir : DIRS) {
+                    Vec3d v2 = v.add(dir);
+                    if (!connectedComponent.contains(v2)) {
+                        if (blocks.get((int) v2.x, (int) v2.y, (int) v2.z) != null) {
+                            connectedComponent.add(v2);
+                            toCheck.add(v2);
+                        }
+                    }
+                }
+            }
+            blocks.allColumns().forEach(c -> {
+                if (!c.isEmpty()) {
+                    List<Integer> toRemove = new LinkedList();
+                    Iterator<Entry<Integer, BlockType>> i = c.iterator();
+                    Entry<Integer, BlockType> prev = i.next();
+                    while (i.hasNext()) {
+                        Entry<Integer, BlockType> e = i.next();
+                        if (e.getValue() != null) {
+                            if (!connectedComponent.contains(new Vec3d(c.x, c.y, e.getKey()))) {
+                                for (int z = prev.getKey() + 1; z <= e.getKey(); z++) {
+                                    toRemove.add(z);
+                                }
+                            }
+                        }
+                        prev = e;
+                    }
+                    for (int z : toRemove) {
+                        blocks.set(c.x, c.y, z, null);
+                    }
+                }
+            });
+        }
     }
 
     public class Tree extends Structure {
@@ -76,6 +123,7 @@ public class StructuredChunk extends AbstractChunk {
                 blocks.setRange(0, 1, 0, (int) height, BlockType.LOG);
                 blocks.setRange(1, 1, 0, (int) height, BlockType.LOG);
             }
+            removeDisconnected(new Vec3d(0, 0, 0));
         }
     }
 

@@ -35,11 +35,11 @@ import world.chunks.StructuredChunk;
 public class World extends Behavior {
 
     public static final int CHUNK_SIZE = 32;
-    public static final int RENDER_DISTANCE = LOW_GRAPHICS ? 8 : 32;
-    public static final int UNLOAD_DISTANCE = LOW_GRAPHICS ? 12 : 40;
+    public static int RENDER_DISTANCE = LOW_GRAPHICS ? 8 : 32;
+    public static final int UNLOAD_DISTANCE = 4;
 
     public static final ShaderProgram TERRAIN_SHADER = Resources.loadShaderProgramGeom("terrain");
-    public static final Texture TERRAIN_TEXTURE = new Texture("sprites/blockSpritesheet.png");
+    public static final Texture TERRAIN_TEXTURE = Texture.load("blockSpritesheet.png");
 
     public final ChunkMap<ConstructedChunk> constructedChunks = new ChunkMap<>(this, ConstructedChunk::new);
     public final ChunkMap<HeightmappedChunk> heightmappedChunks = new ChunkMap<>(this, HeightmappedChunk::new);
@@ -180,7 +180,7 @@ public class World extends Behavior {
 
         public void removeDistant(ChunkPos camera) {
             for (ChunkPos pos : chunks.keySet()) {
-                if (camera.distance(pos) > UNLOAD_DISTANCE) {
+                if (camera.distance(pos) > RENDER_DISTANCE + UNLOAD_DISTANCE) {
                     remove(pos);
                 }
             }

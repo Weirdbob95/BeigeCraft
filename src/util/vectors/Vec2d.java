@@ -50,12 +50,20 @@ public class Vec2d {
         return hash;
     }
 
+    public double length() {
+        return Math.sqrt(x * x + y * y);
+    }
+
     public Vec2d mul(double a) {
         return new Vec2d(x * a, y * a);
     }
 
     public Vec2d mul(Vec2d other) {
         return new Vec2d(x * other.x, y * other.y);
+    }
+
+    public Vec2d normalize() {
+        return div(length());
     }
 
     public Vec2d setX(double x) {

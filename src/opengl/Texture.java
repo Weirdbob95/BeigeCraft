@@ -1,47 +1,29 @@
 package opengl;
 
-import de.matthiasmann.twl.utils.PNGDecoder;
-import de.matthiasmann.twl.utils.PNGDecoder.Format;
 import engine.Activatable;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_MAX_LEVEL;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.stb.STBImage.stbi_failure_reason;
+import static org.lwjgl.stb.STBImage.stbi_load;
+import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
 
 public class Texture implements Activatable {
 
-    private int texture;
-    int texNum;
-    private int type;
+    private final int texture, type;
+    private int width, height;
 
     public Texture(int type) {
         texture = glGenTextures();
         this.type = type;
-        activate();
-        glTexParameteri(type, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glGenerateMipmap(type);
-        deactivate();
-    }
-
-    public Texture(int texNum, int type) {
-        texture = glGenTextures();
-        this.texNum = texNum;
-        this.type = type;
-    }
-
-    public Texture(String fileName) {
-        texture = loadTexture(fileName);
-        type = GL_TEXTURE_2D;
     }
 
     @Override
     public void activate() {
-        glActiveTexture(GL_TEXTURE0 + texNum);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(type, texture);
     }
 
@@ -50,42 +32,41 @@ public class Texture implements Activatable {
         glBindTexture(type, 0);
     }
 
-    public int getID() {
-        return texture;
+    public int getHeight() {
+        return height;
     }
 
-    private static int loadTexture(String fileName) {
-        try {
-            // Load Texture file
-            PNGDecoder decoder = new PNGDecoder(new FileInputStream(fileName));
+    public int getWidth() {
+        return width;
+    }
 
-            // Load texture contents into a byte buffer
-            ByteBuffer buf = ByteBuffer.allocateDirect(
-                    4 * decoder.getWidth() * decoder.getHeight());
-            decoder.decode(buf, decoder.getWidth() * 4, Format.RGBA);
-            buf.flip();
+    private void setParameter(int name, int value) {
+        glTexParameteri(type, name, value);
+    }
 
-            // Create a new OpenGL texture
-            int textureId = glGenTextures();
-            // Bind the texture
-            glBindTexture(GL_TEXTURE_2D, textureId);
+    private void uploadData(int width, int height, ByteBuffer data) {
+        this.width = width;
+        this.height = height;
+        glTexImage2D(type, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(type);
+    }
 
-            // Tell OpenGL how to unpack the RGBA bytes. Each component is 1 byte size
-            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
-
-            // Upload the texture data
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0,
-                    GL_RGBA, GL_UNSIGNED_BYTE, buf);
-            // Generate Mip Map
-            glGenerateMipmap(GL_TEXTURE_2D);
-            return textureId;
-        } catch (IOException ex) {
-            ex.printStackTrace();
+    public static Texture load(String fileName) {
+        int[] widthArray = new int[1];
+        int[] heightArray = new int[1];
+        int[] compArray = new int[1];
+        stbi_set_flip_vertically_on_load(true);
+        ByteBuffer image = stbi_load("sprites/" + fileName, widthArray, heightArray, compArray, 4);
+        if (image == null) {
+            throw new RuntimeException("Failed to load image " + fileName + " : " + stbi_failure_reason());
         }
-        return 0;
+
+        Texture t = new Texture(GL_TEXTURE_2D);
+        t.activate();
+        t.setParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        t.setParameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+        t.setParameter(GL_TEXTURE_MAX_LEVEL, 4);
+        t.uploadData(widthArray[0], heightArray[0], image);
+        return t;
     }
 }

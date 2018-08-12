@@ -68,7 +68,7 @@ public class Window {
         }
 
         if (mainWindow) {
-            glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            setCursorEnabled(false);
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 IntBuffer pWidth = stack.mallocInt(1);
                 IntBuffer pHeight = stack.mallocInt(1);
@@ -102,6 +102,14 @@ public class Window {
     public void nextFrame() {
         glfwSwapBuffers(handle);
         glfwPollEvents();
+    }
+
+    public void setCursorEnabled(boolean enabled) {
+        if (enabled) {
+            glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        } else {
+            glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
     }
 
     public void setCursorPosCallback(GLFWCursorPosCallbackI cursorPosCallback) {

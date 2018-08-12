@@ -7,6 +7,7 @@ import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
 import engine.Input;
+import game.gui.GUIManager;
 import graphics.Animation;
 import graphics.Sprite;
 import static graphics.VoxelRenderer.DIRS;
@@ -42,6 +43,7 @@ public class Player extends Behavior {
     public final PhysicsBehavior physics = require(PhysicsBehavior.class);
     public final SpaceOccupierBehavior spaceOccupier = require(SpaceOccupierBehavior.class);
 
+    public GUIManager gui;
     public boolean flying;
     public boolean crouching;
     public Map<Vec3d, Double> blocksToBreak = new HashMap();
@@ -94,122 +96,126 @@ public class Player extends Behavior {
     @Override
     public void update(double dt) {
 
-        Vec3d desCamPos = position.position.add(new Vec3d(0, 0, crouching ? .4 : .65).mul(PLAYER_SCALE));
+        Vec3d desCamPos = position.position.add(new Vec3d(0, 0, crouching ? .4 : .7).mul(PLAYER_SCALE));
         //camera.position = desCamPos;
         camera3d.position = camera3d.position.lerp(desCamPos, 1 - Math.pow(1e-6, dt));
 
-        // Look around
-        camera3d.horAngle -= Input.mouseDelta().x / 500;
-        camera3d.vertAngle += Input.mouseDelta().y / 500;
-
-        if (camera3d.vertAngle > 1.55) {
-            camera3d.vertAngle = 1.55f;
-        }
-        if (camera3d.vertAngle < -1.55) {
-            camera3d.vertAngle = -1.55f;
-        }
-
-        // Move
-        if (Input.keyJustPressed(GLFW_KEY_LEFT_CONTROL)) {
-            flying = !flying;
-        }
-        double speed = (flying ? 100 : crouching ? 2 : 4) * PLAYER_SCALE;
-
-        Vec3d forwards = camera3d.facing();
-        if (!flying) {
-            forwards = forwards.setZ(0).normalize();
-        }
-        Vec3d sideways = camera3d.up.cross(forwards);
-
         Vec3d idealVel = new Vec3d(0, 0, 0);
-        if (Input.keyDown(GLFW_KEY_W)) {
-            idealVel = idealVel.add(forwards);
-        }
-        if (Input.keyDown(GLFW_KEY_A)) {
-            idealVel = idealVel.add(sideways);
-        }
-        if (Input.keyDown(GLFW_KEY_S)) {
-            idealVel = idealVel.sub(forwards);
-        }
-        if (Input.keyDown(GLFW_KEY_D)) {
-            idealVel = idealVel.sub(sideways);
-        }
-        if (idealVel.lengthSquared() > 0) {
-            idealVel = idealVel.normalize().mul(speed);
-        }
 
-        if (!flying) {
-            idealVel = idealVel.setZ(velocity.velocity.z);
-        }
+        if (!gui.inMenu()) {
 
-        velocity.velocity = velocity.velocity.lerp(idealVel, 1 - Math.pow(.005, dt));
+            // Look around
+            camera3d.horAngle -= Input.mouseDelta().x / 500;
+            camera3d.vertAngle += Input.mouseDelta().y / 500;
 
-        // Jump
-        if (Input.keyDown(GLFW_KEY_SPACE)) {
-            if (physics.onGround || flying) {
-                velocity.velocity = velocity.velocity.setZ((flying ? 100 : Math.sqrt(4.3) * 5) * PLAYER_SCALE);
+            if (camera3d.vertAngle > 1.55) {
+                camera3d.vertAngle = 1.55f;
             }
-        }
-
-        // Crouch
-        if (Input.keyDown(GLFW_KEY_LEFT_SHIFT)) {
-            if (!crouching) {
-                crouching = true;
-                physics.hitboxSize2 = new Vec3d(.3, .3, .6).mul(PLAYER_SCALE);
+            if (camera3d.vertAngle < -1.55) {
+                camera3d.vertAngle = -1.55f;
             }
-        } else {
-            if (crouching) {
-                if (physics.couldChangeHitboxSize(physics.hitboxSize1, new Vec3d(.3, .3, .8).mul(PLAYER_SCALE))) {
-                    crouching = false;
-                    physics.hitboxSize2 = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
+
+            // Move
+            if (Input.keyJustPressed(GLFW_KEY_LEFT_CONTROL)) {
+                flying = !flying;
+            }
+            double speed = (flying ? 100 : crouching ? 2 : 4) * PLAYER_SCALE;
+
+            Vec3d forwards = camera3d.facing();
+            if (!flying) {
+                forwards = forwards.setZ(0).normalize();
+            }
+            Vec3d sideways = camera3d.up.cross(forwards);
+
+            if (Input.keyDown(GLFW_KEY_W)) {
+                idealVel = idealVel.add(forwards);
+            }
+            if (Input.keyDown(GLFW_KEY_A)) {
+                idealVel = idealVel.add(sideways);
+            }
+            if (Input.keyDown(GLFW_KEY_S)) {
+                idealVel = idealVel.sub(forwards);
+            }
+            if (Input.keyDown(GLFW_KEY_D)) {
+                idealVel = idealVel.sub(sideways);
+            }
+            if (idealVel.lengthSquared() > 0) {
+                idealVel = idealVel.normalize().mul(speed);
+            }
+
+            if (!flying) {
+                idealVel = idealVel.setZ(velocity.velocity.z);
+            }
+
+            // Jump
+            if (Input.keyDown(GLFW_KEY_SPACE)) {
+                if (physics.onGround || flying) {
+                    velocity.velocity = velocity.velocity.setZ((flying ? 100 : Math.sqrt(4.3) * 5) * PLAYER_SCALE);
                 }
             }
-        }
 
-        // Break block
-        if (Input.mouseDown(0)) {
-            RaycastHit block = firstSolid();
-            if (block != null) {
-                int handSize = ceil(PLAYER_SCALE);
-                Vec3d origin = block.hitPos
-                        //.add(block.hitDir.mul(handSize / 2.))
-                        .sub(new Vec3d(1, 1, 1).mul(.5 * (handSize - 1)));
-                List<Vec3d> targets = new ArrayList();
-                for (int x = 0; x < handSize; x++) {
-                    for (int y = 0; y < handSize; y++) {
-                        for (int z = 0; z < handSize; z++) {
-                            if (physics.world.getBlock(origin.add(new Vec3d(x, y, z))) != null) {
-                                targets.add(origin.add(new Vec3d(x, y, z)).floor());
+            // Crouch
+            if (Input.keyDown(GLFW_KEY_LEFT_SHIFT)) {
+                if (!crouching) {
+                    crouching = true;
+                    physics.hitboxSize2 = new Vec3d(.3, .3, .6).mul(PLAYER_SCALE);
+                }
+            } else {
+                if (crouching) {
+                    if (physics.couldChangeHitboxSize(physics.hitboxSize1, new Vec3d(.3, .3, .8).mul(PLAYER_SCALE))) {
+                        crouching = false;
+                        physics.hitboxSize2 = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
+                    }
+                }
+            }
+
+            // Break block
+            if (Input.mouseDown(0)) {
+                RaycastHit block = firstSolid();
+                if (block != null) {
+                    int handSize = ceil(PLAYER_SCALE);
+                    Vec3d origin = block.hitPos
+                            //.add(block.hitDir.mul(handSize / 2.))
+                            .sub(new Vec3d(1, 1, 1).mul(.5 * (handSize - 1)));
+                    List<Vec3d> targets = new ArrayList();
+                    for (int x = 0; x < handSize; x++) {
+                        for (int y = 0; y < handSize; y++) {
+                            for (int z = 0; z < handSize; z++) {
+                                if (physics.world.getBlock(origin.add(new Vec3d(x, y, z))) != null) {
+                                    targets.add(origin.add(new Vec3d(x, y, z)).floor());
+                                }
                             }
                         }
                     }
-                }
-                for (Vec3d v : new ArrayList<>(blocksToBreak.keySet())) {
-                    if (!targets.contains(v)) {
-                        blocksToBreak.remove(v);
+                    for (Vec3d v : new ArrayList<>(blocksToBreak.keySet())) {
+                        if (!targets.contains(v)) {
+                            blocksToBreak.remove(v);
+                        }
                     }
-                }
-                for (Vec3d v : targets) {
-                    blocksToBreak.putIfAbsent(v, 0.);
-                    blocksToBreak.put(v, blocksToBreak.get(v) + dt * 8 / targets.size());
-                    if (blocksToBreak.get(v) > .5) {
-                        physics.world.setBlock(v, null);
-                        blocksToBreak.remove(v);
+                    for (Vec3d v : targets) {
+                        blocksToBreak.putIfAbsent(v, 0.);
+                        blocksToBreak.put(v, blocksToBreak.get(v) + dt * 8 / targets.size());
+                        if (blocksToBreak.get(v) > .5) {
+                            physics.world.setBlock(v, null);
+                            blocksToBreak.remove(v);
+                        }
                     }
+                } else {
+                    blocksToBreak.clear();
                 }
             } else {
                 blocksToBreak.clear();
             }
-        } else {
-            blocksToBreak.clear();
-        }
 
-        // Place block
-        if (Input.mouseJustPressed(1)) {
-            RaycastHit block = lastEmpty();
-            if (block != null) {
-                physics.world.setBlock(block.hitPos, BlockType.WOOD);
+            // Place block
+            if (Input.mouseJustPressed(1)) {
+                RaycastHit block = lastEmpty();
+                if (block != null) {
+                    physics.world.setBlock(block.hitPos, BlockType.WOOD);
+                }
             }
         }
+
+        velocity.velocity = velocity.velocity.lerp(idealVel, 1 - Math.pow(.005, dt));
     }
 }

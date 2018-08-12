@@ -55,7 +55,7 @@ void main()
     vec4 viewPos = modelViewMatrix * vec4(pos, 1.);
     gl_Position = projectionMatrix * viewPos;
     texCoordsConst = baseTexCoords;
-    texCoordsInterp = texBlockSize * vec2(0., 1.);
+    texCoordsInterp = vec2(0., 0.);
     fragOcclusion = occlusion[0].x;
     fog = pow(.01, pow(length(viewPos) / maxFogDist, 2));
     EmitVertex();
@@ -63,7 +63,7 @@ void main()
     viewPos = modelViewMatrix * vec4(pos + dir1, 1.);
     gl_Position = projectionMatrix * viewPos;
     texCoordsConst = baseTexCoords;
-    texCoordsInterp = texBlockSize;
+    texCoordsInterp = texBlockSize * vec2(1., 0.);
     fragOcclusion = occlusion[0].y;
     fog = pow(.01, pow(length(viewPos) / maxFogDist, 2));
     EmitVertex();
@@ -71,7 +71,7 @@ void main()
     viewPos = modelViewMatrix * vec4(pos + dir2, 1.);
     gl_Position = projectionMatrix * viewPos;
     texCoordsConst = baseTexCoords;
-    texCoordsInterp = vec2(0., 0.);
+    texCoordsInterp = texBlockSize * vec2(0., 1.);
     fragOcclusion = occlusion[0].w;
     fog = pow(.01, pow(length(viewPos) / maxFogDist, 2));
     EmitVertex();
@@ -79,7 +79,7 @@ void main()
     viewPos = modelViewMatrix * vec4(pos + dir1 + dir2, 1.);
     gl_Position = projectionMatrix * viewPos;
     texCoordsConst = baseTexCoords;
-    texCoordsInterp = texBlockSize * vec2(1., 0.);
+    texCoordsInterp = texBlockSize;
     fragOcclusion = occlusion[0].z;
     fog = pow(.01, pow(length(viewPos) / maxFogDist, 2));
     EmitVertex();

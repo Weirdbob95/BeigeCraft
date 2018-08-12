@@ -2,14 +2,14 @@ package engine;
 
 import java.util.BitSet;
 import opengl.Window;
-import org.joml.Vector2d;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
+import util.vectors.Vec2d;
 
 public abstract class Input {
 
     static void init() {
         Window.window.setCursorPosCallback((window, xpos, ypos) -> {
-            mouse = new Vector2d(xpos, ypos);
+            mouse = new Vec2d(xpos, ypos);
         });
         Window.window.setKeyCallback((window, key, scancode, action, mods) -> {
             if (key >= 0) {
@@ -34,8 +34,8 @@ public abstract class Input {
     private static BitSet keys = new BitSet();
     private static BitSet prevKeys = new BitSet();
 
-    private static Vector2d mouse = new Vector2d();
-    private static Vector2d prevMouse = new Vector2d();
+    private static Vec2d mouse = new Vec2d(0, 0);
+    private static Vec2d prevMouse = new Vec2d(0, 0);
 
     private static BitSet buttons = new BitSet();
     private static BitSet prevButtons = new BitSet();
@@ -54,12 +54,12 @@ public abstract class Input {
         return !keys.get(key) && prevKeys.get(key);
     }
 
-    public static Vector2d mouse() {
-        return new Vector2d(mouse);
+    public static Vec2d mouse() {
+        return mouse;
     }
 
-    public static Vector2d mouseDelta() {
-        return mouse.sub(prevMouse, new Vector2d());
+    public static Vec2d mouseDelta() {
+        return mouse.sub(prevMouse);
     }
 
     public static boolean mouseDown(int button) {

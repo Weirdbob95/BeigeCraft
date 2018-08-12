@@ -1,9 +1,6 @@
 package graphics;
 
-import de.matthiasmann.twl.utils.PNGDecoder;
 import static engine.Activatable.using;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,14 +32,15 @@ public class Sprite {
         }
         return SPRITE_CACHE.get(fileName);
     }
+
     private static final ShaderProgram SPRITE_SHADER = Resources.loadShaderProgram("sprite");
 
     private static final VertexArrayObject SPRITE_VAO = VertexArrayObject.createVAO(() -> {
         BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{
-            0.5f, 0.5f, 0, 1, 0,
-            0.5f, -0.5f, 0, 1, 1,
-            -0.5f, -0.5f, 0, 0, 1,
-            -0.5f, 0.5f, 0, 0, 0
+            0.5f, 0.5f, 0, 1, 1,
+            0.5f, -0.5f, 0, 1, 0,
+            -0.5f, -0.5f, 0, 0, 0,
+            -0.5f, 0.5f, 0, 0, 1
         });
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 20, 0);
         glEnableVertexAttribArray(0);
@@ -50,24 +48,15 @@ public class Sprite {
         glEnableVertexAttribArray(1);
     });
 
-    Texture texture;
-    int width;
-    int height;
+    private final Texture texture;
 
     private Sprite(String fileName) {
-        try {
-            texture = new Texture("sprites/" + fileName);
-            PNGDecoder decoder = new PNGDecoder(new FileInputStream("sprites/" + fileName));
-            width = decoder.getWidth();
-            height = decoder.getHeight();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        this.texture = Texture.load(fileName);
     }
 
     public void draw2d(Vec2d position, double rotation, double scale, Vec4d color) {
         SPRITE_SHADER.setUniform("projectionMatrix", Camera.camera2d.getProjectionMatrix());
-        SPRITE_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(position, rotation, scale * width, scale * height));
+        SPRITE_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(position, rotation, scale * getWidth(), scale * getHeight()));
         SPRITE_SHADER.setUniform("color", color);
         using(Arrays.asList(texture, SPRITE_SHADER, SPRITE_VAO), () -> {
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -87,5 +76,13 @@ public class Sprite {
         using(Arrays.asList(texture, SPRITE_SHADER, SPRITE_VAO), () -> {
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
         });
+    }
+
+    public int getHeight() {
+        return texture.getHeight();
+    }
+
+    public int getWidth() {
+        return texture.getWidth();
     }
 }

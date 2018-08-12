@@ -3,7 +3,6 @@ package opengl;
 import engine.Activatable;
 import java.util.HashMap;
 import org.joml.Matrix4d;
-import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 import util.vectors.Vec3d;
@@ -111,6 +110,10 @@ public class ShaderProgram implements Activatable {
             uniformLocations.put(name, glGetUniformLocation(shaderProgram, name));
         }
         return uniformLocations.get(name);
+    }
+
+    public void setUniform(String name, boolean value) {
+        setUniform(name, value ? 1 : 0);
     }
 
     public void setUniform(String name, int value) {

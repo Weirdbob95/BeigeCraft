@@ -28,7 +28,7 @@ public class BiomeData {
 
     public static BiomeData generate(World world, Vec3d pos) {
         double freqMult = .5;
-        double noisyness = .02;
+        double noisyness = .05;
 
         BiomeData bd = new BiomeData();
         double temp = world.noise("biomedata1").fbm2d(pos.x, pos.y, 4, .001 * freqMult) - .5;

@@ -3,6 +3,7 @@ package util;
 import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import util.vectors.Vec2d;
 import util.vectors.Vec3d;
 
 public abstract class MathUtils {
@@ -17,6 +18,10 @@ public abstract class MathUtils {
 
     public static int clamp(int x, int lower, int upper) {
         return Math.max(lower, Math.min(x, upper));
+    }
+
+    public static double direction(Vec2d v) {
+        return Math.atan2(v.y, v.x);
     }
 
     public static int floor(double x) {
@@ -38,6 +43,11 @@ public abstract class MathUtils {
                 return v;
             }
         }
+    }
+
+    public static Vec2d rotate(Vec2d v, double angle) {
+        return new Vec2d(Math.cos(angle) * v.x - Math.sin(angle) * v.y,
+                Math.sin(angle) * v.x + Math.cos(angle) * v.y);
     }
 
     public static int round(double x) {

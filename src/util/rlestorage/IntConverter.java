@@ -31,12 +31,18 @@ public interface IntConverter<T> {
 
         @Override
         public Integer fromInt(int i) {
-            return i;
+            if (i == 0) {
+                return null;
+            }
+            return i - 1;
         }
 
         @Override
         public int toInt(Integer t) {
-            return t;
+            if (t == null) {
+                return 0;
+            }
+            return t + 1;
         }
     }
 }

@@ -10,7 +10,7 @@ public class ModelBehavior extends Behavior {
 
     public Model model;
     public double rotation = 0;
-    public double scale = 1 / 8.;
+    public double scale = 1 / 16.;
 
     @Override
     public void render() {

@@ -30,7 +30,7 @@ public class MenuRoot extends GUIRoot {
         options.offset = new Vec2d(0, -150);
         options.size = new Vec2d(800, 100);
 
-        GUIButton quit = new GUIButton("Quit", () -> {
+        GUIButton quit = new GUIButton("Exit game", () -> {
             Core.stopGame();
         });
         quit.offset = new Vec2d(0, -275);

@@ -19,10 +19,10 @@ public class Hamster extends Behavior {
 
     @Override
     public void createInner() {
-        model.model = Model.load("hamster.vox");
+        model.model = Model.load("shadow.vox");
         acceleration.acceleration = new Vec3d(0, 0, -32);
-        physics.hitboxSize1 = new Vec3d(.6, .6, model.model.size().z / 16);
-        physics.hitboxSize2 = new Vec3d(.6, .6, model.model.size().z / 16);
+        physics.hitboxSize1 = new Vec3d(.3, .3, model.model.size().z / 32);
+        physics.hitboxSize2 = new Vec3d(.3, .3, model.model.size().z / 32);
     }
 
     @Override

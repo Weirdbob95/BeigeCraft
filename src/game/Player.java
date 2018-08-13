@@ -52,10 +52,10 @@ public class Player extends Behavior {
     @Override
     public void createInner() {
         acceleration.acceleration = new Vec3d(0, 0, -32).mul(PLAYER_SCALE);
-        physics.hitboxSize1Stand = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
-        physics.hitboxSize2Stand = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
-        physics.hitboxSize1Crouch = new Vec3d(.3, .3, .8).mul(PLAYER_SCALE);
-        physics.hitboxSize2Crouch = new Vec3d(.3, .3, .6).mul(PLAYER_SCALE);
+        physics.hitboxSize1Stand = new Vec3d(.3, .3, .9).mul(PLAYER_SCALE);
+        physics.hitboxSize2Stand = new Vec3d(.3, .3, .9).mul(PLAYER_SCALE);
+        physics.hitboxSize1Crouch = new Vec3d(.3, .3, .9).mul(PLAYER_SCALE);
+        physics.hitboxSize2Crouch = new Vec3d(.3, .3, .5).mul(PLAYER_SCALE);
     }
 
     private RaycastHit firstSolid() {

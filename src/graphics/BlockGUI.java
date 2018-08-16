@@ -1,0 +1,81 @@
+package graphics;
+
+import static engine.Activatable.using;
+import static graphics.Sprite.SPRITE_SHADER;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import opengl.BufferObject;
+import opengl.Camera;
+import opengl.VertexArrayObject;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import util.vectors.Vec2d;
+import util.vectors.Vec3d;
+import util.vectors.Vec4d;
+import world.BlockType;
+import static world.World.TERRAIN_TEXTURE;
+
+public class BlockGUI {
+
+    private static final Map<BlockType, BlockGUI> BLOCKGUI_CACHE = new HashMap();
+
+    public static BlockGUI load(BlockType bt) {
+        if (!BLOCKGUI_CACHE.containsKey(bt)) {
+            BlockGUI b = new BlockGUI(bt);
+            BLOCKGUI_CACHE.put(bt, b);
+        }
+        return BLOCKGUI_CACHE.get(bt);
+    }
+
+    private final VertexArrayObject vao;
+
+    private BlockGUI(BlockType bt) {
+        int texID1 = BlockType.getTexID(bt, new Vec3d(1, 0, 0));
+        int texID2 = BlockType.getTexID(bt, new Vec3d(0, 1, 0));
+        int texID3 = BlockType.getTexID(bt, new Vec3d(0, 0, 1));
+        vao = VertexArrayObject.createVAO(() -> {
+            float h = (float) Math.sqrt(3) / 2;
+            BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{
+                -h, -.5f, 0, (texID1 % 256 + .001f) / 5f, (texID1 / 256 + .001f) / 4f, .8f, .8f, .8f, 1,
+                -h, .5f, 0, (texID1 % 256 + .001f) / 5f, (texID1 / 256 + .999f) / 4f, .8f, .8f, .8f, 1,
+                0, 0, 0, (texID1 % 256 + .999f) / 5f, (texID1 / 256 + .999f) / 4f, .8f, .8f, .8f, 1,
+                0, -1, 0, (texID1 % 256 + .999f) / 5f, (texID1 / 256 + .001f) / 4f, .8f, .8f, .8f, 1,
+                h, -.5f, 0, (texID2 % 256 + .001f) / 5f, (texID2 / 256 + .001f) / 4f, .6f, .6f, .6f, 1,
+                h, .5f, 0, (texID2 % 256 + .001f) / 5f, (texID2 / 256 + .999f) / 4f, .6f, .6f, .6f, 1,
+                0, 0, 0, (texID2 % 256 + .999f) / 5f, (texID2 / 256 + .999f) / 4f, .6f, .6f, .6f, 1,
+                0, -1, 0, (texID2 % 256 + .999f) / 5f, (texID2 / 256 + .001f) / 4f, .6f, .6f, .6f, 1,
+                -h, .5f, 0, (texID3 % 256 + .001f) / 5f, (texID3 / 256 + .001f) / 4f, 1, 1, 1, 1,
+                0, 1, 0, (texID3 % 256 + .001f) / 5f, (texID3 / 256 + .999f) / 4f, 1, 1, 1, 1,
+                h, .5f, 0, (texID3 % 256 + .999f) / 5f, (texID3 / 256 + .999f) / 4f, 1, 1, 1, 1,
+                0, 0, 0, (texID3 % 256 + .999f) / 5f, (texID3 / 256 + .001f) / 4f, 1, 1, 1, 1
+            });
+            BufferObject ebo = new BufferObject(GL_ELEMENT_ARRAY_BUFFER, new int[]{
+                0, 1, 2, 0, 2, 3,
+                4, 5, 6, 4, 6, 7,
+                8, 9, 10, 8, 10, 11
+            });
+            glVertexAttribPointer(0, 3, GL_FLOAT, false, 36, 0);
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(1, 2, GL_FLOAT, false, 36, 12);
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(2, 4, GL_FLOAT, false, 36, 20);
+            glEnableVertexAttribArray(2);
+        });
+    }
+
+    public void draw(Vec2d position, double scale) {
+        SPRITE_SHADER.setUniform("projectionMatrix", Camera.camera2d.getProjectionMatrix());
+        SPRITE_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(position, 0, scale, scale));
+        SPRITE_SHADER.setUniform("color", new Vec4d(1, 1, 1, 1));
+        using(Arrays.asList(TERRAIN_TEXTURE, SPRITE_SHADER, vao), () -> {
+            glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
+        });
+    }
+}

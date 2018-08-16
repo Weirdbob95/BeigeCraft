@@ -2,10 +2,12 @@ package game.gui;
 
 import graphics.Font;
 import graphics.Font.FontText;
+import java.util.Objects;
 import util.vectors.Vec4d;
 
 public class GUIText extends GUIItem {
 
+    private String oldText;
     private FontText text;
     public boolean centered = true;
     public double scale = 1;
@@ -36,10 +38,13 @@ public class GUIText extends GUIItem {
     }
 
     public final void setText(String s) {
-        if (s != null && !s.isEmpty()) {
-            text = Font.load("arial_outline").renderText(s);
-        } else {
-            text = null;
+        if (!Objects.equals(s, oldText)) {
+            if (s != null && !s.isEmpty()) {
+                text = Font.load("arial_outline").renderText(s);
+            } else {
+                text = null;
+            }
+            oldText = s;
         }
     }
 }

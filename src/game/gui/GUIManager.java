@@ -5,6 +5,7 @@ import engine.Input;
 import opengl.Window;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_I;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
@@ -15,13 +16,19 @@ public class GUIManager extends Behavior {
     public final MenuRoot menuRoot = new MenuRoot(this);
     public final OptionsRoot optionsRoot = new OptionsRoot(this);
     public final InventoryRoot inventoryRoot = new InventoryRoot(this);
+    public final QAWRoot qawRoot = new QAWRoot(this);
     public final HUD hud = new HUD();
 
-    private GUIItem root;
-    private GUIItem selected;
+    public GUIRoot root;
+    public GUIItem selected;
+    public Vec2d mouse;
 
-    public boolean inMenu() {
-        return root != null;
+    public boolean freezeMouse() {
+        return root != null && root.freezeMouse();
+    }
+
+    public boolean freezeMovement() {
+        return root != null && root.freezeMovement();
     }
 
     @Override
@@ -39,10 +46,18 @@ public class GUIManager extends Behavior {
         return 10;
     }
 
-    public void setRoot(GUIItem newRoot) {
+    public void setRoot(GUIRoot newRoot) {
         if (root != newRoot) {
-            Window.window.setCursorEnabled(newRoot != null);
+            if (root != null) {
+                root.close();
+            }
             root = newRoot;
+            if (root != null) {
+                root.open();
+                Window.window.setCursorEnabled(root.showMouse());
+            } else {
+                Window.window.setCursorEnabled(false);
+            }
         }
     }
 
@@ -62,9 +77,19 @@ public class GUIManager extends Behavior {
                 setRoot(null);
             }
         }
+        if (Input.keyJustPressed(GLFW_KEY_Q)) {
+            if (root == null) {
+                setRoot(qawRoot);
+            }
+        }
+        if (Input.keyJustReleased(GLFW_KEY_Q)) {
+            if (root == qawRoot) {
+                setRoot(null);
+            }
+        }
 
         if (root != null) {
-            Vec2d mouse = new Vec2d(Input.mouse().x - Window.WIDTH / 2, Window.HEIGHT / 2 - Input.mouse().y);
+            mouse = new Vec2d(Input.mouse().x - Window.WIDTH / 2, Window.HEIGHT / 2 - Input.mouse().y);
             GUIItem newSelected = root.allChildren().filter(i -> mouse.x >= i.getLowerLeft().x && mouse.x < i.getUpperRight().x
                     && mouse.y >= i.getLowerLeft().y && mouse.y < i.getUpperRight().y).findFirst().orElse(null);
             if (newSelected != selected) {

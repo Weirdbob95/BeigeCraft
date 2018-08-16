@@ -1,6 +1,8 @@
 package game.gui;
 
+import engine.Input;
 import static game.Settings.SHOW_DEBUG_HUD;
+import game.items.ItemSlot;
 import util.vectors.Vec2d;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
@@ -10,6 +12,7 @@ public class HUD extends GUIItem {
 
     private final GUIText position;
     private final GUIText biome;
+    private final GUIInventorySquare mainHand, offHand;
 
     public HUD() {
         GUISprite crosshares = new GUISprite("crosshares.png");
@@ -23,11 +26,21 @@ public class HUD extends GUIItem {
         biome.offset = new Vec2d(-790, 390);
         biome.centered = false;
 
-        add(crosshares, position, biome);
+        mainHand = new GUIInventorySquare(ItemSlot.MAIN_HAND);
+        mainHand.offset = new Vec2d(-50, -400);
+
+        offHand = new GUIInventorySquare(ItemSlot.OFF_HAND);
+        offHand.offset = new Vec2d(50, -400);
+
+        add(crosshares, position, biome, mainHand, offHand);
     }
 
     @Override
     protected void render() {
+        mainHand.color = new Vec4d(.6, .6, .6, Input.mouseDown(0) ? .8 : .5);
+        mainHand.itemSlot = ItemSlot.MAIN_HAND;
+        offHand.color = new Vec4d(.6, .6, .6, Input.mouseDown(1) ? .8 : .5);
+        offHand.itemSlot = ItemSlot.OFF_HAND;
     }
 
     public void setBiome(Biome b) {

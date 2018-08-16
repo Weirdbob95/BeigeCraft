@@ -1,6 +1,7 @@
 package opengl;
 
 import static game.Settings.ANTI_ALIASING;
+import static game.Settings.SHOW_OPENGL_DEBUG_INFO;
 import java.nio.IntBuffer;
 import org.lwjgl.glfw.*;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -19,14 +20,12 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
 
-    public static boolean SHOW_DEBUG_INFO = false;
-
     public static final int WIDTH = 1600;
     public static final int HEIGHT = 900;
     public static Window window;
 
     public static void initGLFW() {
-        if (SHOW_DEBUG_INFO) {
+        if (SHOW_OPENGL_DEBUG_INFO) {
             GLFWErrorCallback.createThrow().set();
             Configuration.DEBUG.set(true);
         }
@@ -43,7 +42,7 @@ public class Window {
     public static void cleanupGLFW() {
         window.cleanup();
         glfwTerminate();
-        if (SHOW_DEBUG_INFO) {
+        if (SHOW_OPENGL_DEBUG_INFO) {
             glfwSetErrorCallback(null).free();
         }
     }
@@ -94,7 +93,7 @@ public class Window {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        if (SHOW_DEBUG_INFO) {
+        if (SHOW_OPENGL_DEBUG_INFO) {
             GLUtil.setupDebugMessageCallback();
         }
     }

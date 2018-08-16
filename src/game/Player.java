@@ -8,6 +8,10 @@ import behaviors.VelocityBehavior;
 import engine.Behavior;
 import engine.Input;
 import game.gui.GUIManager;
+import game.items.BlockItem;
+import game.items.Item;
+import game.items.ItemSlot;
+import game.items.PickaxeItem;
 import graphics.Animation;
 import graphics.Sprite;
 import static graphics.VoxelRenderer.DIRS;
@@ -30,7 +34,6 @@ import static util.MathUtils.mod;
 import util.vectors.Vec2d;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
-import world.BlockType;
 import world.Raycast.RaycastHit;
 import static world.Raycast.raycastDistance;
 import static world.World.CHUNK_SIZE;
@@ -47,6 +50,7 @@ public class Player extends Behavior {
 
     public GUIManager gui;
     public boolean flying;
+    public boolean breakingBlocks;
     public Map<Vec3d, Double> blocksToBreak = new HashMap();
 
     @Override
@@ -83,20 +87,26 @@ public class Player extends Behavior {
 
     @Override
     public void render() {
-        Animation blockBreak = Animation.load("blockbreak_anim");
-        for (Entry<Vec3d, Double> e : blocksToBreak.entrySet()) {
-            if (e.getValue() > .05) {
-                Sprite s = blockBreak.getSpriteOrNull("", (int) (4 * (e.getValue() - .05)));
-                for (Vec3d dir : DIRS) {
-                    Vec3d drawPos = e.getKey().floor().add(new Vec3d(.5, .5, .5)).sub(dir.mul(.501));
-                    s.draw3d(drawPos, dir, 0, new Vec2d(1, 1), new Vec4d(1, 1, 1, .5));
+        if (breakingBlocks) {
+            Animation blockBreak = Animation.load("blockbreak_anim");
+            for (Entry<Vec3d, Double> e : blocksToBreak.entrySet()) {
+                if (e.getValue() > .05) {
+                    Sprite s = blockBreak.getSpriteOrNull("", (int) (blockBreak.length * (e.getValue() - .05)));
+                    for (Vec3d dir : DIRS) {
+                        Vec3d drawPos = e.getKey().floor().add(new Vec3d(.5, .5, .5)).sub(dir.mul(.501));
+                        s.draw3d(drawPos, dir, 0, new Vec2d(1, 1), new Vec4d(1, 1, 1, .5));
+                    }
                 }
             }
+        } else {
+            blocksToBreak.clear();
         }
     }
 
     @Override
     public void update(double dt) {
+
+        breakingBlocks = false;
 
         gui.hud.setBiome(physics.world.heightmappedChunks
                 .get(physics.world.getChunkPos(position.position)).biomemap[(int) mod(position.position.x, CHUNK_SIZE)][(int) mod(position.position.y, CHUNK_SIZE)].plurality());
@@ -108,8 +118,7 @@ public class Player extends Behavior {
 
         Vec3d idealVel = new Vec3d(0, 0, 0);
 
-        if (!gui.inMenu()) {
-
+        if (!gui.freezeMouse()) {
             // Look around
             camera3d.horAngle -= Input.mouseDelta().x / 500;
             camera3d.vertAngle += Input.mouseDelta().y / 500;
@@ -120,7 +129,9 @@ public class Player extends Behavior {
             if (camera3d.vertAngle < -1.55) {
                 camera3d.vertAngle = -1.55f;
             }
+        }
 
+        if (!gui.freezeMovement()) {
             // Move
             if (Input.keyJustPressed(GLFW_KEY_LEFT_CONTROL)) {
                 flying = !flying;
@@ -156,60 +167,82 @@ public class Player extends Behavior {
             // Jump
             if (Input.keyDown(GLFW_KEY_SPACE)) {
                 if (physics.onGround || flying) {
-                    velocity.velocity = velocity.velocity.setZ((flying ? 100 : 11.5) * PLAYER_SCALE);
+                    velocity.velocity = velocity.velocity.setZ((flying ? 100 : 12) * PLAYER_SCALE);
                 }
             }
 
             // Crouch
             physics.shouldCrouch = Input.keyDown(GLFW_KEY_LEFT_SHIFT);
+        }
 
-            // Break block
-            if (Input.mouseDown(0)) {
-                RaycastHit block = firstSolid();
-                if (block != null) {
-                    int handSize = ceil(PLAYER_SCALE);
-                    Vec3d origin = block.hitPos
-                            //.add(block.hitDir.mul(handSize / 2.))
-                            .sub(new Vec3d(1, 1, 1).mul(.5 * (handSize - 1)));
-                    List<Vec3d> targets = new ArrayList();
-                    for (int x = 0; x < handSize; x++) {
-                        for (int y = 0; y < handSize; y++) {
-                            for (int z = 0; z < handSize; z++) {
-                                if (physics.world.getBlock(origin.add(new Vec3d(x, y, z))) != null) {
-                                    targets.add(origin.add(new Vec3d(x, y, z)).floor());
-                                }
-                            }
-                        }
-                    }
-                    for (Vec3d v : new ArrayList<>(blocksToBreak.keySet())) {
-                        if (!targets.contains(v)) {
-                            blocksToBreak.remove(v);
-                        }
-                    }
-                    for (Vec3d v : targets) {
-                        blocksToBreak.putIfAbsent(v, 0.);
-                        blocksToBreak.put(v, blocksToBreak.get(v) + dt * 8 / targets.size());
-                        if (blocksToBreak.get(v) > 1) {
-                            physics.world.setBlock(v, null);
-                            blocksToBreak.remove(v);
-                        }
-                    }
-                } else {
-                    blocksToBreak.clear();
-                }
-            } else {
-                blocksToBreak.clear();
+        if (!gui.freezeMouse()) {
+            // Use items
+            Item mainItem = ItemSlot.MAIN_HAND == null ? null : ItemSlot.MAIN_HAND.item();
+            if (Input.mouseJustPressed(0)) {
+                useItemPress(mainItem, true);
             }
-
-            // Place block
+            if (Input.mouseDown(0)) {
+                useItemHold(mainItem, true, dt);
+            }
+            Item offItem = ItemSlot.OFF_HAND == null ? null : ItemSlot.OFF_HAND.item();
             if (Input.mouseJustPressed(1)) {
-                RaycastHit block = lastEmpty();
-                if (block != null) {
-                    physics.world.setBlock(block.hitPos, BlockType.WOOD);
-                }
+                useItemPress(offItem, false);
+            }
+            if (Input.mouseDown(1)) {
+                useItemHold(offItem, false, dt);
             }
         }
 
         velocity.velocity = velocity.velocity.lerp(idealVel, 1 - Math.pow(1e-4, dt));
+    }
+
+    private void useItemHold(Item i, boolean isMainHand, double dt) {
+        if (i == null || i instanceof PickaxeItem) {
+            // Break block
+            breakingBlocks = true;
+            RaycastHit block = firstSolid();
+            if (block != null) {
+                int handSize = ceil(PLAYER_SCALE);
+                Vec3d origin = block.hitPos
+                        //.add(block.hitDir.mul(handSize / 2.))
+                        .sub(new Vec3d(1, 1, 1).mul(.5 * (handSize - 1)));
+                List<Vec3d> targets = new ArrayList();
+                for (int x = 0; x < handSize; x++) {
+                    for (int y = 0; y < handSize; y++) {
+                        for (int z = 0; z < handSize; z++) {
+                            if (physics.world.getBlock(origin.add(new Vec3d(x, y, z))) != null) {
+                                targets.add(origin.add(new Vec3d(x, y, z)).floor());
+                            }
+                        }
+                    }
+                }
+                for (Vec3d v : new ArrayList<>(blocksToBreak.keySet())) {
+                    if (!targets.contains(v)) {
+                        blocksToBreak.remove(v);
+                    }
+                }
+                for (Vec3d v : targets) {
+                    blocksToBreak.putIfAbsent(v, 0.);
+                    blocksToBreak.put(v, blocksToBreak.get(v) + dt * 8 / targets.size());
+                    if (blocksToBreak.get(v) > 1) {
+                        ItemSlot.addToInventory(new BlockItem(physics.world.getBlock(v)));
+                        physics.world.setBlock(v, null);
+                        blocksToBreak.remove(v);
+                    }
+                }
+            } else {
+                blocksToBreak.clear();
+            }
+        }
+    }
+
+    private void useItemPress(Item i, boolean isMainHand) {
+        if (i instanceof BlockItem) {
+            RaycastHit block = lastEmpty();
+            if (block != null) {
+                (isMainHand ? ItemSlot.MAIN_HAND : ItemSlot.OFF_HAND).removeItem();
+                physics.world.setBlock(block.hitPos, ((BlockItem) i).blockType);
+            }
+        }
     }
 }

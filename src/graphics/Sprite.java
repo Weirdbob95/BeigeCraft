@@ -33,19 +33,21 @@ public class Sprite {
         return SPRITE_CACHE.get(fileName);
     }
 
-    private static final ShaderProgram SPRITE_SHADER = Resources.loadShaderProgram("sprite");
+    static final ShaderProgram SPRITE_SHADER = Resources.loadShaderProgram("sprite");
 
     private static final VertexArrayObject SPRITE_VAO = VertexArrayObject.createVAO(() -> {
         BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{
-            0.5f, 0.5f, 0, 1, 1,
-            0.5f, -0.5f, 0, 1, 0,
-            -0.5f, -0.5f, 0, 0, 0,
-            -0.5f, 0.5f, 0, 0, 1
+            0.5f, 0.5f, 0, 1, 1, 1, 1, 1, 1,
+            0.5f, -0.5f, 0, 1, 0, 1, 1, 1, 1,
+            -0.5f, -0.5f, 0, 0, 0, 1, 1, 1, 1,
+            -0.5f, 0.5f, 0, 0, 1, 1, 1, 1, 1
         });
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 20, 0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 36, 0);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, 20, 12);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 36, 12);
         glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 4, GL_FLOAT, false, 36, 20);
+        glEnableVertexAttribArray(2);
     });
 
     private final Texture texture;

@@ -9,7 +9,7 @@ public class GUIRectangle extends GUIItem {
     public Vec4d borderColor = new Vec4d(0, 0, 0, 1);
 
     @Override
-    public void render() {
+    protected void render() {
         if (color != null) {
             Graphics.drawRectangle(getLowerLeft(), 0, size, color);
         }

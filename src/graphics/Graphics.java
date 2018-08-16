@@ -10,6 +10,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import util.MathUtils;
 import static util.MathUtils.direction;
 import static util.MathUtils.rotate;
 import util.Resources;
@@ -20,7 +21,7 @@ public class Graphics {
 
     private static final ShaderProgram COLOR_SHADER = Resources.loadShaderProgram("color");
 
-    private static final int CIRCLE_DETAIL = 20;
+    private static final int CIRCLE_DETAIL = 40;
 
     private static final VertexArrayObject CIRCLE_VAO = VertexArrayObject.createVAO(() -> {
         float circleVertices[] = new float[CIRCLE_DETAIL * 3 + 6];
@@ -46,6 +47,13 @@ public class Graphics {
         using(Arrays.asList(COLOR_SHADER, CIRCLE_VAO), () -> {
             glDrawArrays(GL_TRIANGLE_FAN, 0, CIRCLE_DETAIL + 2);
         });
+    }
+
+    public static void drawCircleOutline(Vec2d center, double size, Vec4d color) {
+        for (int i = 0; i < CIRCLE_DETAIL; i++) {
+            drawLine(center.add(MathUtils.rotate(new Vec2d(size, 0), Math.PI * 2 * i / CIRCLE_DETAIL)),
+                    center.add(MathUtils.rotate(new Vec2d(size, 0), Math.PI * 2 * (i + 1) / CIRCLE_DETAIL)), color);
+        }
     }
 
     public static void drawLine(Vec2d p1, Vec2d p2, Vec4d color) {

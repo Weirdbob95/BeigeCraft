@@ -1,4 +1,4 @@
-package game.gui;
+package gui;
 
 import game.items.ItemSlot;
 import graphics.Graphics;

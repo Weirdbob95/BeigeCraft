@@ -7,7 +7,7 @@ import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
 import engine.Input;
-import game.gui.GUIManager;
+import gui.GUIManager;
 import game.items.BlockItem;
 import game.items.Item;
 import game.items.ItemSlot;

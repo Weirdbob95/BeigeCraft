@@ -1,4 +1,4 @@
-package game.gui;
+package gui;
 
 import engine.Input;
 import static game.Settings.SHOW_DEBUG_HUD;

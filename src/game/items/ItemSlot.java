@@ -51,6 +51,16 @@ public class ItemSlot {
             return true;
         }
         for (ItemSlot is : QAW) {
+            if (is.item != null && is.addItem(i)) {
+                return true;
+            }
+        }
+        for (ItemSlot is : INVENTORY) {
+            if (is.item != null && is.addItem(i)) {
+                return true;
+            }
+        }
+        for (ItemSlot is : QAW) {
             if (is.addItem(i)) {
                 return true;
             }
@@ -73,6 +83,16 @@ public class ItemSlot {
 
     public void moveItemsTo(ItemSlot other) {
         while (other.addItem(item)) {
+            count--;
+            if (count == 0) {
+                item = null;
+            }
+        }
+    }
+
+    public void moveItemsTo(ItemSlot other, int max) {
+        while (max > 0 && other.addItem(item)) {
+            max--;
             count--;
             if (count == 0) {
                 item = null;

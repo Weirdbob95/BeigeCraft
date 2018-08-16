@@ -1,4 +1,4 @@
-package game;
+package behaviors;
 
 import behaviors.PositionBehavior;
 import engine.Behavior;

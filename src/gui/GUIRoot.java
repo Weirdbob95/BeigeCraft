@@ -1,4 +1,4 @@
-package game.gui;
+package gui;
 
 import opengl.Window;
 import util.vectors.Vec2d;

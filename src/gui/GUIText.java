@@ -1,4 +1,4 @@
-package game.gui;
+package gui;
 
 import graphics.Font;
 import graphics.Font.FontText;

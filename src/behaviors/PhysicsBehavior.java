@@ -1,6 +1,7 @@
 package behaviors;
 
 import engine.Behavior;
+import java.util.Collection;
 import static util.MathUtils.ceil;
 import static util.MathUtils.floor;
 import static util.MathUtils.mod;
@@ -11,7 +12,9 @@ import world.chunks.ConstructedChunk;
 
 public class PhysicsBehavior extends Behavior {
 
-    private static final int DETAIL = 10;
+    public static final Collection<PhysicsBehavior> ALL_PHYSICS_BEHAVIORS = track(PhysicsBehavior.class);
+
+    private static final int PRECISION = 10;
 
     public final PositionBehavior position = require(PositionBehavior.class);
     public final PreviousPositionBehavior prevPos = require(PreviousPositionBehavior.class);
@@ -42,7 +45,7 @@ public class PhysicsBehavior extends Behavior {
         double best = 0;
         double check = .5;
         double step = .25;
-        for (int i = 0; i < DETAIL; i++) {
+        for (int i = 0; i < PRECISION; i++) {
             if (wouldCollideAt(del.mul(check).add(position.position))) {
                 check -= step;
             } else {
@@ -57,7 +60,6 @@ public class PhysicsBehavior extends Behavior {
 
     @Override
     public void update(double dt) {
-        boolean wasOnGround = onGround;
         onGround = false;
         hitWall = false;
         Vec3d del = position.position.sub(prevPos.prevPos);

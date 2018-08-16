@@ -6,7 +6,10 @@ import static behaviors.MiscBehaviors.onUpdate;
 import engine.Core;
 import engine.Input;
 import static game.Settings.RENDER_DISTANCE;
-import game.gui.GUIManager;
+import game.creatures.Doggo;
+import game.creatures.Kitteh;
+import game.creatures.Skeletor;
+import gui.GUIManager;
 import java.util.Comparator;
 import java.util.Optional;
 import opengl.Camera;
@@ -63,37 +66,28 @@ public abstract class Main {
 
         onUpdate(0, dt -> {
             if (Input.keyJustPressed(GLFW_KEY_G)) {
-                Goblin gobbo = new Goblin();
-                gobbo.model.position.position = p.position.position;
-                gobbo.model.rotation = Camera.camera3d.horAngle;
-                gobbo.physics.world = world;
-                gobbo.create();
+                Skeletor doot = new Skeletor();
+                doot.creature.position.position = p.position.position;
+                doot.creature.model.rotation = Camera.camera3d.horAngle;
+                doot.creature.physics.world = world;
+                doot.create();
             }
             if (Input.keyJustPressed(GLFW_KEY_H)) {
-                Hamster hammy = new Hamster();
-                hammy.model.position.position = p.position.position;
-                hammy.model.rotation = Camera.camera3d.horAngle;
-                hammy.physics.world = world;
-                hammy.create();
+                Kitteh shadow = new Kitteh();
+                shadow.creature.position.position = p.position.position;
+                shadow.creature.model.rotation = Camera.camera3d.horAngle;
+                shadow.creature.physics.world = world;
+                shadow.create();
             }
             if (Input.keyJustPressed(GLFW_KEY_J) || Input.keyDown(GLFW_KEY_K)) {
                 Doggo ziggy = new Doggo();
-                ziggy.model.position.position = p.position.position;
-                ziggy.model.rotation = Camera.camera3d.horAngle;
-                ziggy.physics.world = world;
+                ziggy.creature.position.position = p.position.position;
+                ziggy.creature.model.rotation = Camera.camera3d.horAngle;
+                ziggy.creature.physics.world = world;
                 ziggy.create();
             }
         });
 
-        // MEMORY ALLOCATION DEBUG INFO
-//        for (MemoryPoolMXBean mpBean : ManagementFactory.getMemoryPoolMXBeans()) {
-//            if (mpBean.getType() == MemoryType.HEAP) {
-//                System.out.printf(
-//                        "Name: %s: %s\n",
-//                        mpBean.getName(), mpBean.getUsage()
-//                );
-//            }
-//        }
         Core.run();
     }
 }

@@ -1,7 +1,9 @@
-package game.gui;
+package gui;
 
 import engine.Input;
 import game.items.ItemSlot;
+import graphics.Font;
+import static util.MathUtils.ceil;
 import util.vectors.Vec2d;
 import util.vectors.Vec4d;
 
@@ -36,12 +38,27 @@ public class InventoryRoot extends GUIRoot {
     protected void render() {
         super.render();
         if (Input.mouseJustPressed(0)) {
-            if (manager.selected instanceof GUIInventorySquare) {
-                dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
-                dragSource.moveItemsTo(ItemSlot.GRABBED);
+            if (dragSource == null) {
+                if (manager.selected instanceof GUIInventorySquare) {
+                    dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
+                    dragSource.moveItemsTo(ItemSlot.GRABBED);
+                }
             }
         }
-        if (Input.mouseJustReleased(0)) {
+        if (Input.mouseJustPressed(1)) {
+            if (dragSource != null) {
+                if (manager.selected instanceof GUIInventorySquare) {
+                    ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
+                    ItemSlot.GRABBED.moveItemsTo(newSlot, 1);
+                }
+            } else {
+                if (manager.selected instanceof GUIInventorySquare) {
+                    dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
+                    dragSource.moveItemsTo(ItemSlot.GRABBED, ceil(dragSource.count() / 2.));
+                }
+            }
+        }
+        if ((Input.mouseJustReleased(0) && !Input.mouseDown(1)) || (Input.mouseJustReleased(1) && !Input.mouseDown(0))) {
             if (dragSource != null) {
                 if (manager.selected instanceof GUIInventorySquare) {
                     ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
@@ -59,6 +76,10 @@ public class InventoryRoot extends GUIRoot {
         protected void render() {
             if (ItemSlot.GRABBED.item() != null) {
                 ItemSlot.GRABBED.item().renderGUI(manager.mouse);
+                if (ItemSlot.GRABBED.count() > 1) {
+                    Font.load("arial_outline").renderText("" + ItemSlot.GRABBED.count())
+                            .draw2d(manager.mouse.add(new Vec2d(-30, -18)), 0, 1, new Vec4d(1, 1, 1, 1), new Vec4d(0, 0, 0, 1));
+                }
             }
         }
     }

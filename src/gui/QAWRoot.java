@@ -1,4 +1,4 @@
-package game.gui;
+package gui;
 
 import engine.Input;
 import game.items.ItemSlot;

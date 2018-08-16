@@ -1,10 +1,10 @@
-package game.gui;
+package gui;
 
 import engine.Behavior;
 import engine.Input;
 import opengl.Window;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_I;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -70,7 +70,7 @@ public class GUIManager extends Behavior {
                 setRoot(null);
             }
         }
-        if (Input.keyJustPressed(GLFW_KEY_I)) {
+        if (Input.keyJustPressed(GLFW_KEY_E)) {
             if (root != inventoryRoot) {
                 setRoot(inventoryRoot);
             } else {

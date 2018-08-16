@@ -4,8 +4,8 @@ uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 
 layout (location=0) in vec3 position_in;
-layout (location=2) in vec2 texCoord_in;
-layout (location=3) in vec4 color_in;
+layout (location=1) in vec2 texCoord_in;
+layout (location=2) in vec4 color_in;
 
 out vec2 texCoord;
 out vec4 fragColor;

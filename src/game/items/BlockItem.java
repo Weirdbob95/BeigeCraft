@@ -53,6 +53,6 @@ public class BlockItem extends Item {
 
     @Override
     public void renderGUI(Vec2d pos) {
-        BlockGUI.load(blockType).draw(pos, 20);
+        BlockGUI.load(blockType).draw(pos, 24);
     }
 }

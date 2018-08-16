@@ -1,4 +1,4 @@
-package game.gui;
+package gui;
 
 import graphics.Sprite;
 import util.vectors.Vec4d;

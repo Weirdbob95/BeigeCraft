@@ -1,4 +1,4 @@
-package game.gui;
+package gui;
 
 import static game.Settings.RENDER_DISTANCE;
 import static game.Settings.SHOW_DEBUG_HUD;

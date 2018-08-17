@@ -32,7 +32,7 @@ public abstract class AbstractChunk {
     protected abstract void generate();
 
     public void generateOuter() {
-        isGenerated = false;
+        //isGenerated = false;
         generate();
         isGenerated = true;
     }

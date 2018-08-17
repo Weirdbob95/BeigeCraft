@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import static util.MathUtils.ceil;
+import util.noise.NoiseInterpolator;
 import util.rlestorage.IntConverter.BlockTypeConverter;
 import util.rlestorage.RLEMapStorage;
 import util.vectors.Vec3d;
@@ -107,10 +108,14 @@ public class StructuredChunk extends AbstractChunk {
 
             double size = (2 + height) * .7;
             int intSize = ceil(size);
+            NoiseInterpolator leaves = new NoiseInterpolator(noise, intSize, intSize, intSize);
+            leaves.setTransform(new Vec3d(x1 - intSize, y1 - intSize, z1 - intSize), new Vec3d(2, 2, 2));
+            leaves.generate(4, .7 / size);
             for (int x = -intSize; x <= intSize; x++) {
                 for (int y = -intSize; y <= intSize; y++) {
                     for (int z = -intSize; z <= intSize; z++) {
-                        if (noise.fbm3d(x1 + x, y1 + y, z1 + z, 4, .7 / size) * size > new Vec3d(x, y, z).length()) {
+                        if (leaves.get(x1 + x, y1 + y, z1 + z) * size > new Vec3d(x, y, z).length()) {
+                            //if (noise.fbm3d(x1 + x, y1 + y, z1 + z, 4, .7 / size) * size > new Vec3d(x, y, z).length()) {
                             blocks.set(x, y, (int) height + z, BlockType.LEAVES);
                         }
                     }

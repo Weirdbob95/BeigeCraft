@@ -31,7 +31,7 @@ public class ChunkRenderer extends VoxelRenderer<BlockType> {
             }
         }
         generate();
-        ccs = null;
+        //ccs = null;
     }
 
     @Override

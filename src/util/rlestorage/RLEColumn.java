@@ -1,7 +1,6 @@
 package util.rlestorage;
 
 import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -69,8 +68,23 @@ public class RLEColumn<T> implements Iterable<Entry<Integer, T>> {
     }
 
     @Override
-    public Iterator<Map.Entry<Integer, T>> iterator() {
-        return (Iterator) Arrays.stream(data).mapToObj(i -> new AbstractMap.SimpleImmutableEntry(position(i), blockType(i))).iterator();
+    public Iterator<Entry<Integer, T>> iterator() {
+        return new Iterator() {
+            int pos = 0;
+
+            @Override
+            public boolean hasNext() {
+                return pos < data.length;
+            }
+
+            @Override
+            public Object next() {
+                int i = data[pos];
+                pos++;
+                return new AbstractMap.SimpleImmutableEntry(position(i), blockType(i));
+            }
+
+        };
     }
 
     private int makeData(int pos, T t) {

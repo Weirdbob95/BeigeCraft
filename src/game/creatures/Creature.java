@@ -7,9 +7,12 @@ import behaviors.PositionBehavior;
 import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
+import java.util.Collection;
 import util.vectors.Vec3d;
 
 public class Creature extends Behavior {
+
+    public static final Collection<Creature> ALL = track(Creature.class);
 
     public final PositionBehavior position = require(PositionBehavior.class);
     public final VelocityBehavior velocity = require(VelocityBehavior.class);
@@ -18,8 +21,8 @@ public class Creature extends Behavior {
     public final SpaceOccupierBehavior spaceOccupier = require(SpaceOccupierBehavior.class);
     public final ModelBehavior model = require(ModelBehavior.class);
 
-    public double currentHealth;
-    public double maxHealth;
+    public double currentHealth = 10;
+    public double maxHealth = 10;
 
     public Vec3d goal;
     public double speed = 6;

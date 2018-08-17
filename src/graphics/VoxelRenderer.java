@@ -30,9 +30,9 @@ public abstract class VoxelRenderer<T> {
             new Vec3d(0, -1, 0), new Vec3d(0, 1, 0),
             new Vec3d(0, 0, -1), new Vec3d(0, 0, 1));
 
-    private Map<Vec3d, Integer> numQuadsMap;
-    private Map<Vec3d, VertexArrayObject> vaoMap;
-    private boolean ready;
+    private final Map<Vec3d, Integer> numQuadsMap = new HashMap();
+    private final Map<Vec3d, VertexArrayObject> vaoMap = new HashMap();
+    private final Map<Vec3d, BufferObject> vboMap = new HashMap();
 
     public void cleanup() {
         for (VertexArrayObject vao : vaoMap.values()) {
@@ -45,10 +45,6 @@ public abstract class VoxelRenderer<T> {
     protected abstract Quad createQuad(int x, int y, int z, T voxel, Vec3d dir);
 
     public void generate() {
-        numQuadsMap = new HashMap();
-        vaoMap = new HashMap();
-        ready = false;
-
         Map<Vec3d, List<Quad>> quads = new HashMap();
         for (Vec3d dir : DIRS) {
             quads.put(dir, new ArrayList());
@@ -68,7 +64,6 @@ public abstract class VoxelRenderer<T> {
 
         int vertexSize = vertexAttribSizes().stream().mapToInt(i -> i).sum();
 
-        Map<Vec3d, float[]> verticesMap = new HashMap();
         for (Vec3d dir : DIRS) {
             numQuadsMap.put(dir, quads.get(dir).size());
             float[] vertices = new float[vertexSize * quads.get(dir).size()];
@@ -76,22 +71,27 @@ public abstract class VoxelRenderer<T> {
                 Quad q = quads.get(dir).get(i);
                 System.arraycopy(q.toData(), 0, vertices, vertexSize * i, vertexSize);
             }
-            verticesMap.put(dir, vertices);
-        }
-        Core.onMainThread(() -> {
-            for (Vec3d dir : DIRS) {
-                vaoMap.put(dir, VertexArrayObject.createVAO(() -> {
-                    BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, verticesMap.get(dir));
-                    int total = 0;
-                    for (int i = 0; i < vertexAttribSizes().size(); i++) {
-                        glVertexAttribPointer(i, vertexAttribSizes().get(i), GL_FLOAT, false, vertexSize * 4, total * 4);
-                        glEnableVertexAttribArray(i);
-                        total += vertexAttribSizes().get(i);
-                    }
-                }));
+            if (!vboMap.containsKey(dir)) {
+                vboMap.put(dir, new BufferObject(GL_ARRAY_BUFFER));
             }
-            ready = true;
-        });
+            vboMap.get(dir).activate();
+            vboMap.get(dir).putData(vertices);
+        }
+        if (vaoMap.isEmpty()) {
+            Core.onMainThread(() -> {
+                for (Vec3d dir : DIRS) {
+                    vaoMap.put(dir, VertexArrayObject.createVAO(() -> {
+                        vboMap.get(dir).activate();
+                        int total = 0;
+                        for (int i = 0; i < vertexAttribSizes().size(); i++) {
+                            glVertexAttribPointer(i, vertexAttribSizes().get(i), GL_FLOAT, false, vertexSize * 4, total * 4);
+                            glEnableVertexAttribArray(i);
+                            total += vertexAttribSizes().get(i);
+                        }
+                    }));
+                }
+            });
+        }
     }
 
     private void generateExposedFaces(int x, int y, List<Quad> quads1, List<Quad> quads2) {
@@ -178,7 +178,7 @@ public abstract class VoxelRenderer<T> {
     protected abstract Vec3d min();
 
     public void render(Vec3d position, double rotation, double scale, Vec3d origin) {
-        if (!ready) {
+        if (vaoMap.isEmpty()) {
             return;
         }
         setShaderUniforms();

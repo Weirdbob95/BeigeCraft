@@ -3,14 +3,19 @@ package util;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import opengl.Window;
 
 public abstract class Multithreader {
 
-    private static final int NUM_THREADS = 8;
+    private static final int NUM_THREADS = 3;
     private static final int TIMEOUT = 60;
     private static final ThreadPoolExecutor THREAD_POOL = new ThreadPoolExecutor(NUM_THREADS, NUM_THREADS, TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue(), r -> {
-        Thread t = new Thread(r);
-        t.setPriority(1);
+        Window w = new Window(false);
+        Thread t = new Thread(() -> {
+            w.createContext();
+            r.run();
+        });
+        //t.setPriority(1);
         return t;
     });
 

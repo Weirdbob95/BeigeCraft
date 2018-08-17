@@ -57,8 +57,8 @@ public class Window {
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        if (ANTI_ALIASING) {
-            glfwWindowHint(GLFW_SAMPLES, 16);
+        if (ANTI_ALIASING > 1) {
+            glfwWindowHint(GLFW_SAMPLES, ANTI_ALIASING);
         }
 
         handle = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, mainWindow ? NULL : window.handle);
@@ -86,6 +86,7 @@ public class Window {
     public void createContext() {
         glfwMakeContextCurrent(handle);
         GL.createCapabilities();
+        glfwSwapInterval(0);
 
         glEnable(GL_DEPTH_TEST);
         //glEnable(GL_MULTISAMPLE);

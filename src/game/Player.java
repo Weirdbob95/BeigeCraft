@@ -7,14 +7,16 @@ import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
 import engine.Input;
-import gui.GUIManager;
+import game.creatures.Creature;
 import game.items.BlockItem;
 import game.items.Item;
 import game.items.ItemSlot;
 import game.items.PickaxeItem;
+import game.items.SwordItem;
 import graphics.Animation;
 import graphics.Sprite;
 import static graphics.VoxelRenderer.DIRS;
+import gui.GUIManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -106,6 +108,9 @@ public class Player extends Behavior {
     @Override
     public void update(double dt) {
 
+//        if (dt > 1 / 30.) {
+//            System.out.println(dt);
+//        }
         breakingBlocks = false;
 
         gui.hud.setBiome(physics.world.heightmappedChunks
@@ -120,8 +125,8 @@ public class Player extends Behavior {
 
         if (!gui.freezeMouse()) {
             // Look around
-            camera3d.horAngle -= Input.mouseDelta().x / 500;
-            camera3d.vertAngle += Input.mouseDelta().y / 500;
+            camera3d.horAngle -= Input.mouseDelta().x / 300;
+            camera3d.vertAngle += Input.mouseDelta().y / 300;
 
             if (camera3d.vertAngle > 1.55) {
                 camera3d.vertAngle = 1.55f;
@@ -243,6 +248,17 @@ public class Player extends Behavior {
                 (isMainHand ? ItemSlot.MAIN_HAND : ItemSlot.OFF_HAND).removeItem();
                 physics.world.setBlock(block.hitPos, ((BlockItem) i).blockType);
             }
+        } else if (i instanceof SwordItem) {
+            new ArrayList<>(Creature.ALL).forEach(c -> {
+                Vec3d delta = c.position.position.sub(position.position);
+                if (delta.length() < 5 && delta.normalize().dot(Camera.camera3d.facing()) > .8) {
+                    c.velocity.velocity = c.velocity.velocity.add(Camera.camera3d.facing().setZ(.5).mul(20));
+                    c.currentHealth -= 5;
+                    if (c.currentHealth <= 0) {
+                        c.getRoot().destroy();
+                    }
+                }
+            });
         }
     }
 }

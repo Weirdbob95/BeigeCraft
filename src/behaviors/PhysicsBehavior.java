@@ -1,7 +1,6 @@
 package behaviors;
 
 import engine.Behavior;
-import java.util.Collection;
 import static util.MathUtils.ceil;
 import static util.MathUtils.floor;
 import static util.MathUtils.mod;
@@ -11,8 +10,6 @@ import static world.World.CHUNK_SIZE;
 import world.chunks.ConstructedChunk;
 
 public class PhysicsBehavior extends Behavior {
-
-    public static final Collection<PhysicsBehavior> ALL_PHYSICS_BEHAVIORS = track(PhysicsBehavior.class);
 
     private static final int PRECISION = 10;
 

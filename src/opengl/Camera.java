@@ -68,13 +68,13 @@ public interface Camera {
 
         @Override
         public Matrix4d getProjectionMatrix() {
-            return getProjectionMatrix(Math.PI / 2, Window.WIDTH, Window.HEIGHT, .2f, 2000);
+            return getProjectionMatrix(80, Window.WIDTH, Window.HEIGHT, .2f, 2000);
         }
 
         private Matrix4d getProjectionMatrix(double fov, double width, double height, double zNear, double zFar) {
             double aspectRatio = width / height;
             Matrix4d projectionMatrix = new Matrix4d();
-            projectionMatrix.perspective(fov, aspectRatio, zNear, zFar);
+            projectionMatrix.perspective(fov * Math.PI / 180, aspectRatio, zNear, zFar);
             return projectionMatrix;
         }
 

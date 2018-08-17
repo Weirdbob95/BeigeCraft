@@ -40,6 +40,7 @@ public class Font {
 
     private Texture[] textures;
     private final Map<Integer, FontChar> charMap = new HashMap();
+    private final Map<String, FontText> textMap = new HashMap();
 
     // See http://www.angelcode.com/products/bmfont/doc/file_format.html
     // Info
@@ -141,56 +142,58 @@ public class Font {
         if (text == null || text.isEmpty()) {
             throw new RuntimeException("Invalid text");
         }
-
-        List<float[]>[] data = new List[pages];
-        FontChar prev = null;
-        Vec2d cursor = new Vec2d(0, 0);
-        for (int c : text.toCharArray()) {
-            if (prev != null) {
-                cursor = cursor.add(new Vec2d(prev.getAdvance(c), 0));
-            }
-            FontChar fc = charMap.get(c);
-            if (fc == null) {
-                throw new RuntimeException("Missing character: " + (char) c);
-            }
-            if (data[fc.page] == null) {
-                data[fc.page] = new LinkedList();
-            }
-            float x = (float) cursor.x + fc.xoffset;
-            float y = (float) cursor.y + lineHeight / 2f - fc.yoffset - fc.height;
-            data[fc.page].add(new float[]{
-                x, y, 0, fc.x / 256f, 1 - (fc.y + fc.height) / 256f,
-                x + fc.width, y, 0, (fc.x + fc.width) / 256f, 1 - (fc.y + fc.height) / 256f,
-                x + fc.width, y + fc.height, 0, (fc.x + fc.width) / 256f, 1 - fc.y / 256f,
-                x, y + fc.height, 0, fc.x / 256f, 1 - fc.y / 256f,});
-            prev = fc;
-        }
-
-        FontText ft = new FontText();
-        ft.width = cursor.x + prev.xadvance;
-        for (int i = 0; i < pages; i++) {
-            if (data[i] != null) {
-                ft.numChars[i] = data[i].size();
-                float[] vertices = new float[ft.numChars[i] * 20];
-                int[] indices = new int[ft.numChars[i] * 6];
-                for (int j = 0; j < ft.numChars[i]; j++) {
-                    System.arraycopy(data[i].get(j), 0, vertices, j * 20, 20);
-                    System.arraycopy(new int[]{
-                        0 + 4 * j, 1 + 4 * j, 2 + 4 * j,
-                        0 + 4 * j, 2 + 4 * j, 3 + 4 * j
-                    }, 0, indices, j * 6, 6);
+        if (!textMap.containsKey(text)) {
+            List<float[]>[] data = new List[pages];
+            FontChar prev = null;
+            Vec2d cursor = new Vec2d(0, 0);
+            for (int c : text.toCharArray()) {
+                if (prev != null) {
+                    cursor = cursor.add(new Vec2d(prev.getAdvance(c), 0));
                 }
-                ft.vaoArray[i] = VertexArrayObject.createVAO(() -> {
-                    BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, vertices);
-                    BufferObject ebo = new BufferObject(GL_ELEMENT_ARRAY_BUFFER, indices);
-                    glVertexAttribPointer(0, 3, GL_FLOAT, false, 20, 0);
-                    glEnableVertexAttribArray(0);
-                    glVertexAttribPointer(1, 2, GL_FLOAT, false, 20, 12);
-                    glEnableVertexAttribArray(1);
-                });
+                FontChar fc = charMap.get(c);
+                if (fc == null) {
+                    throw new RuntimeException("Missing character: " + (char) c);
+                }
+                if (data[fc.page] == null) {
+                    data[fc.page] = new LinkedList();
+                }
+                float x = (float) cursor.x + fc.xoffset;
+                float y = (float) cursor.y + lineHeight / 2f - fc.yoffset - fc.height;
+                data[fc.page].add(new float[]{
+                    x, y, 0, fc.x / 256f, 1 - (fc.y + fc.height) / 256f,
+                    x + fc.width, y, 0, (fc.x + fc.width) / 256f, 1 - (fc.y + fc.height) / 256f,
+                    x + fc.width, y + fc.height, 0, (fc.x + fc.width) / 256f, 1 - fc.y / 256f,
+                    x, y + fc.height, 0, fc.x / 256f, 1 - fc.y / 256f,});
+                prev = fc;
             }
+
+            FontText ft = new FontText();
+            ft.width = cursor.x + prev.xadvance;
+            for (int i = 0; i < pages; i++) {
+                if (data[i] != null) {
+                    ft.numChars[i] = data[i].size();
+                    float[] vertices = new float[ft.numChars[i] * 20];
+                    int[] indices = new int[ft.numChars[i] * 6];
+                    for (int j = 0; j < ft.numChars[i]; j++) {
+                        System.arraycopy(data[i].get(j), 0, vertices, j * 20, 20);
+                        System.arraycopy(new int[]{
+                            0 + 4 * j, 1 + 4 * j, 2 + 4 * j,
+                            0 + 4 * j, 2 + 4 * j, 3 + 4 * j
+                        }, 0, indices, j * 6, 6);
+                    }
+                    ft.vaoArray[i] = VertexArrayObject.createVAO(() -> {
+                        BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, vertices);
+                        BufferObject ebo = new BufferObject(GL_ELEMENT_ARRAY_BUFFER, indices);
+                        glVertexAttribPointer(0, 3, GL_FLOAT, false, 20, 0);
+                        glEnableVertexAttribArray(0);
+                        glVertexAttribPointer(1, 2, GL_FLOAT, false, 20, 12);
+                        glEnableVertexAttribArray(1);
+                    });
+                }
+            }
+            textMap.put(text, ft);
         }
-        return ft;
+        return textMap.get(text);
     }
 
     private static class FontChar {

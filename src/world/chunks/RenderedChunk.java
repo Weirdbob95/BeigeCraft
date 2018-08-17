@@ -25,7 +25,11 @@ public class RenderedChunk extends AbstractChunk {
 
     @Override
     protected void generate() {
-        chunkRenderer = new ChunkRenderer(world, pos);
+        if (chunkRenderer == null) {
+            chunkRenderer = new ChunkRenderer(world, pos);
+        } else {
+            chunkRenderer.generate();
+        }
     }
 
     private boolean intersectsFrustum() {

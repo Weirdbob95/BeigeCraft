@@ -40,7 +40,7 @@ public abstract class Main {
 
         Player p = new Player();
         p.position.position = new Vec3d(.4 + .2 * Math.random(), .4 + .2 * Math.random(),
-                world.heightmappedChunks.get(new ChunkPos(0, 0)).heightmap[0][0] + 2);
+                world.heightmappedChunks.get(new ChunkPos(0, 0)).elevationAt(0, 0) + 2);
         Camera.camera3d.position = p.position.position;
         p.physics.world = world;
         p.gui = gui;

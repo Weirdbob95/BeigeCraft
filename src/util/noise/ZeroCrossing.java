@@ -2,7 +2,7 @@ package util.noise;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.IntToDoubleFunction;
 import static util.MathUtils.ceil;
 
 public class ZeroCrossing {
@@ -16,21 +16,21 @@ public class ZeroCrossing {
         this.end = end;
     }
 
-    public static List<ZeroCrossing> findZeroCrossings(Function<Integer, Double> f, int minZ, int maxZ, double maxGrad) {
+    public static List<ZeroCrossing> findZeroCrossings(IntToDoubleFunction f, int minZ, int maxZ, double maxGrad) {
         List<ZeroCrossing> r = new LinkedList();
         int z = minZ;
         while (z <= maxZ) {
             int startZ = z;
-            double val = f.apply(startZ);
+            double val = f.applyAsDouble(startZ);
             boolean positive = val > 0;
             while (val > 0 == positive) {
                 int step = ceil(Math.abs(val) / maxGrad);
                 z += step;
-                val = f.apply(z);
                 if (z > maxZ) {
                     z = maxZ + 1;
                     break;
                 }
+                val = f.applyAsDouble(z);
             }
             ZeroCrossing zc = new ZeroCrossing(positive, startZ, z - 1);
             r.add(zc);

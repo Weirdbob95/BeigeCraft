@@ -41,10 +41,10 @@ public class StructuredChunk extends AbstractChunk {
             int x = random.nextInt(CHUNK_SIZE);
             int y = random.nextInt(CHUNK_SIZE);
             if (hc.biomemap[x][y].plurality().treeDensity > 0 && random.nextDouble() < hc.biomemap[x][y].averageTreeDensity() * .1) {
-                structures.add(new Tree(x, y, hc.heightmap[x][y] + 1,
+                structures.add(new Tree(x, y, hc.elevationAt(x, y) + 1,
                         (2 + random.nextInt(8) + random.nextInt(8)) * hc.biomemap[x][y].averageTreeHeight()));
             } else if (hc.biomemap[x][y].plurality() == Biome.COLD_DESERT && random.nextDouble() < hc.biomemap[x][y].get(Biome.COLD_DESERT) * .01) {
-                structures.add(new Cactus(x, y, hc.heightmap[x][y] + 1, 2 + random.nextInt(6)));
+                structures.add(new Cactus(x, y, hc.elevationAt(x, y) + 1, 2 + random.nextInt(6)));
             }
         }
     }

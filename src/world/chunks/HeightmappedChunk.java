@@ -1,6 +1,11 @@
 package world.chunks;
 
-import static util.MathUtils.floor;
+import java.util.List;
+import java.util.function.IntToDoubleFunction;
+import util.noise.NoiseInterpolator;
+import util.noise.ZeroCrossing;
+import static util.noise.ZeroCrossing.findZeroCrossings;
+import util.vectors.Vec3d;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
@@ -9,29 +14,57 @@ import world.biomes.BiomeData;
 public class HeightmappedChunk extends AbstractChunk {
 
     public final BiomeData[][] biomemap = new BiomeData[CHUNK_SIZE][CHUNK_SIZE];
-    public final int[][] heightmap = new int[CHUNK_SIZE][CHUNK_SIZE];
+    public final List<ZeroCrossing>[][] heightmap = new List[CHUNK_SIZE][CHUNK_SIZE];
+    public final List<ZeroCrossing>[][] cavemap = new List[CHUNK_SIZE][CHUNK_SIZE];
+
+    public double xyLength = 300;
+    public double craziness = .75;
+    public int height = 300;
+    public int zMin = -100;
+    public double caveDensity = 1;
 
     public HeightmappedChunk(World world, ChunkPos pos) {
         super(world, pos);
     }
 
-    @Override
-    protected void generate() {
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-            for (int y = 0; y < CHUNK_SIZE; y++) {
-                biomemap[x][y] = BiomeData.generate(world, worldPos(x, y, 0));
-                heightmap[x][y] = floor(heightAt(x + pos.x * CHUNK_SIZE, y + pos.y * CHUNK_SIZE) * biomemap[x][y].averageElevation());
-            }
-        }
+    public double altitudeAt(int x, int y) {
+        return world.noise("heightmappedchunk1").noise2d(x, y, .001);
     }
 
-    private double heightAt(int x, int y) {
-        return (200 * world.noise("heightmappedchunk1").fbm2d(x, y, 6, .003) - 50)
-                * world.noise("heightmappedchunk4").noise2d(x, y, .002);
-//        double spread = 1;
-//        return (100 * world.noise("heightmappedchunk1").noise2d(x, y, .003 / spread)
-//                + 20 * world.noise("heightmappedchunk2").noise2d(x, y, .015 / spread)
-//                + 4 * world.noise("heightmappedchunk3").noise2d(x, y, .075 / spread)
-//                - 40) * world.noise("heightmappedchunk4").noise2d(x, y, .002 / spread) * 2;
+    public int elevationAt(int x, int y) {
+        return heightmap[x][y].get(heightmap[x][y].size() - 2).end;
+    }
+
+    @Override
+    protected void generate() {
+        NoiseInterpolator terrain = new NoiseInterpolator(world.noise("heightmappedchunk0"), 8, 8, height);
+        terrain.setTransform(worldPos(), new Vec3d(1, 1, 1).mul(CHUNK_SIZE / 8.));
+        terrain.generate(12, 1 / xyLength);
+
+        NoiseInterpolator caves1 = new NoiseInterpolator(world.noise("constructedchunk1"), 8, 8, (height - zMin) / 2);
+        NoiseInterpolator caves2 = new NoiseInterpolator(world.noise("constructedchunk2"), 8, 8, (height - zMin) / 2);
+        caves1.setTransform(worldPos(), new Vec3d(1, 1, 2).mul(CHUNK_SIZE / 8.));
+        caves2.setTransform(worldPos(), new Vec3d(1, 1, 2).mul(CHUNK_SIZE / 8.));
+        caves1.generate(4, .003 * caveDensity);
+        caves2.generate(4, .003 * caveDensity);
+
+        for (int x = 0; x < CHUNK_SIZE; x++) {
+            for (int y = 0; y < CHUNK_SIZE; y++) {
+                int wx = x + pos.x * CHUNK_SIZE;
+                int wy = y + pos.y * CHUNK_SIZE;
+                biomemap[x][y] = BiomeData.generate(world, wx, wy);
+                double wHeight = altitudeAt(wx, wy) * height * biomemap[x][y].averageElevation();
+                IntToDoubleFunction density = z -> terrain.get(wx, wy, (z + height) * craziness) - z / wHeight;
+                heightmap[x][y] = findZeroCrossings(density, 0, height, .02 + 1 / wHeight);
+
+                IntToDoubleFunction caves = z
+                        -> Math.abs(caves1.get(wx, wy, (z + height) * 2) - .5)
+                        + Math.abs(caves2.get(wx, wy, (z + height) * 2) - .5)
+                        - .04 * caveDensity * (1 - 17 / (Math.max(density.applyAsDouble(z), 0) * wHeight + 20.))
+                        - 5 * Math.min(density.applyAsDouble(z), 0);
+                cavemap[x][y] = findZeroCrossings(caves, zMin, height, .1);
+                //cavemap[x][y] = new LinkedList();
+            }
+        }
     }
 }

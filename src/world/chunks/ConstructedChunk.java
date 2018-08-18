@@ -1,15 +1,14 @@
 package world.chunks;
 
-import java.util.function.Function;
 import util.noise.NoiseInterpolator;
 import util.noise.ZeroCrossing;
-import static util.noise.ZeroCrossing.findZeroCrossings;
 import util.rlestorage.IntConverter.BlockTypeConverter;
 import util.rlestorage.RLEArrayStorage;
 import util.vectors.Vec3d;
 import world.BlockType;
 import static world.BlockType.DIRT;
 import static world.BlockType.GRASS;
+import static world.BlockType.LAVA;
 import static world.BlockType.SAND;
 import static world.BlockType.SNOWY_GRASS;
 import static world.BlockType.STONE;
@@ -30,11 +29,6 @@ public class ConstructedChunk extends AbstractChunk {
     protected void generate() {
         double caveDensity = 2;
         double ironDensity = 1;
-        int minZ = -300;
-
-        NoiseInterpolator terrain = new NoiseInterpolator(world.noise("constructedchunk0"), 8, 8, 300);
-        terrain.setTransform(worldPos(), new Vec3d(1, 1, 2).mul(CHUNK_SIZE / 8.));
-        terrain.generate(12, .001);
 
         NoiseInterpolator caves1 = new NoiseInterpolator(world.noise("constructedchunk1"), 8, 8, 128);
         NoiseInterpolator caves2 = new NoiseInterpolator(world.noise("constructedchunk2"), 8, 8, 128);
@@ -77,11 +71,8 @@ public class ConstructedChunk extends AbstractChunk {
                     default:
                         throw new RuntimeException("Unknown biome");
                 }
-                blockStorage.setRangeInfinite(x, y, minZ, STONE);
-                int wx = x + pos.x * CHUNK_SIZE;
-                int wy = y + pos.y * CHUNK_SIZE;
-                Function<Integer, Double> density = z -> terrain.get(wx, wy, (z - minZ) * 2) - .5 - z * .003;
-                for (ZeroCrossing zc : findZeroCrossings(density, minZ, 300, .01)) {
+                blockStorage.setRangeInfinite(x, y, 0, STONE);
+                for (ZeroCrossing zc : hc.heightmap[x][y]) {
                     if (zc.positive) {
                         if (zc.start <= zc.end - 3) {
                             blockStorage.setRange(x, y, zc.start, zc.end - 3, STONE);
@@ -89,53 +80,23 @@ public class ConstructedChunk extends AbstractChunk {
                         if (zc.start <= zc.end - 1) {
                             blockStorage.setRange(x, y, Math.max(zc.end - 2, zc.start), zc.end - 1, nearSurface);
                         }
+//                        if (zc.end > 175) {
+//                            blockStorage.set(x, y, zc.end, SNOWY_GRASS);
+//                        } else if (zc.end > 150) {
+//                            blockStorage.set(x, y, zc.end, TUNDRA_GRASS);
+//                        } else {
                         blockStorage.set(x, y, zc.end, surface);
+//                        }
                     }
                 }
-//                int elevation = hc.heightmap[x][y];
-//                blockStorage.setRangeInfinite(x, y, elevation, GRASS);
-//                blockStorage.setRangeInfinite(x, y, elevation - 1, DIRT);
-//                blockStorage.setRangeInfinite(x, y, elevation - 3, STONE);
-//                for (int z = minZ; z <= elevation; z++) {
-//                    int wx = x + pos.x * CHUNK_SIZE;
-//                    int wy = y + pos.y * CHUNK_SIZE;
-//                    int wz = (z - minZ) * 2;
-//                    double density = terrain.get(wx, wy, wz) - .5 - (z + 50) * .003;
-//                    //System.out.println(density);
-//                    if (density < 0) {
-//                        blockStorage.set(x, y, z, null);
-//                    } else {
-//                        z += floor(density * 100);
-//                    }
-//                }
-                /*
-                int elevation = hc.heightmap[x][y];
-                switch (hc.biomemap[x][y].plurality()) {
-                    case FOREST:
-                    case PLAINS:
-                    case JUNGLE:
-                        blockStorage.setRangeInfinite(x, y, elevation, GRASS);
-                        blockStorage.setRangeInfinite(x, y, elevation - 1, DIRT);
-                        break;
-                    case TAIGA:
-                    case TUNDRA:
-                        blockStorage.setRangeInfinite(x, y, elevation, TUNDRA_GRASS);
-                        blockStorage.setRangeInfinite(x, y, elevation - 1, DIRT);
-                        break;
-                    case SNOW:
-                        blockStorage.setRangeInfinite(x, y, elevation, SNOWY_GRASS);
-                        blockStorage.setRangeInfinite(x, y, elevation - 1, DIRT);
-                        break;
-                    case DESERT:
-                    case COLD_DESERT:
-                        blockStorage.setRangeInfinite(x, y, elevation, SAND);
-                        break;
-                    case ROCK:
-                        blockStorage.setRangeInfinite(x, y, elevation, STONE);
-                        break;
+                for (ZeroCrossing zc : hc.cavemap[x][y]) {
+                    if (!zc.positive) {
+                        blockStorage.setRange(x, y, zc.start, zc.end, null);
+                        if (zc.start <= hc.zMin + 2) {
+                            blockStorage.setRange(x, y, zc.start, hc.zMin + 2, LAVA);
+                        }
+                    }
                 }
-                blockStorage.setRangeInfinite(x, y, elevation - 3, STONE);
-                 */
                 // CAVES
                 /*int caveStart = minZ + 3;
                 for (int z = minZ; z <= elevation; z++) {
@@ -163,12 +124,12 @@ public class ConstructedChunk extends AbstractChunk {
                 }*/
             }
         }
-        /*
+
         for (ChunkPos cp : world.getChunksNearby(pos)) {
             StructuredChunk sc = world.structuredChunks.get(cp);
             sc.constructIn(this);
         }
-         */
-        world.heightmappedChunks.remove(pos);
+
+        //world.heightmappedChunks.remove(pos);
     }
 }

@@ -8,7 +8,6 @@ import static util.MathUtils.clamp;
 import static util.MathUtils.floor;
 import static util.MathUtils.mod;
 import static util.MathUtils.round;
-import util.vectors.Vec3d;
 import world.World;
 import static world.biomes.Biome.*;
 
@@ -26,17 +25,17 @@ public class BiomeData {
     private Biome plurality;
     private double totalStrength;
 
-    public static BiomeData generate(World world, Vec3d pos) {
+    public static BiomeData generate(World world, double x, double y) {
         double freqMult = .5;
         double noisyness = .05;
 
         BiomeData bd = new BiomeData();
-        double temp = world.noise("biomedata1").fbm2d(pos.x, pos.y, 4, .001 * freqMult) - .5;
-        double hum = world.noise("biomedata2").fbm2d(pos.x, pos.y, 4, .001 * freqMult) - .5;
-        temp /= 1 + 300 / pos.length();
-        hum /= 1 + 300 / pos.length();
-        double temp2 = temp + (world.noise("biomedata3").fbm2d(pos.x, pos.y, 3, .1 * freqMult) - .5) * noisyness;
-        double hum2 = hum + (world.noise("biomedata4").fbm2d(pos.x, pos.y, 3, .1 * freqMult) - .5) * noisyness;
+        double temp = world.noise("biomedata1").fbm2d(x, y, 4, .001 * freqMult) - .5;
+        double hum = world.noise("biomedata2").fbm2d(x, y, 4, .001 * freqMult) - .5;
+        temp /= 1 + 300 / Math.sqrt(x * x + y * y);
+        hum /= 1 + 300 / Math.sqrt(x * x + y * y);
+        double temp2 = temp + (world.noise("biomedata3").fbm2d(x, y, 3, .1 * freqMult) - .5) * noisyness;
+        double hum2 = hum + (world.noise("biomedata4").fbm2d(x, y, 3, .1 * freqMult) - .5) * noisyness;
 
         double ext = 8;
         temp = clamp(2 + temp * ext, 0, 4);

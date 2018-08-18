@@ -9,6 +9,7 @@ import opengl.ShaderProgram;
 import static util.MathUtils.floor;
 import static util.MathUtils.mod;
 import util.vectors.Vec3d;
+import util.vectors.Vec4d;
 import world.BlockType;
 import world.ChunkPos;
 import world.World;
@@ -72,7 +73,7 @@ public class ChunkRenderer extends VoxelRenderer<BlockType> {
     }
 
     @Override
-    protected void setShaderUniforms() {
+    protected void setShaderUniforms(Vec4d color) {
     }
 
     @Override

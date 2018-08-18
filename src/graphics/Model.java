@@ -134,9 +134,9 @@ public class Model extends VoxelRenderer<Integer> {
     }
 
     @Override
-    protected void setShaderUniforms() {
+    protected void setShaderUniforms(Vec4d color) {
         shader().setUniform("projectionMatrix", Camera.camera3d.getProjectionMatrix());
-        shader().setUniform("color", new Vec4d(1, 1, 1, 1));
+        shader().setUniform("color", color);
     }
 
     @Override

@@ -22,6 +22,7 @@ import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import util.vectors.Vec3d;
+import util.vectors.Vec4d;
 
 public abstract class VoxelRenderer<T> {
 
@@ -180,11 +181,11 @@ public abstract class VoxelRenderer<T> {
 
     protected abstract Vec3d min();
 
-    public void render(Vec3d position, double rotation, double scale, Vec3d origin) {
+    public void render(Vec3d position, double rotation, double scale, Vec3d origin, Vec4d color) {
         if (vaoMap.isEmpty()) {
             return;
         }
-        setShaderUniforms();
+        setShaderUniforms(color);
         Matrix4d worldMat = Camera.camera3d.getWorldMatrix(position, rotation, scale).translate(origin.toJOML().mul(-1));
         shader().setUniform("modelViewMatrix", worldMat);
         for (Vec3d dir : DIRS) {
@@ -199,7 +200,7 @@ public abstract class VoxelRenderer<T> {
         }
     }
 
-    protected abstract void setShaderUniforms();
+    protected abstract void setShaderUniforms(Vec4d color);
 
     protected abstract ShaderProgram shader();
 

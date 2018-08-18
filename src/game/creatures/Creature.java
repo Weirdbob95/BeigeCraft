@@ -9,6 +9,7 @@ import behaviors.VelocityBehavior;
 import engine.Behavior;
 import java.util.Collection;
 import util.vectors.Vec3d;
+import util.vectors.Vec4d;
 
 public class Creature extends Behavior {
 
@@ -33,6 +34,16 @@ public class Creature extends Behavior {
     @Override
     public void createInner() {
         acceleration.acceleration = new Vec3d(0, 0, -32);
+    }
+
+    public void damage(double damage, Vec3d dir) {
+//        velocity.velocity = velocity.velocity.add(dir.setZ(.5).mul(5 * damage));
+        velocity.velocity = velocity.velocity.add(dir.setZ(.5).mul(20));
+        currentHealth -= damage;
+        model.color = new Vec4d(1, currentHealth / maxHealth, currentHealth / maxHealth, 1);
+        if (currentHealth <= 0) {
+            getRoot().destroy();
+        }
     }
 
     public void setHitboxFromModel() {

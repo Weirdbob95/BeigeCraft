@@ -12,9 +12,12 @@ import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import util.MathUtils;
 import static util.MathUtils.direction;
+import static util.MathUtils.direction1;
+import static util.MathUtils.direction2;
 import static util.MathUtils.rotate;
 import util.Resources;
 import util.vectors.Vec2d;
+import util.vectors.Vec3d;
 import util.vectors.Vec4d;
 
 public class Graphics {
@@ -60,6 +63,16 @@ public class Graphics {
         Vec2d delta = p2.sub(p1);
         COLOR_SHADER.setUniform("projectionMatrix", Camera.camera2d.getProjectionMatrix());
         COLOR_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(p1, direction(delta), delta.length(), delta.length()));
+        COLOR_SHADER.setUniform("color", color);
+        using(Arrays.asList(COLOR_SHADER, LINE_VAO), () -> {
+            glDrawArrays(GL_LINES, 0, 2);
+        });
+    }
+
+    public static void drawLine(Vec3d p1, Vec3d p2, Vec4d color) {
+        Vec3d delta = p2.sub(p1);
+        COLOR_SHADER.setUniform("projectionMatrix", Camera.camera3d.getProjectionMatrix());
+        COLOR_SHADER.setUniform("modelViewMatrix", Camera.camera3d.getWorldMatrix(p1, direction1(delta), direction2(delta), delta.length()));
         COLOR_SHADER.setUniform("color", color);
         using(Arrays.asList(COLOR_SHADER, LINE_VAO), () -> {
             glDrawArrays(GL_LINES, 0, 2);

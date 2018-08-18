@@ -45,6 +45,6 @@ public class RenderedChunk extends AbstractChunk {
             shouldRegenerate = false;
             generateOuter();
         }
-        chunkRenderer.render(worldPos(), 0, 1, new Vec3d(0, 0, 0));
+        chunkRenderer.render(worldPos(), 0, 1, new Vec3d(0, 0, 0), null);
     }
 }

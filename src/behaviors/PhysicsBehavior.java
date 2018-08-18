@@ -23,15 +23,13 @@ public class PhysicsBehavior extends Behavior {
     public boolean hitWall;
     public World world;
 
-    public boolean couldChangeHitboxSize(Vec3d newSize1, Vec3d newSize2) {
-        Vec3d oldSize1 = hitboxSize1;
-        Vec3d oldSize2 = hitboxSize2;
-        hitboxSize1 = newSize1;
-        hitboxSize2 = newSize2;
-        boolean r = !wouldCollideAt(position.position);
-        hitboxSize1 = oldSize1;
-        hitboxSize2 = oldSize2;
-        return r;
+    public boolean containsPoint(Vec3d v) {
+        return v.x >= position.position.x - hitboxSize1.x
+                && v.y >= position.position.y - hitboxSize1.y
+                && v.z >= position.position.z - hitboxSize1.z
+                && v.x <= position.position.x + hitboxSize2.x
+                && v.y <= position.position.y + hitboxSize2.y
+                && v.z <= position.position.z + hitboxSize2.z;
     }
 
     private boolean moveToWall(Vec3d del) {

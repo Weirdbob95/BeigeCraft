@@ -13,6 +13,16 @@ import game.items.Item;
 import game.items.ItemSlot;
 import game.items.PickaxeItem;
 import game.items.SwordItem;
+import game.items.WandItem;
+import game.spells.SpellInfo;
+import game.spells.SpellInfo.SpellTarget;
+import game.spells.TypeDefinitions.SpellEffectFinal;
+import static game.spells.TypeDefinitions.SpellEffectType.DESTRUCTION;
+import static game.spells.TypeDefinitions.SpellElement.FIRE;
+import game.spells.TypeDefinitions.SpellShapeInitial;
+import game.spells.shapes.S_Burst;
+import game.spells.shapes.S_Projectile;
+import game.spells.shapes.SpellShapeMissile;
 import graphics.Animation;
 import graphics.Sprite;
 import static graphics.VoxelRenderer.DIRS;
@@ -31,6 +41,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+import util.MathUtils;
 import static util.MathUtils.ceil;
 import static util.MathUtils.mod;
 import util.vectors.Vec2d;
@@ -252,13 +263,15 @@ public class Player extends Behavior {
             new ArrayList<>(Creature.ALL).forEach(c -> {
                 Vec3d delta = c.position.position.sub(position.position);
                 if (delta.length() < 5 && delta.normalize().dot(Camera.camera3d.facing()) > .8) {
-                    c.velocity.velocity = c.velocity.velocity.add(Camera.camera3d.facing().setZ(.5).mul(20));
-                    c.currentHealth -= 5;
-                    if (c.currentHealth <= 0) {
-                        c.getRoot().destroy();
-                    }
+                    c.damage(5, Camera.camera3d.facing());
                 }
             });
+        } else if (i instanceof WandItem) {
+            SpellShapeMissile missile = new S_Projectile();
+            missile.isMultishot = true;
+            SpellShapeInitial shape = missile.onHit(new S_Burst().onHit(new SpellEffectFinal()));
+            SpellInfo info = new SpellInfo(new SpellTarget(Camera.camera3d.position.add(MathUtils.randomInSphere().mul(.1))), Camera.camera3d.facing(), 1, FIRE, DESTRUCTION, physics.world);
+            shape.cast(info, Camera.camera3d.facing());
         }
     }
 }

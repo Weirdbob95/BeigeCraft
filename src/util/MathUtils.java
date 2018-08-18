@@ -1,6 +1,5 @@
 package util;
 
-import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import util.vectors.Vec2d;
@@ -24,6 +23,14 @@ public abstract class MathUtils {
         return Math.atan2(v.y, v.x);
     }
 
+    public static double direction1(Vec3d v) {
+        return Math.atan2(v.y, v.x);
+    }
+
+    public static double direction2(Vec3d v) {
+        return Math.atan2(v.z, Math.sqrt(v.x * v.x + v.y * v.y));
+    }
+
     public static int floor(double x) {
         return (int) Math.floor(x);
     }
@@ -36,9 +43,9 @@ public abstract class MathUtils {
         return (x % m + m) % m;
     }
 
-    public static Vec3d randomInSphere(Random random) {
+    public static Vec3d randomInSphere() {
         while (true) {
-            Vec3d v = new Vec3d(random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1);
+            Vec3d v = new Vec3d(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
             if (v.lengthSquared() <= 1) {
                 return v;
             }

@@ -99,5 +99,9 @@ public interface Camera {
         public Matrix4d getWorldMatrix(Vec3d translate, double rotation, double scale) {
             return getViewMatrix().translate(translate.toJOML()).rotate(rotation, up.toJOML()).scale(scale);
         }
+
+        public Matrix4d getWorldMatrix(Vec3d translate, double rotation1, double rotation2, double scale) {
+            return getViewMatrix().translate(translate.toJOML()).rotate(rotation1, up.toJOML()).rotate(rotation2, new Vector3d(0, -1, 0)).scale(scale);
+        }
     }
 }

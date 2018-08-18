@@ -7,7 +7,7 @@ import opengl.Window;
 
 public abstract class Multithreader {
 
-    private static final int NUM_THREADS = 3;
+    private static final int NUM_THREADS = 7;
     private static final int TIMEOUT = 60;
     private static final ThreadPoolExecutor THREAD_POOL = new ThreadPoolExecutor(NUM_THREADS, NUM_THREADS, TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue(), r -> {
         Window w = new Window(false);

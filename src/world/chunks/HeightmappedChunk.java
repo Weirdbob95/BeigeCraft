@@ -13,9 +13,9 @@ import world.biomes.BiomeData;
 
 public class HeightmappedChunk extends AbstractChunk {
 
-    public final BiomeData[][] biomemap = new BiomeData[CHUNK_SIZE][CHUNK_SIZE];
-    public final List<ZeroCrossing>[][] heightmap = new List[CHUNK_SIZE][CHUNK_SIZE];
-    public final List<ZeroCrossing>[][] cavemap = new List[CHUNK_SIZE][CHUNK_SIZE];
+    public BiomeData[][] biomemap = new BiomeData[CHUNK_SIZE][CHUNK_SIZE];
+    public List<ZeroCrossing>[][] heightmap = new List[CHUNK_SIZE][CHUNK_SIZE];
+    public List<ZeroCrossing>[][] cavemap = new List[CHUNK_SIZE][CHUNK_SIZE];
 
     public double xyLength = 300;
     public double craziness = .75;
@@ -45,8 +45,8 @@ public class HeightmappedChunk extends AbstractChunk {
         NoiseInterpolator caves2 = new NoiseInterpolator(world.noise("constructedchunk2"), 8, 8, (height - zMin) / 2);
         caves1.setTransform(worldPos(), new Vec3d(1, 1, 2).mul(CHUNK_SIZE / 8.));
         caves2.setTransform(worldPos(), new Vec3d(1, 1, 2).mul(CHUNK_SIZE / 8.));
-        caves1.generate(4, .003 * caveDensity);
-        caves2.generate(4, .003 * caveDensity);
+        caves1.generate(6, .003 * caveDensity);
+        caves2.generate(6, .003 * caveDensity);
 
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {

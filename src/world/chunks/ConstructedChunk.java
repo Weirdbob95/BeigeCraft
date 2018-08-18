@@ -130,6 +130,9 @@ public class ConstructedChunk extends AbstractChunk {
             sc.constructIn(this);
         }
 
+        hc.cavemap = null;
+        hc.heightmap = null;
+
         //world.heightmappedChunks.remove(pos);
     }
 }

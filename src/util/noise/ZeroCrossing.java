@@ -23,7 +23,7 @@ public class ZeroCrossing {
             int startZ = z;
             double val = f.applyAsDouble(startZ);
             boolean positive = val > 0;
-            while (val > 0 == positive) {
+            while (true) {
                 int step = ceil(Math.abs(val) / maxGrad);
                 z += step;
                 if (z > maxZ) {
@@ -31,6 +31,13 @@ public class ZeroCrossing {
                     break;
                 }
                 val = f.applyAsDouble(z);
+                if (val > 0 != positive) {
+                    if (f.applyAsDouble(z - 1) > 0 == positive) {
+                        break;
+                    } else {
+                        z -= step / 2;
+                    }
+                }
             }
             ZeroCrossing zc = new ZeroCrossing(positive, startZ, z - 1);
             r.add(zc);

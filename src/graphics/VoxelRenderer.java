@@ -71,11 +71,14 @@ public abstract class VoxelRenderer<T> {
                 Quad q = quads.get(dir).get(i);
                 System.arraycopy(q.toData(), 0, vertices, vertexSize * i, vertexSize);
             }
-            if (!vboMap.containsKey(dir)) {
-                vboMap.put(dir, new BufferObject(GL_ARRAY_BUFFER));
-            }
-            vboMap.get(dir).activate();
-            vboMap.get(dir).putData(vertices);
+            // Workaround for threading issues
+            Core.onMainThread(() -> {
+                if (!vboMap.containsKey(dir)) {
+                    vboMap.put(dir, new BufferObject(GL_ARRAY_BUFFER));
+                }
+                vboMap.get(dir).activate();
+                vboMap.get(dir).putData(vertices);
+            });
         }
         if (vaoMap.isEmpty()) {
             Core.onMainThread(() -> {

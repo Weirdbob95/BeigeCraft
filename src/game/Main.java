@@ -5,6 +5,7 @@ import static behaviors.MiscBehaviors.onRender;
 import static behaviors.MiscBehaviors.onUpdate;
 import engine.Core;
 import engine.Input;
+import static game.Settings.ENABLE_LOD;
 import static game.Settings.RENDER_DISTANCE;
 import game.creatures.Doggo;
 import game.creatures.Kitteh;
@@ -85,6 +86,9 @@ public abstract class Main {
                 ziggy.creature.model.rotation = Camera.camera3d.horAngle;
                 ziggy.creature.physics.world = world;
                 ziggy.create();
+            }
+            if (Input.keyJustPressed(GLFW_KEY_L)) {
+                ENABLE_LOD = !ENABLE_LOD;
             }
         });
 

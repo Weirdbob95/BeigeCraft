@@ -19,6 +19,10 @@ public abstract class MathUtils {
         return Math.max(lower, Math.min(x, upper));
     }
 
+    public static Vec3d clamp(Vec3d v, Vec3d lower, Vec3d upper) {
+        return new Vec3d(clamp(v.x, lower.x, upper.x), clamp(v.y, lower.y, upper.y), clamp(v.z, lower.z, upper.z));
+    }
+
     public static double direction(Vec2d v) {
         return Math.atan2(v.y, v.x);
     }

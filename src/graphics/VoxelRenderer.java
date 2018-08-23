@@ -2,6 +2,7 @@ package graphics;
 
 import static engine.Activatable.using;
 import engine.Core;
+import static game.Settings.ENABLE_LOD;
 import static game.Settings.MULTITHREADED_OPENGL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,8 @@ import static org.lwjgl.opengl.GL11.glDrawArrays;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static util.MathUtils.clamp;
+import static util.MathUtils.floor;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
 
@@ -32,7 +35,10 @@ public abstract class VoxelRenderer<T> {
             new Vec3d(0, -1, 0), new Vec3d(0, 1, 0),
             new Vec3d(0, 0, -1), new Vec3d(0, 0, 1));
 
-    private final Map<Vec3d, Integer> numQuadsMap = new HashMap();
+    private static final int MAX_LOD = 3;
+
+    //private final Map<Vec3d, Integer> numQuadsMap = new HashMap();
+    private final Map<Vec3d, Map<Integer, Integer>> numQuadsMap = new HashMap();
     private final Map<Vec3d, VertexArrayObject> vaoMap = new HashMap();
     private final Map<Vec3d, BufferObject> vboMap = new HashMap();
 
@@ -67,11 +73,27 @@ public abstract class VoxelRenderer<T> {
         int vertexSize = vertexAttribSizes().stream().mapToInt(i -> i).sum();
 
         for (Vec3d dir : DIRS) {
-            numQuadsMap.put(dir, quads.get(dir).size());
+            //numQuadsMap.put(dir, quads.get(dir).size());
+            List<Quad>[] lodLists = new List[MAX_LOD + 1];
+            for (int lod = 0; lod <= MAX_LOD; lod++) {
+                lodLists[lod] = new ArrayList();
+            }
+            for (Quad q : quads.get(dir)) {
+                lodLists[clamp(q.getLOD(), 0, MAX_LOD)].add(q);
+            }
+            numQuadsMap.put(dir, new HashMap());
+            numQuadsMap.get(dir).put(MAX_LOD, lodLists[MAX_LOD].size());
+            for (int lod = MAX_LOD - 1; lod >= 0; lod--) {
+                numQuadsMap.get(dir).put(lod, lodLists[lod].size() + numQuadsMap.get(dir).get(lod + 1));
+            }
+
             float[] vertices = new float[vertexSize * quads.get(dir).size()];
-            for (int i = 0; i < quads.get(dir).size(); i++) {
-                Quad q = quads.get(dir).get(i);
-                System.arraycopy(q.toData(), 0, vertices, vertexSize * i, vertexSize);
+            int i = 0;
+            for (int lod = MAX_LOD; lod >= 0; lod--) {
+                for (Quad q : lodLists[lod]) {
+                    System.arraycopy(q.toData(), 0, vertices, vertexSize * i, vertexSize);
+                    i++;
+                }
             }
             if (MULTITHREADED_OPENGL) {
                 if (!vboMap.containsKey(dir)) {
@@ -202,8 +224,10 @@ public abstract class VoxelRenderer<T> {
             boolean check = new Vector4d(min().x, min().y, min().z, 1).mul(worldMat).dot(newDir) < 0
                     || new Vector4d(max().x, max().y, max().z, 1).mul(worldMat).dot(newDir) < 0;
             if (check) {
+                double minDist = clamp(Camera.camera3d.position, min().add(position), max().add(position)).sub(Camera.camera3d.position).length();
+                int lod = ENABLE_LOD ? clamp(floor(-8 + Math.log(minDist) / Math.log(2)), 0, MAX_LOD) : 0;
                 using(Arrays.asList(vaoMap.get(dir)), () -> {
-                    glDrawArrays(GL_POINTS, 0, numQuadsMap.get(dir));
+                    glDrawArrays(GL_POINTS, 0, numQuadsMap.get(dir).get(lod));
                 });
             }
         }

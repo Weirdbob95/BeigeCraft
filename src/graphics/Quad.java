@@ -1,6 +1,7 @@
 package graphics;
 
 import static graphics.VoxelRenderer.DIRS;
+import static util.MathUtils.round;
 import util.vectors.Vec3d;
 import world.BlockType;
 
@@ -41,6 +42,47 @@ public abstract class Quad {
             default:
                 return 1;
         }
+    }
+
+    public int getLOD() {
+        int x = round(this.x);
+        int y = round(this.y);
+        int z = round(this.z);
+        int i = 0;
+        int m = 1;
+        switch (normal) {
+            case 0:
+            case 1:
+                while ((y & m) == 0 && (z & m) == 0) {
+                    i += 1;
+                    m *= 2;
+                    if (i >= 3) {
+                        return 3;
+                    }
+                }
+                break;
+            case 2:
+            case 3:
+                while ((x & m) == 0 && (z & m) == 0) {
+                    i += 1;
+                    m *= 2;
+                    if (i >= 3) {
+                        return 3;
+                    }
+                }
+                break;
+            case 4:
+            case 5:
+                while ((x & m) == 0 && (y & m) == 0) {
+                    i += 1;
+                    m *= 2;
+                    if (i >= 3) {
+                        return 3;
+                    }
+                }
+                break;
+        }
+        return i;
     }
 
     public void positionDir(int x, int y, int z, Vec3d dir) {

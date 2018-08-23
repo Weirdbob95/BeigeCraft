@@ -45,12 +45,13 @@ out float fog;
 
 vec4 lodTransform(vec3 pos)
 {
+    //return modelViewMatrix * vec4(pos, 1.);
     vec4 viewPos = modelViewMatrix * vec4(pos, 1.);
-    float lodF = max(0, -4 + log(length(viewPos)));
+    float lodF = max(0, -8 + log2(length(viewPos)));
     int lod = int(lodF);
-    vec3 pos1 = pow(2,lod) * round(pos / pow(2,lod));
-    vec3 pos2 = pow(2,lod+1) * round(pos / pow(2,lod+1));
-    pos = mix(pos1, pos2, lodF - lod);
+    vec3 pos1 = pow(2,lod) * ceil(pos / pow(2,lod));
+    vec3 pos2 = pow(2,lod+1) * ceil(pos / pow(2,lod+1));
+    pos = mix(pos1, pos2, clamp((lodF - lod - .5) * 2 + .5, 0, 1));
     return modelViewMatrix * vec4(pos, 1.);
 }
 

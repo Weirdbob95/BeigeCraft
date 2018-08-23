@@ -119,9 +119,10 @@ public class Player extends Behavior {
     @Override
     public void update(double dt) {
 
-//        if (dt > 1 / 30.) {
-//            System.out.println(dt);
-//        }
+        if (dt > 1 / 20.) {
+            System.out.println(dt);
+        }
+
         breakingBlocks = false;
 
         gui.hud.setBiome(physics.world.heightmappedChunks

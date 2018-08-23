@@ -43,6 +43,17 @@ out vec2 texCoordsInterp;
 out float fragOcclusion;
 out float fog;
 
+vec4 lodTransform(vec3 pos)
+{
+    vec4 viewPos = modelViewMatrix * vec4(pos, 1.);
+    float lodF = max(0, -4 + log(length(viewPos)));
+    int lod = int(lodF);
+    vec3 pos1 = pow(2,lod) * round(pos / pow(2,lod));
+    vec3 pos2 = pow(2,lod+1) * round(pos / pow(2,lod+1));
+    pos = mix(pos1, pos2, lodF - lod);
+    return modelViewMatrix * vec4(pos, 1.);
+}
+
 void main()
 {
     vec3 pos = gl_in[0].gl_Position.xyz + OFFSET[normal[0]];
@@ -52,7 +63,8 @@ void main()
     vec2 texBlockSize = 16. / textureSize(texture_sampler, 0);
     vec2 baseTexCoords = vec2(texID[0] % 256, texID[0] / 256) * texBlockSize;
 
-    vec4 viewPos = modelViewMatrix * vec4(pos, 1.);
+    vec4 viewPos = lodTransform(pos);
+    //vec4 viewPos = modelViewMatrix * vec4(pos, 1.);
     gl_Position = projectionMatrix * viewPos;
     texCoordsConst = baseTexCoords;
     texCoordsInterp = vec2(0., 0.);
@@ -60,7 +72,8 @@ void main()
     fog = pow(.01, pow(length(viewPos) / maxFogDist, 2));
     EmitVertex();
 
-    viewPos = modelViewMatrix * vec4(pos + dir1, 1.);
+    viewPos = lodTransform(pos + dir1);
+    //viewPos = modelViewMatrix * vec4(pos + dir1, 1.);
     gl_Position = projectionMatrix * viewPos;
     texCoordsConst = baseTexCoords;
     texCoordsInterp = texBlockSize * vec2(1., 0.);
@@ -68,7 +81,8 @@ void main()
     fog = pow(.01, pow(length(viewPos) / maxFogDist, 2));
     EmitVertex();
 
-    viewPos = modelViewMatrix * vec4(pos + dir2, 1.);
+    viewPos = lodTransform(pos + dir2);
+    //viewPos = modelViewMatrix * vec4(pos + dir2, 1.);
     gl_Position = projectionMatrix * viewPos;
     texCoordsConst = baseTexCoords;
     texCoordsInterp = texBlockSize * vec2(0., 1.);
@@ -76,7 +90,8 @@ void main()
     fog = pow(.01, pow(length(viewPos) / maxFogDist, 2));
     EmitVertex();
 
-    viewPos = modelViewMatrix * vec4(pos + dir1 + dir2, 1.);
+    viewPos = lodTransform(pos + dir1 + dir2);
+    //viewPos = modelViewMatrix * vec4(pos + dir1 + dir2, 1.);
     gl_Position = projectionMatrix * viewPos;
     texCoordsConst = baseTexCoords;
     texCoordsInterp = texBlockSize;

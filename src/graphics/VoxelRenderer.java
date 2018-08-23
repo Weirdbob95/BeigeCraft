@@ -2,6 +2,7 @@ package graphics;
 
 import static engine.Activatable.using;
 import engine.Core;
+import static game.Settings.MULTITHREADED_OPENGL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -72,14 +73,22 @@ public abstract class VoxelRenderer<T> {
                 Quad q = quads.get(dir).get(i);
                 System.arraycopy(q.toData(), 0, vertices, vertexSize * i, vertexSize);
             }
-            // Workaround for threading issues
-            Core.onMainThread(() -> {
+            if (MULTITHREADED_OPENGL) {
                 if (!vboMap.containsKey(dir)) {
                     vboMap.put(dir, new BufferObject(GL_ARRAY_BUFFER));
                 }
                 vboMap.get(dir).activate();
                 vboMap.get(dir).putData(vertices);
-            });
+            } else {
+                // Workaround for threading issues
+                Core.onMainThread(() -> {
+                    if (!vboMap.containsKey(dir)) {
+                        vboMap.put(dir, new BufferObject(GL_ARRAY_BUFFER));
+                    }
+                    vboMap.get(dir).activate();
+                    vboMap.get(dir).putData(vertices);
+                });
+            }
         }
         if (vaoMap.isEmpty()) {
             Core.onMainThread(() -> {

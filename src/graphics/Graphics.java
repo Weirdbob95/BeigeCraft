@@ -6,6 +6,7 @@ import opengl.BufferObject;
 import opengl.Camera;
 import opengl.ShaderProgram;
 import opengl.VertexArrayObject;
+import org.joml.Vector3d;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
@@ -88,6 +89,21 @@ public class Graphics {
     public static void drawRectangle(Vec2d position, double rotation, Vec2d size, Vec4d color) {
         COLOR_SHADER.setUniform("projectionMatrix", Camera.camera2d.getProjectionMatrix());
         COLOR_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(position, rotation, size.x, size.y));
+        COLOR_SHADER.setUniform("color", color);
+        using(Arrays.asList(COLOR_SHADER, RECTANGLE_VAO), () -> {
+            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        });
+    }
+
+    public static void drawRectangle3d(Vec3d position, Vec3d normal, double rotation, Vec2d size, Vec4d color) {
+        COLOR_SHADER.setUniform("projectionMatrix", Camera.camera3d.getProjectionMatrix());
+        if (normal.x != 0 || normal.y != 0) {
+            COLOR_SHADER.setUniform("modelViewMatrix", Camera.camera3d.getWorldMatrix(position)
+                    .rotateTowards(normal.toJOML(), Camera.camera3d.up.toJOML()).rotate(rotation, normal.toJOML()).scale(new Vector3d(size.x, size.y, 1)));
+        } else {
+            COLOR_SHADER.setUniform("modelViewMatrix", Camera.camera3d.getWorldMatrix(position)
+                    .rotate(rotation, normal.toJOML()).scale(new Vector3d(size.x, size.y, 1)));
+        }
         COLOR_SHADER.setUniform("color", color);
         using(Arrays.asList(COLOR_SHADER, RECTANGLE_VAO), () -> {
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);

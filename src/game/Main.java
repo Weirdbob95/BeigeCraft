@@ -89,6 +89,16 @@ public abstract class Main {
             }
             if (Input.keyJustPressed(GLFW_KEY_L)) {
                 ENABLE_LOD = !ENABLE_LOD;
+                System.out.println(ENABLE_LOD);
+            }
+            if (Input.keyDown(GLFW_KEY_R)) {
+                world.waterManager.waterBlocks.put(Camera.camera3d.position.floor(), 1.);
+            }
+            if (Input.keyDown(GLFW_KEY_T)) {
+                world.waterManager.spawnWater = Camera.camera3d.position.floor();
+            }
+            if (Input.keyDown(GLFW_KEY_Y)) {
+                world.waterManager.spawnWater = null;
             }
         });
 

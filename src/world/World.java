@@ -31,6 +31,7 @@ import world.chunks.HeightmappedChunk;
 import world.chunks.PlannedChunk;
 import world.chunks.RenderedChunk;
 import world.chunks.StructuredChunk;
+import world.water.WaterManager;
 
 public class World extends Behavior {
 
@@ -47,8 +48,16 @@ public class World extends Behavior {
     public final ChunkMap<StructuredChunk> structuredChunks = new ChunkMap<>(this, StructuredChunk::new);
 
     public final long seed = new Random().nextLong();
+    public WaterManager waterManager;
 
     private final HashMap<String, Noise> noiseMap = new HashMap();
+
+    @Override
+    public void createInner() {
+        waterManager = new WaterManager();
+        waterManager.world = this;
+        waterManager.create();
+    }
 
     public BlockType getBlock(Vec3d pos) {
         return constructedChunks.get(getChunkPos(pos)).blockStorage.get((int) mod(pos.x, CHUNK_SIZE), (int) mod(pos.y, CHUNK_SIZE), floor(pos.z));

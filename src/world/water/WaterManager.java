@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import opengl.Camera;
 import static util.MathUtils.clamp;
 import static util.MathUtils.round;
 import util.vectors.Vec2d;
@@ -54,7 +53,7 @@ public class WaterManager extends Behavior {
                 if (toUpdate.contains(e.getKey())) {
                     Graphics.drawRectangle3d(e.getKey().add(new Vec3d(0, 0, e.getValue().amount)), new Vec3d(0, 0, 1), 0, new Vec2d(1, 1), new Vec4d(.2 + 10 * f, .2 + 10 * f, 1, 1));
                 } else {
-                    Graphics.drawRectangle3d(e.getKey().add(new Vec3d(0, 0, e.getValue().amount)), new Vec3d(0, 0, 1), 0, new Vec2d(1, 1), new Vec4d(1, w.amount * 1e5, 1, 1));
+                    Graphics.drawRectangle3d(e.getKey().add(new Vec3d(0, 0, e.getValue().amount)), new Vec3d(0, 0, 1), 0, new Vec2d(1, 1), new Vec4d(1, w.flowSpeed() * 1e5, 1, 1));
                 }
                 sum += w.amount;
             }
@@ -74,16 +73,16 @@ public class WaterManager extends Behavior {
             if (spawnWater != null) {
                 addToMap(spawnWater, new WaterData(1, 0, 0, 0), changes);
             }
-            Vec3d splash = Camera.camera3d.position.floor().add(new Vec3d(0, 0, -3));
-            if (waterBlocks.containsKey(splash)) {
-                addToMap(splash, new WaterData(waterBlocks.get(splash).amount, Math.random() - .5, Math.random() - .5, Math.random() - .5), changes);
-            }
+//            Vec3d splash = Camera.camera3d.position.floor().add(new Vec3d(0, 0, -3));
+//            if (waterBlocks.containsKey(splash)) {
+//                addToMap(splash, new WaterData(waterBlocks.get(splash).amount, Math.random() - .5, Math.random() - .5, Math.random() - .5), changes);
+//            }
 
             // Calculate the new flow rate
             for (Vec3d pos : toUpdate) {
                 WaterData posW = get(pos, waterBlocks);
 
-                double flowFriction = .000001;
+                double flowFriction = .01;
                 double averageContribution = .3;
                 double changeSpeed = .3;
 
@@ -135,64 +134,91 @@ public class WaterManager extends Behavior {
             }
             // Apply changes to the actual water flow rates
             for (Entry<Vec3d, WaterData> e : changes.entrySet()) {
-                if (!e.getValue().equals(waterBlocks.put(e.getKey(), e.getValue()))) {
-                    newToUpdate.add(e.getKey());
-                    for (Vec3d dir : DIRS) {
-                        newToUpdate.add(e.getKey().add(dir));
+                if (waterBlocks.get(e.getKey()) == null) {
+                    if (!e.getValue().equals(new WaterData())) {
+                        waterBlocks.put(e.getKey(), e.getValue());
+                        newToUpdate.add(e.getKey());
+                        for (Vec3d dir : DIRS) {
+                            newToUpdate.add(e.getKey().add(dir));
+                        }
                     }
-                }
-                if (e.getValue().equals(null)) {
-                    waterBlocks.remove(e.getKey());
+                } else {
+                    if (e.getValue().equals(new WaterData())) {
+                        waterBlocks.remove(e.getKey());
+                        newToUpdate.add(e.getKey());
+                        for (Vec3d dir : DIRS) {
+                            newToUpdate.add(e.getKey().add(dir));
+                        }
+                    } else if (!e.getValue().equals(waterBlocks.get(e.getKey()))) {
+                        waterBlocks.put(e.getKey(), e.getValue());
+                        newToUpdate.add(e.getKey());
+                        for (Vec3d dir : DIRS) {
+                            newToUpdate.add(e.getKey().add(dir));
+                        }
+                    }
                 }
             }
             changes.clear();
 
-//            HashMap<Vec3d, Double> allOutflow = new HashMap();
-//            HashMap<Vec3d, Double> allInflow = new HashMap();
-//            for (Vec3d pos : toUpdate) {
-//
-//            }
+            HashMap<Vec3d, Double> allOutflow = new HashMap();
+            HashMap<Vec3d, Double> allInflow = new HashMap();
+            for (Vec3d pos : toUpdate) {
+                WaterData posW = get(pos, waterBlocks);
+                allOutflow.put(pos, Math.max(posW.flowX, 0) + Math.max(posW.flowY, 0) + Math.max(posW.flowZ, 0)
+                        + Math.max(-get(pos.add(new Vec3d(-1, 0, 0)), waterBlocks).flowX, 0)
+                        + Math.max(-get(pos.add(new Vec3d(0, -1, 0)), waterBlocks).flowY, 0)
+                        + Math.max(-get(pos.add(new Vec3d(0, 0, -1)), waterBlocks).flowZ, 0));
+                allInflow.put(pos, Math.max(-posW.flowX, 0) + Math.max(-posW.flowY, 0) + Math.max(-posW.flowZ, 0)
+                        + Math.max(get(pos.add(new Vec3d(-1, 0, 0)), waterBlocks).flowX, 0)
+                        + Math.max(get(pos.add(new Vec3d(0, -1, 0)), waterBlocks).flowY, 0)
+                        + Math.max(get(pos.add(new Vec3d(0, 0, -1)), waterBlocks).flowZ, 0));
+            }
             // Update water amounts based on flow
             for (Vec3d pos : toUpdate) {
                 WaterData posW = get(pos, waterBlocks);
                 if (posW.amount <= 0) {
                     continue;
                 }
-                HashMap<Vec3d, Double> outflow = new HashMap();
                 if (posW.flowX > 0) {
-                    outflow.put(pos.add(new Vec3d(1, 0, 0)), posW.flowX);
+                    double scaleFactor = Math.min(1, posW.amount / allOutflow.get(pos));
+                } else if (posW.flowX < 0) {
+
                 }
-                if (posW.flowY > 0) {
-                    outflow.put(pos.add(new Vec3d(0, 1, 0)), posW.flowY);
-                }
-                if (posW.flowZ > 0) {
-                    outflow.put(pos.add(new Vec3d(0, 0, 1)), posW.flowZ);
-                }
-                double otherFlowX = get(pos.add(new Vec3d(-1, 0, 0)), waterBlocks).flowX;
-                if (otherFlowX < 0) {
-                    outflow.put(pos.add(new Vec3d(-1, 0, 0)), -otherFlowX);
-                }
-                double otherFlowY = get(pos.add(new Vec3d(0, -1, 0)), waterBlocks).flowY;
-                if (otherFlowY < 0) {
-                    outflow.put(pos.add(new Vec3d(0, -1, 0)), -otherFlowY);
-                }
-                double otherFlowZ = get(pos.add(new Vec3d(0, 0, -1)), waterBlocks).flowZ;
-                if (otherFlowZ < 0) {
-                    outflow.put(pos.add(new Vec3d(0, 0, -1)), -otherFlowZ);
-                }
-                double outflowSum = 0;
-                for (Double d : outflow.values()) {
-                    outflowSum += d;
-                }
-                if (outflowSum > 0) {
-                    double scaleFactor = Math.min(1, posW.amount / outflowSum);
-                    for (Entry<Vec3d, Double> e : outflow.entrySet()) {
-                        changes.putIfAbsent(e.getKey(), get(e.getKey(), waterBlocks));
-                        addToMap(e.getKey(), new WaterData(e.getValue() * scaleFactor, 0, 0, 0), changes);
-                    }
-                    changes.putIfAbsent(pos, get(pos, waterBlocks));
-                    addToMap(pos, new WaterData(-outflowSum * scaleFactor, 0, 0, 0), changes);
-                }
+//                HashMap<Vec3d, Double> outflow = new HashMap();
+//                if (posW.flowX > 0) {
+//                    outflow.put(pos.add(new Vec3d(1, 0, 0)), posW.flowX);
+//                }
+//                if (posW.flowY > 0) {
+//                    outflow.put(pos.add(new Vec3d(0, 1, 0)), posW.flowY);
+//                }
+//                if (posW.flowZ > 0) {
+//                    outflow.put(pos.add(new Vec3d(0, 0, 1)), posW.flowZ);
+//                }
+//                double otherFlowX = get(pos.add(new Vec3d(-1, 0, 0)), waterBlocks).flowX;
+//                if (otherFlowX < 0) {
+//                    outflow.put(pos.add(new Vec3d(-1, 0, 0)), -otherFlowX);
+//                }
+//                double otherFlowY = get(pos.add(new Vec3d(0, -1, 0)), waterBlocks).flowY;
+//                if (otherFlowY < 0) {
+//                    outflow.put(pos.add(new Vec3d(0, -1, 0)), -otherFlowY);
+//                }
+//                double otherFlowZ = get(pos.add(new Vec3d(0, 0, -1)), waterBlocks).flowZ;
+//                if (otherFlowZ < 0) {
+//                    outflow.put(pos.add(new Vec3d(0, 0, -1)), -otherFlowZ);
+//                }
+//                double outflowSum = 0;
+//                for (Double d : outflow.values()) {
+//                    outflowSum += d;
+//                }
+//                if (outflowSum > 0) {
+//                    double scaleFactor = Math.min(1, posW.amount / outflowSum);
+//                    for (Entry<Vec3d, Double> e : outflow.entrySet()) {
+//                        changes.putIfAbsent(e.getKey(), get(e.getKey(), waterBlocks));
+//                        addToMap(e.getKey(), new WaterData(e.getValue() * scaleFactor, 0, 0, 0), changes);
+//                    }
+//                    changes.putIfAbsent(pos, get(pos, waterBlocks));
+//                    addToMap(pos, new WaterData(-outflowSum * scaleFactor, 0, 0, 0), changes);
+//                }
             }
             // Round water levels
             for (Vec3d pos : toUpdate) {
@@ -202,14 +228,28 @@ public class WaterManager extends Behavior {
             }
             // Apply changes to the actual water amounts
             for (Entry<Vec3d, WaterData> e : changes.entrySet()) {
-                if (!e.getValue().equals(waterBlocks.put(e.getKey(), e.getValue()))) {
-                    newToUpdate.add(e.getKey());
-                    for (Vec3d dir : DIRS) {
-                        newToUpdate.add(e.getKey().add(dir));
+                if (waterBlocks.get(e.getKey()) == null) {
+                    if (!e.getValue().equals(new WaterData())) {
+                        waterBlocks.put(e.getKey(), e.getValue());
+                        newToUpdate.add(e.getKey());
+                        for (Vec3d dir : DIRS) {
+                            newToUpdate.add(e.getKey().add(dir));
+                        }
                     }
-                }
-                if (e.getValue().equals(null)) {
-                    waterBlocks.remove(e.getKey());
+                } else {
+                    if (e.getValue().equals(new WaterData())) {
+                        waterBlocks.remove(e.getKey());
+                        newToUpdate.add(e.getKey());
+                        for (Vec3d dir : DIRS) {
+                            newToUpdate.add(e.getKey().add(dir));
+                        }
+                    } else if (!e.getValue().equals(waterBlocks.get(e.getKey()))) {
+                        waterBlocks.put(e.getKey(), e.getValue());
+                        newToUpdate.add(e.getKey());
+                        for (Vec3d dir : DIRS) {
+                            newToUpdate.add(e.getKey().add(dir));
+                        }
+                    }
                 }
             }
             toUpdate = newToUpdate;
@@ -244,9 +284,9 @@ public class WaterManager extends Behavior {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj == null) {
-                return equals(new WaterData());
-            }
+//            if (obj == null) {
+//                return equals(new WaterData());
+//            }
             if (obj instanceof WaterData) {
                 WaterData w = (WaterData) obj;
                 return Math.abs(amount - w.amount) < 1e-6 && Math.abs(flowX - w.flowX) < 1e-6
@@ -271,7 +311,7 @@ public class WaterManager extends Behavior {
         }
 
         public boolean isZero() {
-            return Math.abs(amount) < 1e-5 && flowSpeed() < 1e-8;
+            return Math.abs(amount) < 1e-8 && flowSpeed() < 1e-8;
         }
 
         public double maxFlowTo(WaterData other) {

@@ -27,6 +27,7 @@ import graphics.Animation;
 import graphics.Sprite;
 import static graphics.VoxelRenderer.DIRS;
 import gui.GUIManager;
+import static java.lang.Math.round;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import java.util.Map.Entry;
 import opengl.Camera;
 import static opengl.Camera.camera3d;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
@@ -44,6 +46,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
 import util.MathUtils;
 import static util.MathUtils.ceil;
 import static util.MathUtils.mod;
+import static util.MathUtils.vecMap;
 import util.vectors.Vec2d;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
@@ -206,6 +209,15 @@ public class Player extends Behavior {
             }
             if (Input.mouseDown(1)) {
                 useItemHold(offItem, false, dt);
+            }
+        }
+
+        if (Input.keyJustPressed(GLFW_KEY_C)) {
+            RaycastHit block = firstSolid();
+            if (block != null) {
+                Chest c = new Chest();
+                c.model.position.position = vecMap(block.hitPos, x -> (double) round(x)).sub(block.hitDir);
+                c.create();
             }
         }
 

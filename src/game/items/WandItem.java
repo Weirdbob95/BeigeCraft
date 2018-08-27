@@ -3,9 +3,8 @@ package game.items;
 import game.Player;
 import game.spells.SpellInfo;
 import game.spells.SpellInfo.SpellTarget;
-import static game.spells.TypeDefinitions.SpellEffectType.*;
-import static game.spells.TypeDefinitions.SpellElement.*;
-import game.spells.TypeDefinitions.SpellShapeInitial;
+import game.spells.SpellPart.SpellShapeInitial;
+import static game.spells.TypeDefinitions.constructSpell;
 import game.spells.effects.FireIgnite;
 import game.spells.shapes.S_Burst;
 import game.spells.shapes.S_Projectile;
@@ -35,12 +34,12 @@ public class WandItem extends Item {
     public void renderGUI(Vec2d pos) {
         renderSprite("item_wand.png", pos);
     }
-       public void useItemPress(Player player, boolean isMainHand) {
-            SpellShapeMissile missile = new S_Projectile();
-            missile.isMultishot = true;
-            SpellShapeInitial shape = missile.onHit(new S_Burst().onHit(new FireIgnite()));
-            SpellInfo info = new SpellInfo(new SpellTarget(Camera.camera3d.position.add(MathUtils.randomInSphere().mul(.1))), Camera.camera3d.facing(), 1, FIRE, IGNITE, player.physics.world);
-            shape.cast(info, Camera.camera3d.facing());
-        }
-    }
 
+    public void useItemPress(Player player, boolean isMainHand) {
+        SpellShapeMissile missile = new S_Projectile();
+        missile.isMultishot = true;
+        SpellShapeInitial shape = constructSpell(missile, new S_Burst(), new FireIgnite());
+        SpellInfo info = new SpellInfo(new SpellTarget(Camera.camera3d.position.add(MathUtils.randomInSphere().mul(.1))), Camera.camera3d.facing(), 1, player.physics.world);
+        shape.cast(info);
+    }
+}

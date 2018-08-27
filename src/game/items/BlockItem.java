@@ -57,13 +57,13 @@ public class BlockItem extends Item {
     public void renderGUI(Vec2d pos) {
         BlockGUI.load(blockType).draw(pos, 24);
     }
+
     @Override
     public void useItemPress(Player player, boolean isMainHand) {
         RaycastHit block = player.lastEmpty();
-    
-            if (block != null) {
-                (isMainHand ? ItemSlot.MAIN_HAND : ItemSlot.OFF_HAND).removeItem();
-                player.physics.world.setBlock(block.hitPos, ((BlockItem) this).blockType);
-            }
+        if (block != null) {
+            (isMainHand ? ItemSlot.MAIN_HAND : ItemSlot.OFF_HAND).removeItem();
+            player.physics.world.setBlock(block.hitPos, ((BlockItem) this).blockType);
+        }
     }
 }

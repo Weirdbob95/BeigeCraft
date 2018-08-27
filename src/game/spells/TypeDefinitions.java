@@ -1,75 +1,77 @@
 package game.spells;
 
-import util.vectors.Vec3d;
+import game.spells.SpellPart.SpellEffect;
+import game.spells.SpellPart.SpellShapeInitial;
 
+/**
+ * The TypeDefinitions class provides a container for a number of useful
+ * functions and enums related to spells.
+ *
+ * The TypeDefinitions class acts only as an organizational tool for other code.
+ * It should never be instantiated.
+ *
+ * @author rsoiffer
+ */
 public abstract class TypeDefinitions {
 
+    /**
+     * The SpellCastingType enum represents the way a spell is cast.
+     */
     public static enum SpellCastingType {
+
+        /**
+         * An instant spell activates as soon as the player presses the key.
+         */
         INSTANT,
+        /**
+         * A charged spell starts charging while the player holds the key,
+         * becoming more powerful over time. The spell is cast when the player
+         * releases the key.
+         */
         CHARGED,
+        /**
+         * A channeled spell is cast continuously while the player holds the
+         * key.
+         */
         CHANNELED
     }
 
-    public static enum SpellEffectType {
-        IGNITE,
-        LIFT
-    }
-
+    /**
+     * The SpellElement enum represents the element associated with a
+     * SpellEffect.
+     */
     public static enum SpellElement {
+
         FIRE,
         ICE,
-        WIND
+        WIND,
+        STONE,
+        LIGHTNING
     }
 
-    public static SpellShapeInitial constructSpell(SpellElement element, SpellEffectType effectType, SpellShapeInitial shapeInitial, SpellShapeModifier... shapeModifiers) {
-        if (shapeModifiers.length == 0) {
-            shapeInitial.onHit(new SpellEffectFinal());
-        } else {
-            shapeInitial.onHit(shapeModifiers[0]);
-            for (int i = 0; i < shapeModifiers.length - 1; i++) {
-                shapeModifiers[i].onHit(shapeModifiers[i + 1]);
+    /**
+     * Constructs a spell with the given initial shape and the given parts.
+     *
+     * This method is primarily intended as a helper method to make it easier to
+     * test out particular spell constructions.
+     *
+     * @param shapeInitial The spell's initial shape
+     * @param parts All of the parts in the spell
+     * @return The spell's initial shape
+     */
+    public static SpellShapeInitial constructSpell(SpellShapeInitial shapeInitial, SpellPart... parts) {
+        if (parts.length == 0 || !(parts[parts.length - 1] instanceof SpellEffect)) {
+            throw new RuntimeException("The spell must end with a spell effect");
+        }
+        for (SpellPart part : parts) {
+            if (part instanceof SpellShapeInitial) {
+                throw new RuntimeException("A spell cannot have an initial shape as an intermediate effect");
             }
-            shapeModifiers[shapeModifiers.length - 1].onHit(new SpellEffectFinal());
+        }
+        shapeInitial.onHit = parts[0];
+        for (int i = 0; i < parts.length - 1; i++) {
+            parts[i].onHit = parts[i + 1];
         }
         return shapeInitial;
-    }
-
-    public static interface SpellEffect {
-
-        public void cast(SpellInfo info);
-    }
-
-    public static class SpellEffectFinal implements SpellEffect {
-
-        @Override
-        public void cast(SpellInfo info) {
-            if (info.target.targetsCreature) {
-                EffectDefinitions.hitCreature(info.element, info.effectType, info.target.creature, info.powerMultiplier, info.direction);
-            } else {
-                EffectDefinitions.hitTerrain(info.element, info.effectType, info.target.terrain, info.powerMultiplier, info.direction);
-            }
-        }
-    }
-
-    public abstract static class SpellShape<T extends SpellShape> {
-
-        private SpellEffect onHit;
-
-        public void hit(SpellInfo info) {
-            onHit.cast(info);
-        }
-
-        public T onHit(SpellEffect onHit) {
-            this.onHit = onHit;
-            return (T) this;
-        }
-    }
-
-    public abstract static class SpellShapeInitial extends SpellShape<SpellShapeInitial> {
-
-        public abstract void cast(SpellInfo info, Vec3d goal);
-    }
-
-    public abstract static class SpellShapeModifier extends SpellShape<SpellShapeModifier> implements SpellEffect {
     }
 }

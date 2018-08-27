@@ -20,6 +20,7 @@ public class ItemSlot {
         addToInventory(new SwordItem(),
                 new PickaxeItem(),
                 new WandItem(),
+                new WaterBucketItem(),
                 new BlockItem(BlockType.WOOD),
                 new BlockItem(BlockType.WOOD));
     }

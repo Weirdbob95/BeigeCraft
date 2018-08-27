@@ -28,16 +28,14 @@ public class SwordItem extends Item {
     public void renderGUI(Vec2d pos) {
         renderSprite("item_sword.png", pos);
     }
-    
-    @Override
-       public void useItemPress(Player player, boolean isMainHand) {
-            new ArrayList<>(Creature.ALL).forEach(c -> {
-                Vec3d delta = c.position.position.sub(player.position.position);
-                if (delta.length() < 5 && delta.normalize().dot(Camera.camera3d.facing()) > .8) {
-                    c.damage(5, Camera.camera3d.facing());
-                }
-            });
-       }
-}
 
-        
+    @Override
+    public void useItemPress(Player player, boolean isMainHand) {
+        new ArrayList<>(Creature.ALL).forEach(c -> {
+            Vec3d delta = c.position.position.sub(player.position.position);
+            if (delta.length() < 5 && delta.normalize().dot(Camera.camera3d.facing()) > .8) {
+                c.damage(5, Camera.camera3d.facing());
+            }
+        });
+    }
+}

@@ -7,28 +7,12 @@ import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
 import engine.Input;
-import game.creatures.Creature;
-import game.items.BlockItem;
 import game.items.Item;
 import game.items.ItemSlot;
-import game.items.PickaxeItem;
-import game.items.SwordItem;
-import game.items.WandItem;
-import game.spells.SpellInfo;
-import game.spells.SpellInfo.SpellTarget;
-import game.spells.TypeDefinitions.SpellEffectFinal;
-import static game.spells.TypeDefinitions.SpellEffectType.*;
-import static game.spells.TypeDefinitions.SpellElement.*;
-import game.spells.TypeDefinitions.SpellShapeInitial;
-import game.spells.shapes.S_Burst;
-import game.spells.shapes.S_Projectile;
-import game.spells.shapes.SpellShapeMissile;
 import graphics.Animation;
 import graphics.Sprite;
 import static graphics.VoxelRenderer.DIRS;
 import gui.GUIManager;
-import static java.lang.Math.round;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +27,8 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-import util.MathUtils;
-import static util.MathUtils.ceil;
 import static util.MathUtils.mod;
+import static util.MathUtils.round;
 import static util.MathUtils.vecMap;
 import util.vectors.Vec2d;
 import util.vectors.Vec3d;
@@ -198,25 +181,25 @@ public class Player extends Behavior {
             // Use items
             Item mainItem = ItemSlot.MAIN_HAND == null ? null : ItemSlot.MAIN_HAND.item();
             if (Input.mouseJustPressed(0)) {
-                if (mainItem != null){
-                mainItem.useItemPress(this, true);
-            }
+                if (mainItem != null) {
+                    mainItem.useItemPress(this, true);
+                }
             }
             if (Input.mouseDown(0)) {
                 if (mainItem != null) {
-                mainItem.useItemHold(this, true, dt);
-            }
+                    mainItem.useItemHold(this, true, dt);
+                }
             }
             Item offItem = ItemSlot.OFF_HAND == null ? null : ItemSlot.OFF_HAND.item();
             if (Input.mouseJustPressed(1)) {
-                if(offItem != null) {
-                offItem.useItemPress(this, false);
-            }
+                if (offItem != null) {
+                    offItem.useItemPress(this, false);
+                }
             }
             if (Input.mouseDown(1)) {
                 if (offItem != null) {
-                offItem.useItemHold(this, false, dt);
-            }
+                    offItem.useItemHold(this, false, dt);
+                }
             }
         }
 
@@ -232,6 +215,4 @@ public class Player extends Behavior {
         velocity.velocity = velocity.velocity.lerp(idealVel, 1 - Math.pow(1e-4, dt));
     }
 
-
- 
 }

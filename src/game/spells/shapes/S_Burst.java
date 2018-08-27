@@ -3,10 +3,16 @@ package game.spells.shapes;
 import static engine.Behavior.track;
 import game.creatures.Creature;
 import game.spells.SpellInfo;
-import game.spells.TypeDefinitions.SpellShapeModifier;
+import game.spells.SpellPart.SpellShapeModifier;
 import java.util.Collection;
 import java.util.LinkedList;
 
+/**
+ * The S_Burst class represents a Burst shape modifier, as described in the
+ * spellcrafting design document.
+ *
+ * @author rsoiffer
+ */
 public class S_Burst extends SpellShapeModifier {
 
     private static final Collection<Creature> ALL_CREATURES = track(Creature.class);

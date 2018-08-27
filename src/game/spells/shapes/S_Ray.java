@@ -7,13 +7,23 @@ import graphics.Graphics;
 import java.util.LinkedList;
 import util.vectors.Vec3d;
 
+/**
+ * The S_Ray class represents a Ray initial shape, as described in the
+ * spellcrafting design document.
+ *
+ * @author rsoiffer
+ */
 public class S_Ray extends SpellShapeMissile {
 
     @Override
-    public void cast(SpellInfo info, Vec3d goal) {
-        spawnMissiles(info, goal, S_RayBehavior.class, 200);
+    public void cast(SpellInfo info) {
+        spawnMissiles(info, S_RayBehavior.class, 200);
     }
 
+    /**
+     * The S_RayBehavior class represents the physical incarnation of a spell
+     * ray in the game world.
+     */
     public static class S_RayBehavior extends Behavior {
 
         private final static double PERSIST_TIME = .3;
@@ -27,8 +37,6 @@ public class S_Ray extends SpellShapeMissile {
         @Override
         public void createInner() {
             missile.lifetime.lifetime = 1;
-            missile.homingRate = 20;
-
             pastPositions.add(missile.position.position);
             pastTimes.add(0.);
         }

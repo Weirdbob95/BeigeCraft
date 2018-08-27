@@ -37,6 +37,18 @@ public class WaterManager extends Behavior {
 
     private double elapsedTime;
 
+    public void addWater(Vec3d pos, double amount) {
+        pos = pos.floor();
+        synchronized (this) {
+            waterBlocks.putIfAbsent(pos, new WaterData());
+            waterBlocks.get(pos).amount = clamp(waterBlocks.get(pos).amount + amount, 0, 1);
+            toUpdate.add(pos);
+            for (Vec3d dir : ALL_NEARBY) {
+                toUpdate.add(pos.add(dir));
+            }
+        }
+    }
+
     private void applyChanges(Map<Vec3d, WaterData> changes, Set<Vec3d> newToUpdate) {
         for (Entry<Vec3d, WaterData> e : changes.entrySet()) {
             if (waterBlocks.get(e.getKey()) == null) {
@@ -117,6 +129,10 @@ public class WaterManager extends Behavior {
 
     private double renderHeight(Vec3d pos) {
         return get(pos.add(new Vec3d(0, 0, 1)), waterBlocks).amount < 1e-4 ? get(pos, waterBlocks).amount : 1;
+    }
+
+    public double renderLayer() {
+        return 1;
     }
 
     @Override

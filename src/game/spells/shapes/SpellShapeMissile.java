@@ -6,15 +6,37 @@ import behaviors.VelocityBehavior;
 import engine.Behavior;
 import game.creatures.Creature;
 import game.spells.SpellInfo;
-import game.spells.TypeDefinitions.SpellShapeInitial;
+import game.spells.SpellPart.SpellShapeInitial;
 import util.MathUtils;
-import util.vectors.Vec3d;
 
+/**
+ * The SpellShapeMissile class represents one of a Projectile, Ray, or Lob
+ * initial shape.
+ *
+ * @author rsoiffer
+ */
 public abstract class SpellShapeMissile extends SpellShapeInitial {
 
+    /**
+     * Whether the spell shape should scatter into multiple smaller missiles
+     */
     public boolean isMultishot;
 
-    public void spawnMissiles(SpellInfo info, Vec3d goal, Class<? extends Behavior> c, double velocity) {
+    /**
+     * Spawns one or more missiles with the given parameters.
+     *
+     * This function is intended as a helpful function for each of the spell
+     * shapes that spawns missiles of some kind. It provides a common
+     * implementation of multishot so that each spell shape doesn't have to
+     * reimplement it.
+     *
+     * The behavior to spawn must require MissileBehavior
+     *
+     * @param info The SpellInfo at which to cast the spell
+     * @param c The behavior to spawn
+     * @param velocity The speed of the missiles
+     */
+    public void spawnMissiles(SpellInfo info, Class<? extends Behavior> c, double velocity) {
         try {
             for (int i = 0; i < (isMultishot ? 5 : 1); i++) {
                 Behavior b = c.newInstance();
@@ -31,6 +53,10 @@ public abstract class SpellShapeMissile extends SpellShapeInitial {
         }
     }
 
+    /**
+     * The MissilesBehavior class represents the physical incarnation of a spell
+     * missile in the game world.
+     */
     public static class MissileBehavior extends Behavior {
 
         public final PositionBehavior position = require(PositionBehavior.class);
@@ -39,7 +65,6 @@ public abstract class SpellShapeMissile extends SpellShapeInitial {
 
         public SpellShapeMissile spellShape;
         public SpellInfo info;
-        public double homingRate;
 
         @Override
         public void update(double dt) {

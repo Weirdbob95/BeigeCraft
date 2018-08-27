@@ -1,5 +1,7 @@
 package game.spells;
 
+import game.spells.TypeDefinitions.SpellElement;
+
 /**
  * The SpellPart class represents any part of a spell.
  *
@@ -40,7 +42,7 @@ public abstract class SpellPart {
         /**
          * @return The element associated with the effect
          */
-        public abstract TypeDefinitions.SpellElement element();
+        public abstract SpellElement element();
     }
 
     /**

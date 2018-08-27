@@ -42,23 +42,6 @@ public class SpellInfo {
     public final World world;
 
     /**
-     * Constructs a new SpellInfo that targets the caster of the spell and that
-     * heads towards a given goal location. This method is used when a creature
-     * casts a spell and needs to construct a SpellInfo.
-     *
-     * @param caster The creature casting the spell
-     * @param goal The target point the caster is aiming for
-     * @param powerMultiplier The initial power of the spell
-     * @param world The world the creature lives in
-     */
-    public SpellInfo(Creature caster, Vec3d goal, double powerMultiplier, World world) {
-        this.target = new SpellTarget(caster);
-        this.direction = goal.sub(caster.position.position);
-        this.powerMultiplier = powerMultiplier;
-        this.world = world;
-    }
-
-    /**
      * Constructs a new SpellInfo with the given parameters.
      *
      * @param target The target of the spell
@@ -74,7 +57,7 @@ public class SpellInfo {
     }
 
     /**
-     * @return The color of the spell
+     * @return The color of the spell's graphics effects
      */
     public Vec4d color() {
         return new Vec4d(1, .2, 0, 1);

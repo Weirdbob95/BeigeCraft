@@ -2,9 +2,9 @@ package game.spells;
 
 import game.creatures.Creature;
 import game.spells.TypeDefinitions.SpellEffectType;
-import static game.spells.TypeDefinitions.SpellEffectType.DESTRUCTION;
+import static game.spells.TypeDefinitions.SpellEffectType.*;
 import game.spells.TypeDefinitions.SpellElement;
-import static game.spells.TypeDefinitions.SpellElement.FIRE;
+import static game.spells.TypeDefinitions.SpellElement.*;
 import util.vectors.Vec3d;
 
 public abstract class EffectDefinitions {
@@ -13,7 +13,7 @@ public abstract class EffectDefinitions {
         switch (element) {
             case FIRE:
                 switch (effectType) {
-                    case DESTRUCTION:
+                    case IGNITE:
                         creature.damage(5 * powerMultiplier, direction);
                         return;
                 }

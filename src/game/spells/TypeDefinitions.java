@@ -11,14 +11,14 @@ public abstract class TypeDefinitions {
     }
 
     public static enum SpellEffectType {
-        DESTRUCTION,
-        CONTROL,
-        EMPOWERMENT
+        IGNITE,
+        LIFT
     }
 
     public static enum SpellElement {
         FIRE,
-        ICE
+        ICE,
+        WIND
     }
 
     public static SpellShapeInitial constructSpell(SpellElement element, SpellEffectType effectType, SpellShapeInitial shapeInitial, SpellShapeModifier... shapeModifiers) {

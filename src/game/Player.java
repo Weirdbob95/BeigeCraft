@@ -17,8 +17,8 @@ import game.items.WandItem;
 import game.spells.SpellInfo;
 import game.spells.SpellInfo.SpellTarget;
 import game.spells.TypeDefinitions.SpellEffectFinal;
-import static game.spells.TypeDefinitions.SpellEffectType.DESTRUCTION;
-import static game.spells.TypeDefinitions.SpellElement.FIRE;
+import static game.spells.TypeDefinitions.SpellEffectType.*;
+import static game.spells.TypeDefinitions.SpellElement.*;
 import game.spells.TypeDefinitions.SpellShapeInitial;
 import game.spells.shapes.S_Burst;
 import game.spells.shapes.S_Projectile;
@@ -56,7 +56,7 @@ import static world.World.CHUNK_SIZE;
 
 public class Player extends Behavior {
 
-    private static final double PLAYER_SCALE = 2;
+    public static final double PLAYER_SCALE = 2;
 
     public final PositionBehavior position = require(PositionBehavior.class);
     public final VelocityBehavior velocity = require(VelocityBehavior.class);
@@ -78,7 +78,7 @@ public class Player extends Behavior {
         physics.hitboxSize2Crouch = new Vec3d(.3, .3, .5).mul(PLAYER_SCALE);
     }
 
-    private RaycastHit firstSolid() {
+    public RaycastHit firstSolid() {
         List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 4 * PLAYER_SCALE);
         for (int i = 0; i < raycast.size(); i++) {
             if (physics.world.getBlock(raycast.get(i).hitPos) != null) {
@@ -88,7 +88,7 @@ public class Player extends Behavior {
         return null;
     }
 
-    private RaycastHit lastEmpty() {
+    public RaycastHit lastEmpty() {
         List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 4 * PLAYER_SCALE);
         for (int i = 0; i < raycast.size() - 1; i++) {
             if (physics.world.getBlock(raycast.get(i).hitPos) != null) {
@@ -198,17 +198,25 @@ public class Player extends Behavior {
             // Use items
             Item mainItem = ItemSlot.MAIN_HAND == null ? null : ItemSlot.MAIN_HAND.item();
             if (Input.mouseJustPressed(0)) {
-                useItemPress(mainItem, true);
+                if (mainItem != null){
+                mainItem.useItemPress(this, true);
+            }
             }
             if (Input.mouseDown(0)) {
-                useItemHold(mainItem, true, dt);
+                if (mainItem != null) {
+                mainItem.useItemHold(this, true, dt);
+            }
             }
             Item offItem = ItemSlot.OFF_HAND == null ? null : ItemSlot.OFF_HAND.item();
             if (Input.mouseJustPressed(1)) {
-                useItemPress(offItem, false);
+                if(offItem != null) {
+                offItem.useItemPress(this, false);
+            }
             }
             if (Input.mouseDown(1)) {
-                useItemHold(offItem, false, dt);
+                if (offItem != null) {
+                offItem.useItemHold(this, false, dt);
+            }
             }
         }
 
@@ -224,66 +232,6 @@ public class Player extends Behavior {
         velocity.velocity = velocity.velocity.lerp(idealVel, 1 - Math.pow(1e-4, dt));
     }
 
-    private void useItemHold(Item i, boolean isMainHand, double dt) {
-        if (i == null || i instanceof PickaxeItem) {
-            // Break block
-            breakingBlocks = true;
-            RaycastHit block = firstSolid();
-            if (block != null) {
-                int handSize = ceil(PLAYER_SCALE);
-                Vec3d origin = block.hitPos
-                        //.add(block.hitDir.mul(handSize / 2.))
-                        .sub(new Vec3d(1, 1, 1).mul(.5 * (handSize - 1)));
-                List<Vec3d> targets = new ArrayList();
-                for (int x = 0; x < handSize; x++) {
-                    for (int y = 0; y < handSize; y++) {
-                        for (int z = 0; z < handSize; z++) {
-                            if (physics.world.getBlock(origin.add(new Vec3d(x, y, z))) != null) {
-                                targets.add(origin.add(new Vec3d(x, y, z)).floor());
-                            }
-                        }
-                    }
-                }
-                for (Vec3d v : new ArrayList<>(blocksToBreak.keySet())) {
-                    if (!targets.contains(v)) {
-                        blocksToBreak.remove(v);
-                    }
-                }
-                for (Vec3d v : targets) {
-                    blocksToBreak.putIfAbsent(v, 0.);
-                    blocksToBreak.put(v, blocksToBreak.get(v) + dt * 8 / targets.size());
-                    if (blocksToBreak.get(v) > 1) {
-                        ItemSlot.addToInventory(new BlockItem(physics.world.getBlock(v)));
-                        physics.world.setBlock(v, null);
-                        blocksToBreak.remove(v);
-                    }
-                }
-            } else {
-                blocksToBreak.clear();
-            }
-        }
-    }
 
-    private void useItemPress(Item i, boolean isMainHand) {
-        if (i instanceof BlockItem) {
-            RaycastHit block = lastEmpty();
-            if (block != null) {
-                (isMainHand ? ItemSlot.MAIN_HAND : ItemSlot.OFF_HAND).removeItem();
-                physics.world.setBlock(block.hitPos, ((BlockItem) i).blockType);
-            }
-        } else if (i instanceof SwordItem) {
-            new ArrayList<>(Creature.ALL).forEach(c -> {
-                Vec3d delta = c.position.position.sub(position.position);
-                if (delta.length() < 5 && delta.normalize().dot(Camera.camera3d.facing()) > .8) {
-                    c.damage(5, Camera.camera3d.facing());
-                }
-            });
-        } else if (i instanceof WandItem) {
-            SpellShapeMissile missile = new S_Projectile();
-            missile.isMultishot = true;
-            SpellShapeInitial shape = missile.onHit(new S_Burst().onHit(new SpellEffectFinal()));
-            SpellInfo info = new SpellInfo(new SpellTarget(Camera.camera3d.position.add(MathUtils.randomInSphere().mul(.1))), Camera.camera3d.facing(), 1, FIRE, DESTRUCTION, physics.world);
-            shape.cast(info, Camera.camera3d.facing());
-        }
-    }
+ 
 }

@@ -1,9 +1,8 @@
 package graphics;
 
-import static engine.Activatable.using;
-import java.util.Arrays;
 import opengl.BufferObject;
 import opengl.Camera;
+import static opengl.GLObject.bindAll;
 import opengl.ShaderProgram;
 import opengl.VertexArrayObject;
 import org.joml.Vector3d;
@@ -48,9 +47,8 @@ public class Graphics {
         COLOR_SHADER.setUniform("projectionMatrix", Camera.camera2d.getProjectionMatrix());
         COLOR_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(center, 0, size, size));
         COLOR_SHADER.setUniform("color", color);
-        using(Arrays.asList(COLOR_SHADER, CIRCLE_VAO), () -> {
-            glDrawArrays(GL_TRIANGLE_FAN, 0, CIRCLE_DETAIL + 2);
-        });
+        bindAll(COLOR_SHADER, CIRCLE_VAO);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, CIRCLE_DETAIL + 2);
     }
 
     public static void drawCircleOutline(Vec2d center, double size, Vec4d color) {
@@ -65,9 +63,8 @@ public class Graphics {
         COLOR_SHADER.setUniform("projectionMatrix", Camera.camera2d.getProjectionMatrix());
         COLOR_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(p1, direction(delta), delta.length(), delta.length()));
         COLOR_SHADER.setUniform("color", color);
-        using(Arrays.asList(COLOR_SHADER, LINE_VAO), () -> {
-            glDrawArrays(GL_LINES, 0, 2);
-        });
+        bindAll(COLOR_SHADER, LINE_VAO);
+        glDrawArrays(GL_LINES, 0, 2);
     }
 
     public static void drawLine(Vec3d p1, Vec3d p2, Vec4d color) {
@@ -75,9 +72,8 @@ public class Graphics {
         COLOR_SHADER.setUniform("projectionMatrix", Camera.camera3d.getProjectionMatrix());
         COLOR_SHADER.setUniform("modelViewMatrix", Camera.camera3d.getWorldMatrix(p1, direction1(delta), direction2(delta), delta.length()));
         COLOR_SHADER.setUniform("color", color);
-        using(Arrays.asList(COLOR_SHADER, LINE_VAO), () -> {
-            glDrawArrays(GL_LINES, 0, 2);
-        });
+        bindAll(COLOR_SHADER, LINE_VAO);
+        glDrawArrays(GL_LINES, 0, 2);
     }
 
     private static final VertexArrayObject RECTANGLE_VAO = VertexArrayObject.createVAO(() -> {
@@ -90,9 +86,8 @@ public class Graphics {
         COLOR_SHADER.setUniform("projectionMatrix", Camera.camera2d.getProjectionMatrix());
         COLOR_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(position, rotation, size.x, size.y));
         COLOR_SHADER.setUniform("color", color);
-        using(Arrays.asList(COLOR_SHADER, RECTANGLE_VAO), () -> {
-            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-        });
+        bindAll(COLOR_SHADER, RECTANGLE_VAO);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
 
     public static void drawRectangle3d(Vec3d position, Vec3d normal, double rotation, Vec2d size, Vec4d color) {
@@ -105,9 +100,8 @@ public class Graphics {
                     .rotate(rotation, normal.toJOML()).scale(new Vector3d(size.x, size.y, 1)));
         }
         COLOR_SHADER.setUniform("color", color);
-        using(Arrays.asList(COLOR_SHADER, RECTANGLE_VAO), () -> {
-            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-        });
+        bindAll(COLOR_SHADER, RECTANGLE_VAO);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
 
     public static void drawRectangleOutline(Vec2d position, double rotation, Vec2d size, Vec4d color) {

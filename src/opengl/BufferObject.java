@@ -1,12 +1,10 @@
 package opengl;
 
-import engine.Activatable;
 import static org.lwjgl.opengl.GL15.*;
 
-public class BufferObject implements Activatable {
+public class BufferObject extends GLObject {
 
-    public final int bufferObject;
-    private final int type;
+    final int type;
 
     public BufferObject(int type, float[] data) {
         this(type);
@@ -19,30 +17,27 @@ public class BufferObject implements Activatable {
     }
 
     public BufferObject(int type) {
-        bufferObject = glGenBuffers();
+        super(glGenBuffers());
         this.type = type;
-        activate();
     }
 
     @Override
-    public void activate() {
-        glBindBuffer(type, bufferObject);
+    public void bind() {
+        GLState.bindBuffer(this);
     }
 
     @Override
-    public void deactivate() {
-        glBindBuffer(type, 0);
-    }
-
     public void destroy() {
-        glDeleteBuffers(bufferObject);
+        glDeleteBuffers(id);
     }
 
     public final void putData(float[] data) {
+        bind();
         glBufferData(type, data, GL_STATIC_DRAW);
     }
 
     public final void putData(int[] data) {
+        bind();
         glBufferData(type, data, GL_STATIC_DRAW);
     }
 }

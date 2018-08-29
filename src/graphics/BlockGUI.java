@@ -1,12 +1,11 @@
 package graphics;
 
-import static engine.Activatable.using;
 import static graphics.Sprite.SPRITE_SHADER;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import opengl.BufferObject;
 import opengl.Camera;
+import static opengl.GLObject.bindAll;
 import opengl.VertexArrayObject;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -75,8 +74,7 @@ public class BlockGUI {
         SPRITE_SHADER.setUniform("projectionMatrix", Camera.camera2d.getProjectionMatrix());
         SPRITE_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(position, 0, scale, scale));
         SPRITE_SHADER.setUniform("color", new Vec4d(1, 1, 1, 1));
-        using(Arrays.asList(TERRAIN_TEXTURE, SPRITE_SHADER, vao), () -> {
-            glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
-        });
+        bindAll(TERRAIN_TEXTURE, SPRITE_SHADER, vao);
+        glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
     }
 }

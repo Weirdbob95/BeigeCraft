@@ -2,13 +2,12 @@ package gui;
 
 import engine.Behavior;
 import engine.Input;
+import opengl.GLState;
 import opengl.Window;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
 import util.vectors.Vec2d;
 
 public class GUIManager extends Behavior {
@@ -33,12 +32,12 @@ public class GUIManager extends Behavior {
 
     @Override
     public void render() {
-        glDisable(GL_DEPTH_TEST);
+        GLState.disable(GL_DEPTH_TEST);
         hud.renderOuter();
         if (root != null) {
             root.renderOuter();
         }
-        glEnable(GL_DEPTH_TEST);
+        GLState.enable(GL_DEPTH_TEST);
     }
 
     @Override

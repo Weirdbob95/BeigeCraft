@@ -1,35 +1,32 @@
 package opengl;
 
-import engine.Activatable;
 import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_MAX_LEVEL;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
 
-public class Texture implements Activatable {
+public class Texture extends GLObject {
 
-    private final int texture, type;
+    final int type;
     private int width, height;
+    public int num;
 
     public Texture(int type) {
-        texture = glGenTextures();
+        super(glGenTextures());
         this.type = type;
     }
 
     @Override
-    public void activate() {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(type, texture);
+    public void bind() {
+        GLState.bindTexture(this);
     }
 
     @Override
-    public void deactivate() {
-        glBindTexture(type, 0);
+    public void destroy() {
+        glDeleteTextures(id);
     }
 
     public int getHeight() {
@@ -40,13 +37,15 @@ public class Texture implements Activatable {
         return width;
     }
 
-    private void setParameter(int name, int value) {
+    void setParameter(int name, int value) {
+        bind();
         glTexParameteri(type, name, value);
     }
 
     private void uploadData(int width, int height, ByteBuffer data) {
         this.width = width;
         this.height = height;
+        bind();
         glTexImage2D(type, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(type);
     }
@@ -62,7 +61,6 @@ public class Texture implements Activatable {
         }
 
         Texture t = new Texture(GL_TEXTURE_2D);
-        t.activate();
         t.setParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         t.setParameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
         t.setParameter(GL_TEXTURE_MAX_LEVEL, 4);

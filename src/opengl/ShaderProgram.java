@@ -1,6 +1,5 @@
 package opengl;
 
-import engine.Activatable;
 import java.util.HashMap;
 import org.joml.Matrix4d;
 import static org.lwjgl.opengl.GL20.*;
@@ -8,11 +7,9 @@ import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
 
-public class ShaderProgram implements Activatable {
+public class ShaderProgram extends GLObject {
 
-    private static int activeProgram;
-
-    private final int shaderProgram;
+    private final HashMap<String, Integer> uniformLocations = new HashMap();
 
     /**
      * Constructs a shader program with both a vertex shader and a fragment
@@ -22,6 +19,8 @@ public class ShaderProgram implements Activatable {
      * @param fragmentShaderSource The source code of the fragment shader.
      */
     public ShaderProgram(String vertexShaderSource, String fragmentShaderSource) {
+        super(glCreateProgram());
+
         int vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader, vertexShaderSource);
         glCompileShader(vertexShader);
@@ -36,10 +35,9 @@ public class ShaderProgram implements Activatable {
             throw new RuntimeException("Fragment shader doesn't compile:\n" + glGetShaderInfoLog(fragmentShader));
         }
 
-        shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        glLinkProgram(shaderProgram);
+        glAttachShader(id, vertexShader);
+        glAttachShader(id, fragmentShader);
+        glLinkProgram(id);
         // TODO: Check for linking errors
 
         glDeleteShader(vertexShader);
@@ -55,6 +53,8 @@ public class ShaderProgram implements Activatable {
      * @param fragmentShaderSource The source code of the fragment shader.
      */
     public ShaderProgram(String vertexShaderSource, String geometryShaderSource, String fragmentShaderSource) {
+        super(glCreateProgram());
+
         int vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader, vertexShaderSource);
         glCompileShader(vertexShader);
@@ -76,11 +76,10 @@ public class ShaderProgram implements Activatable {
             throw new RuntimeException("Fragment shader doesn't compile:\n" + glGetShaderInfoLog(fragmentShader));
         }
 
-        shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, geometryShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        glLinkProgram(shaderProgram);
+        glAttachShader(id, vertexShader);
+        glAttachShader(id, geometryShader);
+        glAttachShader(id, fragmentShader);
+        glLinkProgram(id);
         // TODO: Check for linking errors
 
         glDeleteShader(vertexShader);
@@ -88,26 +87,18 @@ public class ShaderProgram implements Activatable {
     }
 
     @Override
-    public void activate() {
-        if (activeProgram != shaderProgram) {
-            glUseProgram(shaderProgram);
-            activeProgram = shaderProgram;
-        }
+    public void bind() {
+        GLState.bindShaderProgram(this);
     }
 
     @Override
-    public void deactivate() {
-        if (activeProgram != 0) {
-            glUseProgram(0);
-            activeProgram = 0;
-        }
+    public void destroy() {
+        glDeleteProgram(id);
     }
-
-    private final HashMap<String, Integer> uniformLocations = new HashMap();
 
     private int getUniformLocation(String name) {
         if (!uniformLocations.containsKey(name)) {
-            uniformLocations.put(name, glGetUniformLocation(shaderProgram, name));
+            uniformLocations.put(name, glGetUniformLocation(id, name));
         }
         return uniformLocations.get(name);
     }
@@ -117,25 +108,25 @@ public class ShaderProgram implements Activatable {
     }
 
     public void setUniform(String name, int value) {
-        activate();
+        bind();
         int uniform = getUniformLocation(name);
         glUniform1i(uniform, value);
     }
 
     public void setUniform(String name, Vec3d value) {
-        activate();
+        bind();
         int uniform = getUniformLocation(name);
         glUniform3fv(uniform, new float[]{(float) value.x, (float) value.y, (float) value.z});
     }
 
     public void setUniform(String name, Vec4d value) {
-        activate();
+        bind();
         int uniform = getUniformLocation(name);
         glUniform4fv(uniform, new float[]{(float) value.x, (float) value.y, (float) value.z, (float) value.w});
     }
 
     public void setUniform(String name, Matrix4d mat) {
-        activate();
+        bind();
         int uniform = getUniformLocation(name);
         glUniformMatrix4fv(uniform, false, new float[]{
             (float) mat.m00(), (float) mat.m01(), (float) mat.m02(), (float) mat.m03(),

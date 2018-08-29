@@ -16,7 +16,7 @@ import world.World;
 
 public class WaterManager extends Behavior {
 
-    private static final double TICK_RATE = 20;
+    private static final double TICK_RATE = 10;
 
     private static final Set<Vec3d> ALL_NEARBY = new HashSet();
 

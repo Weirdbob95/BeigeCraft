@@ -22,7 +22,8 @@ public class ItemSlot {
                 new WandItem(),
                 new WaterBucketItem(),
                 new BlockItem(BlockType.WOOD),
-                new BlockItem(BlockType.WOOD));
+                new BlockItem(BlockType.WOOD),
+                new BlockItem(BlockType.LAVA));
     }
 
     private Item item;

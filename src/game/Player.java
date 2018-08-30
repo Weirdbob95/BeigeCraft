@@ -103,6 +103,11 @@ public class Player extends Behavior {
     }
 
     @Override
+    public double renderLayer() {
+        return 3;
+    }
+
+    @Override
     public void update(double dt) {
 
 //        if (dt > 1 / 20.) {

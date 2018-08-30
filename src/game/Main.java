@@ -10,7 +10,6 @@ import static game.Settings.RENDER_DISTANCE;
 import game.creatures.Doggo;
 import game.creatures.Kitteh;
 import game.creatures.Skeletor;
-import static graphics.Sprite.SPRITE_SHADER;
 import gui.GUIManager;
 import java.util.Comparator;
 import java.util.Optional;
@@ -23,6 +22,7 @@ import static org.lwjgl.opengl.GL11.*;
 import util.Multithreader;
 import util.Resources;
 import util.vectors.Vec3d;
+import util.vectors.Vec4d;
 import world.ChunkPos;
 import world.World;
 
@@ -34,44 +34,33 @@ public abstract class Main {
         Framebuffer f = new Framebuffer(true, true, true);
 
         Framebuffer blur1 = new Framebuffer(true, false, false);
-        Framebuffer blur2 = new Framebuffer(true, false, false);
 
         onRender(-10, () -> {
-            glClearColor(.6f, .8f, 1, 1);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            f.bind();
-            glClearColor(0, 0, 0, 0);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            f.clear(new Vec4d(0, 0, 0, 0));
+            GLState.setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         });
 
-        ShaderProgram blurShader = Resources.loadShaderProgram("blur");
+        ShaderProgram blurShader = Resources.loadShaderProgram("simple2d", "blur");
+        ShaderProgram simpleShader = Resources.loadShaderProgram("simple2d");
 
         onRender(5, () -> {
-            GLState.disable(GL_DEPTH_TEST);
+            GLState.inTempState(() -> {
+                GLState.disable(GL_DEPTH_TEST);
 
-            blur1.bind();
-            blurShader.setUniform("horizontal", true);
-            Framebuffer.draw(f.colorBuffer2, blurShader);
-
-            for (int i = 0; i < 1; i++) {
-                blur2.bind();
-                blurShader.setUniform("horizontal", false);
-                Framebuffer.draw(blur1.colorBuffer, blurShader);
-                blur1.bind();
                 blurShader.setUniform("horizontal", true);
-                Framebuffer.draw(blur2.colorBuffer, blurShader);
-            }
+                blur1.drawToSelf(f.colorBuffer2, blurShader);
 
-            GLState.bindFramebuffer(null);
-            Framebuffer.draw(f.colorBuffer, SPRITE_SHADER);
+                Framebuffer.clearWindow(new Vec4d(.6, .8, 1, 1));
+                Framebuffer.drawToWindow(f.colorBuffer, simpleShader);
 
-            GLState.setBlendFunc(GL_ONE, GL_ONE);
-            blurShader.setUniform("horizontal", false);
-            Framebuffer.draw(blur1.colorBuffer, blurShader);
+                GLState.setBlendFunc(GL_ONE, GL_ONE);
+                blurShader.setUniform("horizontal", false);
+                Framebuffer.drawToWindow(blur1.colorBuffer, blurShader);
+                GLState.setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            });
+
             GLState.setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-            GLState.enable(GL_DEPTH_TEST);
+            GLState.bindFramebuffer(null);
         });
 
         new FPSBehavior().create();

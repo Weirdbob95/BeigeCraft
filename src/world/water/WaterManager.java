@@ -131,6 +131,7 @@ public class WaterManager extends Behavior {
         return get(pos.add(new Vec3d(0, 0, 1)), waterBlocks).amount < 1e-4 ? get(pos, waterBlocks).amount : 1;
     }
 
+    @Override
     public double renderLayer() {
         return 1;
     }

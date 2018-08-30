@@ -68,6 +68,8 @@ public class GLState {
 
     private GLState copy() {
         GLState copy = new GLState();
+        copy.blendFunc1 = blendFunc1;
+        copy.blendFunc2 = blendFunc2;
         copy.buffers.putAll(buffers);
         copy.flags.putAll(flags);
         copy.framebuffer = framebuffer;
@@ -113,6 +115,24 @@ public class GLState {
         return state.vao;
     }
 
+    public static void inTempState(Runnable r) {
+        GLState oldState = state.copy();
+        r.run();
+        setBlendFunc(oldState.blendFunc1, oldState.blendFunc2);
+        for (BufferObject buffer : oldState.buffers.values()) {
+            bindBuffer(buffer);
+        }
+        for (Entry<Integer, Boolean> e : oldState.flags.entrySet()) {
+            if (e.getValue() != null) {
+                setFlag(e.getKey(), e.getValue());
+            }
+        }
+        bindFramebuffer(oldState.framebuffer);
+        bindShaderProgram(oldState.shader);
+        bindTexture(oldState.texture);
+        bindVertexArrayObject(oldState.vao);
+    }
+
     public static void setBlendFunc(int blendFunc1, int blendFunc2) {
         if (blendFunc1 != state.blendFunc1 || blendFunc2 != state.blendFunc2) {
             state.blendFunc1 = blendFunc1;
@@ -132,20 +152,8 @@ public class GLState {
         }
     }
 
-    public static void inTempState(Runnable r) {
-        GLState oldState = state.copy();
-        r.run();
-        for (BufferObject buffer : oldState.buffers.values()) {
-            bindBuffer(buffer);
-        }
-        for (Entry<Integer, Boolean> e : oldState.flags.entrySet()) {
-            if (e.getValue() != null) {
-                setFlag(e.getKey(), e.getValue());
-            }
-        }
-        bindFramebuffer(oldState.framebuffer);
-        bindShaderProgram(oldState.shader);
-        bindTexture(oldState.texture);
-        bindVertexArrayObject(oldState.vao);
+    @Override
+    public String toString() {
+        return "GLState{" + "blendFunc1=" + blendFunc1 + ", blendFunc2=" + blendFunc2 + ", buffers=" + buffers + ", flags=" + flags + ", framebuffer=" + framebuffer + ", shader=" + shader + ", texture=" + texture + ", vao=" + vao + '}';
     }
 }

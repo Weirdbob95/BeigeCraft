@@ -15,15 +15,21 @@ public class InventoryRoot extends GUIRoot {
         super(manager);
         this.color = new Vec4d(.6, .6, .6, .95);
 
-        GUIInventoryGrid grid = new GUIInventoryGrid(12, 4);
+        GUIInventoryGrid grid = new GUIInventoryGrid(12, 4, ItemSlot.INVENTORY);
         grid.offset = new Vec2d(0, -175);
 
         GUIInventoryQAW qaw = new GUIInventoryQAW();
         qaw.offset = new Vec2d(0, 160);
 
+        GUIInventoryGrid craftingGrid = new GUIInventoryGrid(2, 2, ItemSlot.CRAFTING_GRID);
+        craftingGrid.offset = new Vec2d(300, 160);
+
+        GUIInventorySquare craftingOutput = new GUIInventorySquare(null);
+        craftingOutput.offset = new Vec2d(450, 160);
+
         DraggedItem draggedItem = new DraggedItem();
 
-        add(grid, qaw, draggedItem);
+        add(grid, qaw, craftingGrid, craftingOutput, draggedItem);
     }
 
     @Override
@@ -38,34 +44,30 @@ public class InventoryRoot extends GUIRoot {
     protected void render() {
         super.render();
         if (Input.mouseJustPressed(0)) {
-            if (dragSource == null) {
+            if (ItemSlot.GRABBED.isEmpty()) {
                 if (manager.selected instanceof GUIInventorySquare) {
                     dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
                     dragSource.moveItemsTo(ItemSlot.GRABBED);
                 }
+            } else {
+                if (manager.selected instanceof GUIInventorySquare) {
+                    ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
+                    newSlot.moveItemsTo(ItemSlot.GRABBED);
+                    ItemSlot.GRABBED.swapItems(newSlot);
+                }
             }
         }
         if (Input.mouseJustPressed(1)) {
-            if (dragSource != null) {
-                if (manager.selected instanceof GUIInventorySquare) {
-                    ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
-                    ItemSlot.GRABBED.moveItemsTo(newSlot, 1);
-                }
-            } else {
+            if (ItemSlot.GRABBED.isEmpty()) {
                 if (manager.selected instanceof GUIInventorySquare) {
                     dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
                     dragSource.moveItemsTo(ItemSlot.GRABBED, ceil(dragSource.count() / 2.));
                 }
-            }
-        }
-        if ((Input.mouseJustReleased(0) && !Input.mouseDown(1)) || (Input.mouseJustReleased(1) && !Input.mouseDown(0))) {
-            if (dragSource != null) {
+            } else {
                 if (manager.selected instanceof GUIInventorySquare) {
                     ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
-                    ItemSlot.GRABBED.moveItemsTo(newSlot);
+                    ItemSlot.GRABBED.moveItemsTo(newSlot, 1);
                 }
-                ItemSlot.GRABBED.moveItemsTo(dragSource);
-                dragSource = null;
             }
         }
     }

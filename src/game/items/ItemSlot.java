@@ -6,6 +6,7 @@ public class ItemSlot {
 
     public static final ItemSlot[] INVENTORY = new ItemSlot[48];
     public static final ItemSlot[] QAW = new ItemSlot[8];
+    public static final ItemSlot[] CRAFTING_GRID = new ItemSlot[4];
     public static final ItemSlot GRABBED = new ItemSlot();
     public static ItemSlot MAIN_HAND;
     public static ItemSlot OFF_HAND;
@@ -80,6 +81,10 @@ public class ItemSlot {
         return count;
     }
 
+    public boolean isEmpty() {
+        return item == null;
+    }
+
     public Item item() {
         return item;
     }
@@ -108,5 +113,14 @@ public class ItemSlot {
         if (count == 0) {
             item = null;
         }
+    }
+
+    public void swapItems(ItemSlot other) {
+        Item tempItem = other.item;
+        int tempCount = other.count;
+        other.item = item;
+        other.count = count;
+        item = tempItem;
+        count = tempCount;
     }
 }

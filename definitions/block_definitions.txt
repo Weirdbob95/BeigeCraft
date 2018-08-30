@@ -91,7 +91,7 @@ cactus:
         type: diff_top_bot
         side: [4, 1]
         top: [4, 2]
-        bottom: [4, 3]
+        bottom: [4, 2]
     tool: axe
 
 lava:

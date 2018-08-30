@@ -1,6 +1,6 @@
 package game.items;
 
-import world.BlockType;
+import static world.BlockType.get;
 
 public class ItemSlot {
 
@@ -22,9 +22,9 @@ public class ItemSlot {
                 new PickaxeItem(),
                 new WandItem(),
                 new WaterBucketItem(),
-                new BlockItem(BlockType.WOOD),
-                new BlockItem(BlockType.WOOD),
-                new BlockItem(BlockType.LAVA));
+                new BlockItem(get("planks")),
+                new BlockItem(get("planks")),
+                new BlockItem(get("lava")));
     }
 
     private Item item;

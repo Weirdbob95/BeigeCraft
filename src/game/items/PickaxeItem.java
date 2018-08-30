@@ -6,6 +6,7 @@ import java.util.List;
 import static util.MathUtils.ceil;
 import util.vectors.Vec2d;
 import util.vectors.Vec3d;
+import world.BlockType;
 import world.Raycast;
 
 public class PickaxeItem extends Item {
@@ -59,7 +60,10 @@ public class PickaxeItem extends Item {
                 player.blocksToBreak.putIfAbsent(v, 0.);
                 player.blocksToBreak.put(v, player.blocksToBreak.get(v) + dt * 8 / targets.size());
                 if (player.blocksToBreak.get(v) > 1) {
-                    ItemSlot.addToInventory(new BlockItem(player.physics.world.getBlock(v)));
+                    BlockType bt = player.physics.world.getBlock(v).getOnBreak();
+                    if (bt != null) {
+                        ItemSlot.addToInventory(new BlockItem(player.physics.world.getBlock(v).getOnBreak()));
+                    }
                     player.physics.world.setBlock(v, null);
                     player.blocksToBreak.remove(v);
                 }

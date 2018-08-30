@@ -36,9 +36,9 @@ public class BlockGUI {
     private final VertexArrayObject vao;
 
     private BlockGUI(BlockType bt) {
-        int texID1 = BlockType.getTexID(bt, new Vec3d(1, 0, 0));
-        int texID2 = BlockType.getTexID(bt, new Vec3d(0, 1, 0));
-        int texID3 = BlockType.getTexID(bt, new Vec3d(0, 0, 1));
+        int texID1 = bt.getTexID(new Vec3d(1, 0, 0));
+        int texID2 = bt.getTexID(new Vec3d(0, 1, 0));
+        int texID3 = bt.getTexID(new Vec3d(0, 0, 1));
         vao = VertexArrayObject.createVAO(() -> {
             float h = (float) Math.sqrt(3) / 2;
             float ep = .01f;

@@ -1,6 +1,7 @@
 package util.rlestorage;
 
 import world.BlockType;
+import static world.BlockType.getByID;
 
 public interface IntConverter<T> {
 
@@ -12,10 +13,7 @@ public interface IntConverter<T> {
 
         @Override
         public BlockType fromInt(int i) {
-            if (i == 0) {
-                return null;
-            }
-            return BlockType.VALUES[i - 1];
+            return getByID(i);
         }
 
         @Override
@@ -23,7 +21,7 @@ public interface IntConverter<T> {
             if (t == null) {
                 return 0;
             }
-            return t.ordinal() + 1;
+            return t.id();
         }
     }
 

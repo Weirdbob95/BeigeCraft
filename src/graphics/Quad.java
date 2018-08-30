@@ -111,7 +111,7 @@ public abstract class Quad {
         public int texID;
 
         public void texCoordFromBlockType(BlockType bt, Vec3d dir) {
-            texID = BlockType.getTexID(bt, dir);
+            texID = bt.getTexID(dir);
         }
 
         @Override

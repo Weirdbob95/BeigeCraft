@@ -5,12 +5,12 @@ import util.noise.ZeroCrossing;
 import util.rlestorage.IntConverter.BlockTypeConverter;
 import util.rlestorage.RLEArrayStorage;
 import util.vectors.Vec3d;
-import world.BlockType;
+import definitions.BlockType;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
-import static world.BlockType.getByID;
-import static world.BlockType.get;
+import static definitions.BlockType.getBlock;
+import static definitions.BlockType.getBlockByID;
 
 public class ConstructedChunk extends AbstractChunk {
 
@@ -44,33 +44,33 @@ public class ConstructedChunk extends AbstractChunk {
                     case FOREST:
                     case PLAINS:
                     case JUNGLE:
-                        surface = get("grass0");
-                        nearSurface = get("dirt");
+                        surface = getBlock("grass0");
+                        nearSurface = getBlock("dirt");
                         break;
                     case TAIGA:
                     case TUNDRA:
-                        surface = get("grass1");
-                        nearSurface = get("dirt");
+                        surface = getBlock("grass1");
+                        nearSurface = getBlock("dirt");
                         break;
                     case SNOW:
-                        surface = get("grass2");
-                        nearSurface = get("dirt");
+                        surface = getBlock("grass2");
+                        nearSurface = getBlock("dirt");
                         break;
                     case DESERT:
                     case COLD_DESERT:
-                        surface = nearSurface = get("sand");
+                        surface = nearSurface = getBlock("sand");
                         break;
                     case ROCK:
-                        surface = nearSurface = get("stone");
+                        surface = nearSurface = getBlock("stone");
                         break;
                     default:
                         throw new RuntimeException("Unknown biome");
                 }
-                blockStorage.setRangeInfinite(x, y, 0, get("stone"));
+                blockStorage.setRangeInfinite(x, y, 0, getBlock("stone"));
                 for (ZeroCrossing zc : hc.heightmap[x][y]) {
                     if (zc.positive) {
                         if (zc.start <= zc.end - 3) {
-                            blockStorage.setRange(x, y, zc.start, zc.end - 3, get("stone"));
+                            blockStorage.setRange(x, y, zc.start, zc.end - 3, getBlock("stone"));
                         }
                         if (zc.start <= zc.end - 1) {
                             blockStorage.setRange(x, y, Math.max(zc.end - 2, zc.start), zc.end - 1, nearSurface);
@@ -88,7 +88,7 @@ public class ConstructedChunk extends AbstractChunk {
                     if (!zc.positive) {
                         blockStorage.setRange(x, y, zc.start, zc.end, null);
                         if (zc.start <= hc.zMin + 2) {
-                            blockStorage.setRange(x, y, zc.start, hc.zMin + 2, get("lava"));
+                            blockStorage.setRange(x, y, zc.start, hc.zMin + 2, getBlock("lava"));
                         }
                     }
                 }

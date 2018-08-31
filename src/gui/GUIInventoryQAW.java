@@ -1,6 +1,6 @@
 package gui;
 
-import game.items.ItemSlot;
+import game.inventory.ItemSlot;
 import graphics.Graphics;
 import util.MathUtils;
 import util.vectors.Vec2d;

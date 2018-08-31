@@ -7,8 +7,8 @@ import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
 import engine.Input;
-import game.items.Item;
-import game.items.ItemSlot;
+import game.inventory.ItemSlot;
+import definitions.ItemType;
 import graphics.Animation;
 import graphics.Sprite;
 import static graphics.VoxelRenderer.DIRS;
@@ -184,26 +184,26 @@ public class Player extends Behavior {
 
         if (!gui.freezeMouse()) {
             // Use items
-            Item mainItem = ItemSlot.MAIN_HAND == null ? null : ItemSlot.MAIN_HAND.item();
+            ItemType mainItem = ItemSlot.MAIN_HAND == null ? null : ItemSlot.MAIN_HAND.item();
             if (Input.mouseJustPressed(0)) {
                 if (mainItem != null) {
-                    mainItem.useItemPress(this, true);
+                    mainItem.use().useItemPress(this, true);
                 }
             }
             if (Input.mouseDown(0)) {
                 if (mainItem != null) {
-                    mainItem.useItemHold(this, true, dt);
+                    mainItem.use().useItemHold(this, true, dt);
                 }
             }
-            Item offItem = ItemSlot.OFF_HAND == null ? null : ItemSlot.OFF_HAND.item();
+            ItemType offItem = ItemSlot.OFF_HAND == null ? null : ItemSlot.OFF_HAND.item();
             if (Input.mouseJustPressed(1)) {
                 if (offItem != null) {
-                    offItem.useItemPress(this, false);
+                    offItem.use().useItemPress(this, false);
                 }
             }
             if (Input.mouseDown(1)) {
                 if (offItem != null) {
-                    offItem.useItemHold(this, false, dt);
+                    offItem.use().useItemHold(this, false, dt);
                 }
             }
         }

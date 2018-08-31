@@ -1,5 +1,6 @@
 package world;
 
+import definitions.BlockType;
 import engine.Behavior;
 import static game.Settings.RENDER_DISTANCE;
 import java.util.Collections;

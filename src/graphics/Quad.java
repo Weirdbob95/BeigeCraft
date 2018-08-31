@@ -3,7 +3,7 @@ package graphics;
 import static graphics.VoxelRenderer.DIRS;
 import static util.MathUtils.round;
 import util.vectors.Vec3d;
-import world.BlockType;
+import definitions.BlockType;
 
 public abstract class Quad {
 

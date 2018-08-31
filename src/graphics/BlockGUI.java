@@ -18,7 +18,7 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import util.vectors.Vec2d;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
-import world.BlockType;
+import definitions.BlockType;
 import static world.World.TERRAIN_TEXTURE;
 
 public class BlockGUI {

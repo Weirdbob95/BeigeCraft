@@ -14,13 +14,13 @@ import util.noise.NoiseInterpolator;
 import util.rlestorage.IntConverter.BlockTypeConverter;
 import util.rlestorage.RLEMapStorage;
 import util.vectors.Vec3d;
-import world.BlockType;
+import definitions.BlockType;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
 import world.biomes.Biome;
-import static world.BlockType.getByID;
-import static world.BlockType.get;
+import static definitions.BlockType.getBlock;
+import static definitions.BlockType.getBlockByID;
 
 public class StructuredChunk extends AbstractChunk {
 
@@ -118,17 +118,17 @@ public class StructuredChunk extends AbstractChunk {
                     for (int z = -intSize; z <= intSize; z++) {
                         if (leaves.get(x1 + x, y1 + y, z1 + z) * size > new Vec3d(x, y, z).length()) {
                             //if (noise.fbm3d(x1 + x, y1 + y, z1 + z, 4, .7 / size) * size > new Vec3d(x, y, z).length()) {
-                            blocks.set(x, y, (int) height + z, get("leaves"));
+                            blocks.set(x, y, (int) height + z, getBlock("leaves"));
                         }
                     }
                 }
             }
-            blocks.setRange(0, 0, 0, (int) height + 1, get("leaves"));
-            blocks.setRange(0, 0, 0, (int) height, get("log"));
+            blocks.setRange(0, 0, 0, (int) height + 1, getBlock("leaves"));
+            blocks.setRange(0, 0, 0, (int) height, getBlock("log"));
             if (random.nextDouble() < (height - 10) / 5.) {
-                blocks.setRange(1, 0, 0, (int) height, get("log"));
-                blocks.setRange(0, 1, 0, (int) height, get("log"));
-                blocks.setRange(1, 1, 0, (int) height, get("log"));
+                blocks.setRange(1, 0, 0, (int) height, getBlock("log"));
+                blocks.setRange(0, 1, 0, (int) height, getBlock("log"));
+                blocks.setRange(1, 1, 0, (int) height, getBlock("log"));
             }
             removeDisconnected(new Vec3d(0, 0, 0));
         }
@@ -138,7 +138,7 @@ public class StructuredChunk extends AbstractChunk {
 
         public Cactus(int x, int y, int z, int height) {
             super(x, y, z);
-            blocks.setRange(0, 0, 0, (int) height, get("cactus"));
+            blocks.setRange(0, 0, 0, (int) height, getBlock("cactus"));
         }
     }
 }

@@ -1,7 +1,7 @@
 package util.rlestorage;
 
-import world.BlockType;
-import static world.BlockType.getByID;
+import definitions.BlockType;
+import static definitions.BlockType.getBlockByID;
 
 public interface IntConverter<T> {
 
@@ -13,7 +13,7 @@ public interface IntConverter<T> {
 
         @Override
         public BlockType fromInt(int i) {
-            return getByID(i);
+            return getBlockByID(i);
         }
 
         @Override

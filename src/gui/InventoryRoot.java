@@ -1,7 +1,7 @@
 package gui;
 
 import engine.Input;
-import game.items.ItemSlot;
+import game.inventory.ItemSlot;
 import graphics.Font;
 import static util.MathUtils.ceil;
 import util.vectors.Vec2d;
@@ -9,6 +9,7 @@ import util.vectors.Vec4d;
 
 public class InventoryRoot extends GUIRoot {
 
+    public ItemSlot[] craftingSlots = ItemSlot.makeItemSlots(4);
     public ItemSlot dragSource;
 
     public InventoryRoot(GUIManager manager) {
@@ -21,10 +22,10 @@ public class InventoryRoot extends GUIRoot {
         GUIInventoryQAW qaw = new GUIInventoryQAW();
         qaw.offset = new Vec2d(0, 160);
 
-        GUIInventoryGrid craftingGrid = new GUIInventoryGrid(2, 2, ItemSlot.CRAFTING_GRID);
+        GUIInventoryGrid craftingGrid = new GUIInventoryGrid(2, 2, craftingSlots);
         craftingGrid.offset = new Vec2d(300, 160);
 
-        GUIInventorySquare craftingOutput = new GUIInventorySquare(null);
+        GUICraftingOutput craftingOutput = new GUICraftingOutput(craftingSlots);
         craftingOutput.offset = new Vec2d(450, 160);
 
         DraggedItem draggedItem = new DraggedItem();
@@ -44,27 +45,35 @@ public class InventoryRoot extends GUIRoot {
     protected void render() {
         super.render();
         if (Input.mouseJustPressed(0)) {
-            if (ItemSlot.GRABBED.isEmpty()) {
-                if (manager.selected instanceof GUIInventorySquare) {
+            if (manager.selected instanceof GUIInventorySquare) {
+                if (ItemSlot.GRABBED.isEmpty()) {
                     dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
                     dragSource.moveItemsTo(ItemSlot.GRABBED);
-                }
-            } else {
-                if (manager.selected instanceof GUIInventorySquare) {
+                } else {
                     ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
                     newSlot.moveItemsTo(ItemSlot.GRABBED);
                     ItemSlot.GRABBED.swapItems(newSlot);
                 }
+            } else if (manager.selected instanceof GUICraftingOutput) {
+                GUICraftingOutput gco = (GUICraftingOutput) manager.selected;
+                if (gco.outputItem != null) {
+                    for (int i = 0; i < gco.outputNum; i++) {
+                        ItemSlot.addToInventory(gco.outputItem);
+                    }
+                    for (ItemSlot is : gco.craftingSlots) {
+                        if (!is.isEmpty()) {
+                            is.removeItem();
+                        }
+                    }
+                }
             }
         }
         if (Input.mouseJustPressed(1)) {
-            if (ItemSlot.GRABBED.isEmpty()) {
-                if (manager.selected instanceof GUIInventorySquare) {
+            if (manager.selected instanceof GUIInventorySquare) {
+                if (ItemSlot.GRABBED.isEmpty()) {
                     dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
                     dragSource.moveItemsTo(ItemSlot.GRABBED, ceil(dragSource.count() / 2.));
-                }
-            } else {
-                if (manager.selected instanceof GUIInventorySquare) {
+                } else {
                     ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
                     ItemSlot.GRABBED.moveItemsTo(newSlot, 1);
                 }

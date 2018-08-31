@@ -2,7 +2,7 @@ package gui;
 
 import engine.Input;
 import static game.Settings.SHOW_DEBUG_HUD;
-import game.items.ItemSlot;
+import game.inventory.ItemSlot;
 import util.vectors.Vec2d;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;

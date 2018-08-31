@@ -1,5 +1,6 @@
 package util;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -60,6 +61,10 @@ public class YAMLObject {
 
     public int valueToInt() {
         return Integer.parseInt(value);
+    }
+
+    public List<String> valueToList() {
+        return Arrays.asList(value.substring(1, value.length() - 1).split(", "));
     }
 
     public Vec2d valueToVec2d() {

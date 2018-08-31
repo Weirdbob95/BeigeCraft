@@ -10,7 +10,7 @@ import static util.MathUtils.floor;
 import static util.MathUtils.mod;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
-import world.BlockType;
+import definitions.BlockType;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;

@@ -1,0 +1,19 @@
+shapeless_recipe:
+    input: block.log
+    output: block.planks
+    output_num: 4
+
+recipe:
+    size: [1, 2]
+    row1: [block.planks]
+    row2: [block.planks]
+    output: stick
+    output_num: 4
+
+recipe:
+    size: [3, 3]
+    row1: [block.stone, block.stone, block.stone]
+    row2: [none, stick, none]
+    row3: [none, stick, none]
+    output: pickaxe
+    output_num: 1

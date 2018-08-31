@@ -1,35 +1,15 @@
-package game.items;
+package game.inventory;
 
 import game.Player;
 import java.util.ArrayList;
 import java.util.List;
 import static util.MathUtils.ceil;
-import util.vectors.Vec2d;
 import util.vectors.Vec3d;
-import world.BlockType;
+import definitions.BlockType;
 import world.Raycast;
+import static definitions.ItemType.getItemByBlock;
 
-public class PickaxeItem extends Item {
-
-    @Override
-    public String description() {
-        return "This tool is great at mining blocks, especially stone.";
-    }
-
-    @Override
-    public int maxStackSize() {
-        return 1;
-    }
-
-    @Override
-    public String name() {
-        return "Pickaxe";
-    }
-
-    @Override
-    public void renderGUI(Vec2d pos) {
-        renderSprite("item_pickaxe.png", pos);
-    }
+public class PickaxeItem extends UsableItem {
 
     @Override
     public void useItemHold(Player player, boolean isMainHand, double dt) {
@@ -62,7 +42,7 @@ public class PickaxeItem extends Item {
                 if (player.blocksToBreak.get(v) > 1) {
                     BlockType bt = player.physics.world.getBlock(v).getOnBreak();
                     if (bt != null) {
-                        ItemSlot.addToInventory(new BlockItem(player.physics.world.getBlock(v).getOnBreak()));
+                        ItemSlot.addToInventory(getItemByBlock(player.physics.world.getBlock(v).getOnBreak()));
                     }
                     player.physics.world.setBlock(v, null);
                     player.blocksToBreak.remove(v);
@@ -71,6 +51,5 @@ public class PickaxeItem extends Item {
         } else {
             player.blocksToBreak.clear();
         }
-
     }
 }

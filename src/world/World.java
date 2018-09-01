@@ -18,6 +18,9 @@ import opengl.Camera;
 import static opengl.GLObject.bindAll;
 import opengl.ShaderProgram;
 import opengl.Texture;
+import static org.lwjgl.opengl.GL20.glDrawBuffers;
+import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
+import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT1;
 import static util.MathUtils.floor;
 import static util.MathUtils.mod;
 import util.Multithreader;
@@ -106,9 +109,11 @@ public class World extends Behavior {
         bindAll(TERRAIN_TEXTURE, TERRAIN_BLOOM_TEXTURE, TERRAIN_SHADER);
         TERRAIN_SHADER.setUniform("projectionMatrix", Camera.camera3d.getProjectionMatrix());
         TERRAIN_SHADER.setUniform("color", new Vec4d(1, 1, 1, 1));
+        glDrawBuffers(new int[]{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
         for (ChunkPos pos : renderedChunks.allGenerated()) {
             renderedChunks.get(pos).render();
         }
+        glDrawBuffers(new int[]{GL_COLOR_ATTACHMENT0});
         ChunkPos camera = getChunkPos(Camera.camera3d.position);
         constructedChunks.removeDistant(camera);
         heightmappedChunks.removeDistant(camera);

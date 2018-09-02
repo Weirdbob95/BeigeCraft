@@ -46,6 +46,7 @@ public class Player extends Behavior {
     public final AccelerationBehavior acceleration = require(AccelerationBehavior.class);
     public final PlayerPhysicsBehavior physics = require(PlayerPhysicsBehavior.class);
     public final SpaceOccupierBehavior spaceOccupier = require(SpaceOccupierBehavior.class);
+    //public final Creature creature = require(Creature.class);
 
     public GUIManager gui;
     public boolean flying;

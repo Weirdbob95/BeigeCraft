@@ -7,9 +7,7 @@ import engine.Core;
 import engine.Input;
 import static game.Settings.ENABLE_LOD;
 import static game.Settings.RENDER_DISTANCE;
-import game.creatures.Doggo;
-import game.creatures.Kitteh;
-import game.creatures.Skeletor;
+import game.creatures.*;
 import gui.GUIManager;
 import java.util.Comparator;
 import java.util.Optional;
@@ -87,6 +85,14 @@ public abstract class Main {
                 ziggy.creature.physics.world = world;
                 ziggy.create();
             }
+            if (Input.keyJustPressed(GLFW_KEY_M)) {
+                Goblin squee = new Goblin();
+                squee.enemy.creature.position.position = p.position.position;
+                squee.enemy.creature.model.rotation = Camera.camera3d.horAngle;
+                squee.enemy.creature.physics.world = world;
+                squee.create();
+            }
+
             if (Input.keyJustPressed(GLFW_KEY_L)) {
                 ENABLE_LOD = !ENABLE_LOD;
                 System.out.println(ENABLE_LOD);

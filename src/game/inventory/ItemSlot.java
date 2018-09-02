@@ -1,36 +1,32 @@
-package game.items;
+package game.inventory;
 
-import world.BlockType;
+import definitions.ItemType;
+import static definitions.ItemType.getItem;
 
 public class ItemSlot {
 
-    public static final ItemSlot[] INVENTORY = new ItemSlot[48];
-    public static final ItemSlot[] QAW = new ItemSlot[8];
+    public static final ItemSlot[] INVENTORY = makeItemSlots(48);
+    public static final ItemSlot[] QAW = makeItemSlots(8);
     public static final ItemSlot GRABBED = new ItemSlot();
     public static ItemSlot MAIN_HAND;
     public static ItemSlot OFF_HAND;
 
     static {
-        for (int i = 0; i < INVENTORY.length; i++) {
-            INVENTORY[i] = new ItemSlot();
-        }
-        for (int i = 0; i < QAW.length; i++) {
-            QAW[i] = new ItemSlot();
-        }
-        addToInventory(new SwordItem(),
-                new PickaxeItem(),
-                new WandItem(),
-                new BlockItem(BlockType.WOOD),
-                new BlockItem(BlockType.WOOD));
+        addToInventory(
+                getItem("sword"),
+                getItem("pickaxe"),
+                getItem("wand"),
+                getItem("water_bucket"),
+                getItem("block.lava"));
     }
 
-    private Item item;
+    private ItemType item;
     private int count;
 
     private ItemSlot() {
     }
 
-    private boolean addItem(Item i) {
+    private boolean addItem(ItemType i) {
         if (i != null) {
             if (item == null || (item.equals(i) && count < item.maxStackSize())) {
                 item = i;
@@ -41,13 +37,13 @@ public class ItemSlot {
         return false;
     }
 
-    public static void addToInventory(Item... a) {
-        for (Item i : a) {
+    public static void addToInventory(ItemType... a) {
+        for (ItemType i : a) {
             addToInventory(i);
         }
     }
 
-    public static boolean addToInventory(Item i) {
+    public static boolean addToInventory(ItemType i) {
         if (i == null) {
             return true;
         }
@@ -78,8 +74,20 @@ public class ItemSlot {
         return count;
     }
 
-    public Item item() {
+    public boolean isEmpty() {
+        return item == null;
+    }
+
+    public ItemType item() {
         return item;
+    }
+
+    public static ItemSlot[] makeItemSlots(int num) {
+        ItemSlot[] slots = new ItemSlot[num];
+        for (int i = 0; i < num; i++) {
+            slots[i] = new ItemSlot();
+        }
+        return slots;
     }
 
     public void moveItemsTo(ItemSlot other) {
@@ -106,5 +114,14 @@ public class ItemSlot {
         if (count == 0) {
             item = null;
         }
+    }
+
+    public void swapItems(ItemSlot other) {
+        ItemType tempItem = other.item;
+        int tempCount = other.count;
+        other.item = item;
+        other.count = count;
+        item = tempItem;
+        count = tempCount;
     }
 }

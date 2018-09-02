@@ -1,14 +1,13 @@
 package graphics;
 
-import static engine.Activatable.using;
 import static java.lang.Integer.parseInt;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import opengl.BufferObject;
 import opengl.Camera;
+import static opengl.GLObject.bindAll;
 import opengl.ShaderProgram;
 import opengl.Texture;
 import opengl.VertexArrayObject;
@@ -224,31 +223,21 @@ public class Font {
         private int[] numChars = new int[pages];
 
         public void draw2d(Vec2d position, double rotation, double scale, Vec4d color) {
-            FONT_SHADER.setUniform("projectionMatrix", Camera.camera2d.getProjectionMatrix());
-            FONT_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(position, rotation, scale, scale));
-            FONT_SHADER.setUniform("color", color);
-            FONT_SHADER.setUniform("outline", false);
-            for (int i = 0; i < pages; i++) {
-                int nc = numChars[i];
-                if (nc > 0) {
-                    using(Arrays.asList(textures[i], FONT_SHADER, vaoArray[i]), () -> {
-                        glDrawElements(GL_TRIANGLES, 6 * nc, GL_UNSIGNED_INT, 0);
-                    });
-                }
-            }
+            draw2d(position, rotation, scale, null);
         }
 
         public void draw2d(Vec2d position, double rotation, double scale, Vec4d color, Vec4d outlineColor) {
             FONT_SHADER.setUniform("projectionMatrix", Camera.camera2d.getProjectionMatrix());
             FONT_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(position, rotation, scale, scale));
-            FONT_SHADER.setUniform("color", outlineColor);
-            FONT_SHADER.setUniform("outline", true);
-            for (int i = 0; i < pages; i++) {
-                int nc = numChars[i];
-                if (nc > 0) {
-                    using(Arrays.asList(textures[i], FONT_SHADER, vaoArray[i]), () -> {
+            if (outlineColor != null) {
+                FONT_SHADER.setUniform("color", outlineColor);
+                FONT_SHADER.setUniform("outline", true);
+                for (int i = 0; i < pages; i++) {
+                    int nc = numChars[i];
+                    if (nc > 0) {
+                        bindAll(textures[i], FONT_SHADER, vaoArray[i]);
                         glDrawElements(GL_TRIANGLES, 6 * nc, GL_UNSIGNED_INT, 0);
-                    });
+                    }
                 }
             }
             FONT_SHADER.setUniform("color", color);
@@ -256,17 +245,8 @@ public class Font {
             for (int i = 0; i < pages; i++) {
                 int nc = numChars[i];
                 if (nc > 0) {
-                    using(Arrays.asList(textures[i], FONT_SHADER, vaoArray[i]), () -> {
-                        glDrawElements(GL_TRIANGLES, 6 * nc, GL_UNSIGNED_INT, 0);
-                    });
-                }
-            }
-            for (int i = 0; i < pages; i++) {
-                int nc = numChars[i];
-                if (nc > 0) {
-                    using(Arrays.asList(textures[i], FONT_SHADER, vaoArray[i]), () -> {
-                        glDrawElements(GL_TRIANGLES, 6 * nc, GL_UNSIGNED_INT, 0);
-                    });
+                    bindAll(textures[i], FONT_SHADER, vaoArray[i]);
+                    glDrawElements(GL_TRIANGLES, 6 * nc, GL_UNSIGNED_INT, 0);
                 }
             }
         }

@@ -1,0 +1,51 @@
+default_template:
+    name: Missing name
+    texture: item_block.png
+    max_stack_size: 64
+    on_use:
+        type: none
+
+stick:
+    include: default_template
+    name: Stick
+    texture: item_stick.png
+
+tool_template:
+    include: default_template
+    max_stack_size: 1
+    on_use:
+        type: tool
+        tool_type: none
+        tool_level: 0
+
+pickaxe:
+    include: tool_template
+    name: Pickaxe
+    texture: item_pickaxe.png
+    on_use:
+        tool_type: pickaxe
+        tool_level: 1
+
+sword:
+    include: default_template
+    name: Sword
+    texture: item_sword.png
+    max_stack_size: 1
+    on_use:
+        type: sword
+
+wand:
+    include: default_template
+    name: Wand
+    texture: item_wand.png
+    max_stack_size: 1
+    on_use:
+        type: wand
+
+water_bucket:
+    include: default_template
+    name: Water Bucket
+    texture: item_waterbucket.png
+    max_stack_size: 1
+    on_use:
+        type: water_bucket

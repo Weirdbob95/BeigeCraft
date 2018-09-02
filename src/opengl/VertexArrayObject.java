@@ -1,34 +1,27 @@
 package opengl;
 
-import engine.Activatable;
-import static engine.Activatable.using;
 import static org.lwjgl.opengl.ARBVertexArrayObject.*;
 
-public class VertexArrayObject implements Activatable {
-
-    private final int VAO;
+public class VertexArrayObject extends GLObject {
 
     public static VertexArrayObject createVAO(Runnable r) {
-        VertexArrayObject VAO = new VertexArrayObject();
-        using(r, VAO);
-        return VAO;
+        VertexArrayObject vao = new VertexArrayObject();
+        vao.bind();
+        r.run();
+        return vao;
     }
 
     private VertexArrayObject() {
-        VAO = glGenVertexArrays();
+        super(glGenVertexArrays());
     }
 
     @Override
-    public void activate() {
-        glBindVertexArray(VAO);
+    public void bind() {
+        GLState.bindVertexArrayObject(this);
     }
 
     @Override
-    public void deactivate() {
-        glBindVertexArray(0);
-    }
-
     public void destroy() {
-        glDeleteVertexArrays(VAO);
+        glDeleteVertexArrays(id);
     }
 }

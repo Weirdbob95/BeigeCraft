@@ -1,11 +1,10 @@
 package graphics;
 
-import static engine.Activatable.using;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import opengl.BufferObject;
 import opengl.Camera;
+import static opengl.GLObject.bindAll;
 import opengl.ShaderProgram;
 import opengl.Texture;
 import opengl.VertexArrayObject;
@@ -33,9 +32,9 @@ public class Sprite {
         return SPRITE_CACHE.get(fileName);
     }
 
-    static final ShaderProgram SPRITE_SHADER = Resources.loadShaderProgram("sprite");
+    public static final ShaderProgram SPRITE_SHADER = Resources.loadShaderProgram("sprite");
 
-    private static final VertexArrayObject SPRITE_VAO = VertexArrayObject.createVAO(() -> {
+    public static final VertexArrayObject SPRITE_VAO = VertexArrayObject.createVAO(() -> {
         BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{
             0.5f, 0.5f, 0, 1, 1, 1, 1, 1, 1,
             0.5f, -0.5f, 0, 1, 0, 1, 1, 1, 1,
@@ -60,9 +59,8 @@ public class Sprite {
         SPRITE_SHADER.setUniform("projectionMatrix", Camera.camera2d.getProjectionMatrix());
         SPRITE_SHADER.setUniform("modelViewMatrix", Camera.camera2d.getWorldMatrix(position, rotation, scale * getWidth(), scale * getHeight()));
         SPRITE_SHADER.setUniform("color", color);
-        using(Arrays.asList(texture, SPRITE_SHADER, SPRITE_VAO), () -> {
-            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-        });
+        bindAll(texture, SPRITE_SHADER, SPRITE_VAO);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
 
     public void draw3d(Vec3d position, Vec3d normal, double rotation, Vec2d size, Vec4d color) {
@@ -75,9 +73,8 @@ public class Sprite {
                     .rotate(rotation, normal.toJOML()).scale(new Vector3d(size.x, size.y, 1)));
         }
         SPRITE_SHADER.setUniform("color", color);
-        using(Arrays.asList(texture, SPRITE_SHADER, SPRITE_VAO), () -> {
-            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-        });
+        bindAll(texture, SPRITE_SHADER, SPRITE_VAO);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
 
     public int getHeight() {

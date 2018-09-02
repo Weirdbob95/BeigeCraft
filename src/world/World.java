@@ -1,9 +1,8 @@
 package world;
 
-import static engine.Activatable.using;
+import definitions.BlockType;
 import engine.Behavior;
 import static game.Settings.RENDER_DISTANCE;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,8 +15,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import opengl.Camera;
+import static opengl.GLObject.bindAll;
 import opengl.ShaderProgram;
 import opengl.Texture;
+import static org.lwjgl.opengl.GL20.glDrawBuffers;
+import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
+import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT1;
 import static util.MathUtils.floor;
 import static util.MathUtils.mod;
 import util.Multithreader;
@@ -40,6 +43,12 @@ public class World extends Behavior {
 
     public static final ShaderProgram TERRAIN_SHADER = Resources.loadShaderProgramGeom("terrain");
     public static final Texture TERRAIN_TEXTURE = Texture.load("blockSpritesheet.png");
+    public static final Texture TERRAIN_BLOOM_TEXTURE = Texture.load("blockSpritesheet_bloom.png");
+
+    static {
+        TERRAIN_BLOOM_TEXTURE.num = 1;
+        TERRAIN_SHADER.setUniform("bloom_sampler", 1);
+    }
 
     public final ChunkMap<ConstructedChunk> constructedChunks = new ChunkMap<>(this, ConstructedChunk::new);
     public final ChunkMap<HeightmappedChunk> heightmappedChunks = new ChunkMap<>(this, HeightmappedChunk::new);
@@ -97,13 +106,14 @@ public class World extends Behavior {
     @Override
     public void render() {
         renderedChunks.get(getChunkPos(Camera.camera3d.position));
-        using(Arrays.asList(TERRAIN_TEXTURE, TERRAIN_SHADER), () -> {
-            TERRAIN_SHADER.setUniform("projectionMatrix", Camera.camera3d.getProjectionMatrix());
-            TERRAIN_SHADER.setUniform("color", new Vec4d(1, 1, 1, 1));
-            for (ChunkPos pos : renderedChunks.allGenerated()) {
-                renderedChunks.get(pos).render();
-            }
-        });
+        bindAll(TERRAIN_TEXTURE, TERRAIN_BLOOM_TEXTURE, TERRAIN_SHADER);
+        TERRAIN_SHADER.setUniform("projectionMatrix", Camera.camera3d.getProjectionMatrix());
+        TERRAIN_SHADER.setUniform("color", new Vec4d(1, 1, 1, 1));
+        glDrawBuffers(new int[]{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
+        for (ChunkPos pos : renderedChunks.allGenerated()) {
+            renderedChunks.get(pos).render();
+        }
+        glDrawBuffers(new int[]{GL_COLOR_ATTACHMENT0});
         ChunkPos camera = getChunkPos(Camera.camera3d.position);
         constructedChunks.removeDistant(camera);
         heightmappedChunks.removeDistant(camera);

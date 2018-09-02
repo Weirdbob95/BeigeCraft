@@ -1,6 +1,6 @@
 package gui;
 
-import game.items.ItemSlot;
+import game.inventory.ItemSlot;
 import util.vectors.Vec2d;
 import util.vectors.Vec4d;
 
@@ -10,7 +10,6 @@ public class GUIInventorySquare extends GUIRectangle {
 
     public ItemSlot itemSlot;
     public GUIText count;
-    public double hoverTime = -1;
 
     public GUIInventorySquare(ItemSlot itemSlot) {
         this.itemSlot = itemSlot;
@@ -27,13 +26,11 @@ public class GUIInventorySquare extends GUIRectangle {
     @Override
     protected void onHoverStart() {
         color = new Vec4d(1, 1, 1, .3);
-        hoverTime = System.nanoTime() / 1e9;
     }
 
     @Override
     protected void onHoverStop() {
         color = new Vec4d(1, 1, 1, .1);
-        hoverTime = -1;
     }
 
     @Override

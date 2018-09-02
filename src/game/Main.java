@@ -12,10 +12,15 @@ import gui.GUIManager;
 import java.util.Comparator;
 import java.util.Optional;
 import opengl.Camera;
+import opengl.Framebuffer;
+import opengl.GLState;
+import opengl.ShaderProgram;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import util.Multithreader;
+import util.Resources;
 import util.vectors.Vec3d;
+import util.vectors.Vec4d;
 import world.ChunkPos;
 import world.World;
 
@@ -24,9 +29,36 @@ public abstract class Main {
     public static void main(String[] args) {
         Core.init();
 
+        Framebuffer f = new Framebuffer(true, true, true);
+
+        Framebuffer blur1 = new Framebuffer(true, false, false);
+
         onRender(-10, () -> {
-            glClearColor(.6f, .8f, 1, 1);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            f.clear(new Vec4d(0, 0, 0, 0));
+            GLState.setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        });
+
+        ShaderProgram blurShader = Resources.loadShaderProgram("simple2d", "blur");
+        ShaderProgram simpleShader = Resources.loadShaderProgram("simple2d");
+
+        onRender(5, () -> {
+            GLState.inTempState(() -> {
+                GLState.disable(GL_DEPTH_TEST);
+
+                blurShader.setUniform("horizontal", true);
+                blur1.drawToSelf(f.colorBuffer2, blurShader);
+
+                Framebuffer.clearWindow(new Vec4d(.6, .8, 1, 1));
+                Framebuffer.drawToWindow(f.colorBuffer, simpleShader);
+
+                GLState.setBlendFunc(GL_ONE, GL_ONE);
+                blurShader.setUniform("horizontal", false);
+                Framebuffer.drawToWindow(blur1.colorBuffer, blurShader);
+                GLState.setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            });
+
+            GLState.setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            GLState.bindFramebuffer(null);
         });
 
         new FPSBehavior().create();

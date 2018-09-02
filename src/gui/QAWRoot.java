@@ -1,7 +1,7 @@
 package gui;
 
 import engine.Input;
-import game.items.ItemSlot;
+import game.inventory.ItemSlot;
 import graphics.Graphics;
 import util.MathUtils;
 import static util.MathUtils.mod;

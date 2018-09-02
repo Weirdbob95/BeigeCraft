@@ -24,6 +24,11 @@ public class Resources {
                 Resources.loadFileAsString("src/shaders/" + name + ".frag"));
     }
 
+    public static ShaderProgram loadShaderProgram(String vertName, String fragName) {
+        return new ShaderProgram(Resources.loadFileAsString("src/shaders/" + vertName + ".vert"),
+                Resources.loadFileAsString("src/shaders/" + fragName + ".frag"));
+    }
+
     public static ShaderProgram loadShaderProgramGeom(String name) {
         return new ShaderProgram(Resources.loadFileAsString("src/shaders/" + name + ".vert"),
                 Resources.loadFileAsString("src/shaders/" + name + ".geom"),

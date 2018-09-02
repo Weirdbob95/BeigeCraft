@@ -1,7 +1,7 @@
 package gui;
 
 import engine.Input;
-import game.items.ItemSlot;
+import game.inventory.ItemSlot;
 import graphics.Font;
 import static util.MathUtils.ceil;
 import util.vectors.Vec2d;
@@ -9,21 +9,28 @@ import util.vectors.Vec4d;
 
 public class InventoryRoot extends GUIRoot {
 
+    public ItemSlot[] craftingSlots = ItemSlot.makeItemSlots(4);
     public ItemSlot dragSource;
 
     public InventoryRoot(GUIManager manager) {
         super(manager);
         this.color = new Vec4d(.6, .6, .6, .95);
 
-        GUIInventoryGrid grid = new GUIInventoryGrid(12, 4);
+        GUIInventoryGrid grid = new GUIInventoryGrid(12, 4, ItemSlot.INVENTORY);
         grid.offset = new Vec2d(0, -175);
 
         GUIInventoryQAW qaw = new GUIInventoryQAW();
         qaw.offset = new Vec2d(0, 160);
 
+        GUIInventoryGrid craftingGrid = new GUIInventoryGrid(2, 2, craftingSlots);
+        craftingGrid.offset = new Vec2d(300, 160);
+
+        GUICraftingOutput craftingOutput = new GUICraftingOutput(craftingSlots);
+        craftingOutput.offset = new Vec2d(450, 160);
+
         DraggedItem draggedItem = new DraggedItem();
 
-        add(grid, qaw, draggedItem);
+        add(grid, qaw, craftingGrid, craftingOutput, draggedItem);
     }
 
     @Override
@@ -38,34 +45,38 @@ public class InventoryRoot extends GUIRoot {
     protected void render() {
         super.render();
         if (Input.mouseJustPressed(0)) {
-            if (dragSource == null) {
-                if (manager.selected instanceof GUIInventorySquare) {
+            if (manager.selected instanceof GUIInventorySquare) {
+                if (ItemSlot.GRABBED.isEmpty()) {
                     dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
                     dragSource.moveItemsTo(ItemSlot.GRABBED);
+                } else {
+                    ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
+                    newSlot.moveItemsTo(ItemSlot.GRABBED);
+                    ItemSlot.GRABBED.swapItems(newSlot);
+                }
+            } else if (manager.selected instanceof GUICraftingOutput) {
+                GUICraftingOutput gco = (GUICraftingOutput) manager.selected;
+                if (gco.outputItem != null) {
+                    for (int i = 0; i < gco.outputNum; i++) {
+                        ItemSlot.addToInventory(gco.outputItem);
+                    }
+                    for (ItemSlot is : gco.craftingSlots) {
+                        if (!is.isEmpty()) {
+                            is.removeItem();
+                        }
+                    }
                 }
             }
         }
         if (Input.mouseJustPressed(1)) {
-            if (dragSource != null) {
-                if (manager.selected instanceof GUIInventorySquare) {
+            if (manager.selected instanceof GUIInventorySquare) {
+                if (ItemSlot.GRABBED.isEmpty()) {
+                    dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
+                    dragSource.moveItemsTo(ItemSlot.GRABBED, ceil(dragSource.count() / 2.));
+                } else {
                     ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
                     ItemSlot.GRABBED.moveItemsTo(newSlot, 1);
                 }
-            } else {
-                if (manager.selected instanceof GUIInventorySquare) {
-                    dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
-                    dragSource.moveItemsTo(ItemSlot.GRABBED, ceil(dragSource.count() / 2.));
-                }
-            }
-        }
-        if ((Input.mouseJustReleased(0) && !Input.mouseDown(1)) || (Input.mouseJustReleased(1) && !Input.mouseDown(0))) {
-            if (dragSource != null) {
-                if (manager.selected instanceof GUIInventorySquare) {
-                    ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
-                    ItemSlot.GRABBED.moveItemsTo(newSlot);
-                }
-                ItemSlot.GRABBED.moveItemsTo(dragSource);
-                dragSource = null;
             }
         }
     }

@@ -1,6 +1,5 @@
 package graphics;
 
-import static engine.Activatable.using;
 import engine.Core;
 import static game.Settings.ENABLE_LOD;
 import static game.Settings.MULTITHREADED_OPENGL;
@@ -99,7 +98,7 @@ public abstract class VoxelRenderer<T> {
                 if (!vboMap.containsKey(dir)) {
                     vboMap.put(dir, new BufferObject(GL_ARRAY_BUFFER));
                 }
-                vboMap.get(dir).activate();
+                vboMap.get(dir).bind();
                 vboMap.get(dir).putData(vertices);
             } else {
                 // Workaround for threading issues
@@ -107,7 +106,7 @@ public abstract class VoxelRenderer<T> {
                     if (!vboMap.containsKey(dir)) {
                         vboMap.put(dir, new BufferObject(GL_ARRAY_BUFFER));
                     }
-                    vboMap.get(dir).activate();
+                    vboMap.get(dir).bind();
                     vboMap.get(dir).putData(vertices);
                 });
             }
@@ -116,7 +115,7 @@ public abstract class VoxelRenderer<T> {
             Core.onMainThread(() -> {
                 for (Vec3d dir : DIRS) {
                     vaoMap.put(dir, VertexArrayObject.createVAO(() -> {
-                        vboMap.get(dir).activate();
+                        vboMap.get(dir).bind();
                         int total = 0;
                         for (int i = 0; i < vertexAttribSizes().size(); i++) {
                             glVertexAttribPointer(i, vertexAttribSizes().get(i), GL_FLOAT, false, vertexSize * 4, total * 4);
@@ -226,9 +225,8 @@ public abstract class VoxelRenderer<T> {
             if (check) {
                 double minDist = clamp(Camera.camera3d.position, min().add(position), max().add(position)).sub(Camera.camera3d.position).length();
                 int lod = ENABLE_LOD ? clamp(floor(-8 + Math.log(minDist) / Math.log(2)), 0, MAX_LOD) : 0;
-                using(Arrays.asList(vaoMap.get(dir)), () -> {
-                    glDrawArrays(GL_POINTS, 0, numQuadsMap.get(dir).get(lod));
-                });
+                vaoMap.get(dir).bind();
+                glDrawArrays(GL_POINTS, 0, numQuadsMap.get(dir).get(lod));
             }
         }
     }

@@ -11,7 +11,7 @@ public class Vec3d {
         this.y = y;
         this.z = z;
     }
-
+    
     public Vec3d add(double a) {
         return new Vec3d(x + a, y + a, z + a);
     }

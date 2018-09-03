@@ -5,9 +5,11 @@ import static behaviors.MiscBehaviors.onRender;
 import static behaviors.MiscBehaviors.onUpdate;
 import engine.Core;
 import engine.Input;
-import static game.Settings.ENABLE_LOD;
-import static game.Settings.RENDER_DISTANCE;
-import game.creatures.*;
+import static game.Settings.*;
+import game.creatures.Doggo;
+import game.creatures.Goblin;
+import game.creatures.Kitteh;
+import game.creatures.Skeletor;
 import gui.GUIManager;
 import java.util.Comparator;
 import java.util.Optional;
@@ -45,16 +47,20 @@ public abstract class Main {
             GLState.inTempState(() -> {
                 GLState.disable(GL_DEPTH_TEST);
 
-                blurShader.setUniform("horizontal", true);
-                blur1.drawToSelf(f.colorBuffer2, blurShader);
+                if (BLOOM) {
+                    blurShader.setUniform("horizontal", true);
+                    blur1.drawToSelf(f.colorBuffer2, blurShader);
+                }
 
                 Framebuffer.clearWindow(new Vec4d(.6, .8, 1, 1));
                 Framebuffer.drawToWindow(f.colorBuffer, simpleShader);
 
-                GLState.setBlendFunc(GL_ONE, GL_ONE);
-                blurShader.setUniform("horizontal", false);
-                Framebuffer.drawToWindow(blur1.colorBuffer, blurShader);
-                GLState.setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                if (BLOOM) {
+                    GLState.setBlendFunc(GL_ONE, GL_ONE);
+                    blurShader.setUniform("horizontal", false);
+                    Framebuffer.drawToWindow(blur1.colorBuffer, blurShader);
+                    GLState.setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                }
             });
 
             GLState.setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

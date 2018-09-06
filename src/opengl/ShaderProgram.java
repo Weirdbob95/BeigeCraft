@@ -4,6 +4,7 @@ import java.util.HashMap;
 import org.joml.Matrix4d;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
+import util.vectors.Vec2d;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
 
@@ -111,6 +112,12 @@ public class ShaderProgram extends GLObject {
         bind();
         int uniform = getUniformLocation(name);
         glUniform1i(uniform, value);
+    }
+
+    public void setUniform(String name, Vec2d value) {
+        bind();
+        int uniform = getUniformLocation(name);
+        glUniform2fv(uniform, new float[]{(float) value.x, (float) value.y});
     }
 
     public void setUniform(String name, Vec3d value) {

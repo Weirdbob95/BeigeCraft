@@ -1,11 +1,11 @@
 package behaviors;
 
 import engine.Behavior;
-import game.creatures.Creature;
+import game.creatures.CreatureBehavior;
 
-public class CollisionBehavior extends Behavior{
+public class CollisionBehavior extends Behavior {
 
-public Creature test(){
-return null;
-}
+    public CreatureBehavior test() {
+        return null;
+    }
 }

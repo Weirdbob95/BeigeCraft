@@ -6,17 +6,17 @@ import opengl.Camera;
 
 public class Doggo extends Behavior {
 
-    public final Creature creature = require(Creature.class);
+    public final MonsterBehavior monster = require(MonsterBehavior.class);
 
     @Override
     public void createInner() {
-        creature.model.model = Model.load("bigzig.vox");
-        creature.speed = 9;
-        creature.setHitboxFromModel();
+        monster.model.model = Model.load("bigzig.vox");
+        monster.creature.speed = 9;
+        monster.setHitboxFromModel();
     }
 
     @Override
     public void update(double dt) {
-        creature.goal = Camera.camera3d.position;
+        monster.goal = Camera.camera3d.position;
     }
 }

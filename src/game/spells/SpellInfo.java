@@ -1,6 +1,6 @@
 package game.spells;
 
-import game.creatures.Creature;
+import game.creatures.CreatureBehavior;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
 import world.World;
@@ -91,7 +91,7 @@ public class SpellInfo {
      * @param creature The new target of the spell
      * @return The new SpellInfo
      */
-    public SpellInfo setTarget(Creature creature) {
+    public SpellInfo setTarget(CreatureBehavior creature) {
         return new SpellInfo(new SpellTarget(creature), direction, powerMultiplier, world);
     }
 
@@ -122,7 +122,7 @@ public class SpellInfo {
          * The creature that the spell targets (or null if the spell targets a
          * block)
          */
-        public final Creature creature;
+        public final CreatureBehavior creature;
 
         /**
          * The block that the spell targets (or null if the spell targets a
@@ -135,7 +135,7 @@ public class SpellInfo {
          *
          * @param creature The target of the spell
          */
-        public SpellTarget(Creature creature) {
+        public SpellTarget(CreatureBehavior creature) {
             this.targetsCreature = true;
             this.creature = creature;
             this.terrain = null;

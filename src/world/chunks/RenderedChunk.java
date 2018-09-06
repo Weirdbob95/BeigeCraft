@@ -2,7 +2,6 @@ package world.chunks;
 
 import graphics.ChunkRenderer;
 import opengl.Camera;
-import util.vectors.Vec3d;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
@@ -45,6 +44,6 @@ public class RenderedChunk extends AbstractChunk {
             shouldRegenerate = false;
             generateOuter();
         }
-        chunkRenderer.render(worldPos(), 0, 1, new Vec3d(0, 0, 0), null);
+        chunkRenderer.render(worldPos(), null);
     }
 }

@@ -15,6 +15,6 @@ public class ModelBehavior extends Behavior {
 
     @Override
     public void render() {
-        model.render(position.position, rotation, scale, model.size().mul(.5), color);
+        model.render(position.position, rotation, 0, scale, model.size().mul(.5), color);
     }
 }

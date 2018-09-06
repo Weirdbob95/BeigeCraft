@@ -32,7 +32,8 @@ public class CreatureBehavior extends Behavior {
 
     public void damage(double damage, Vec3d dir) {
 //        velocity.velocity = velocity.velocity.add(dir.setZ(.5).mul(5 * damage));
-        velocity.velocity = velocity.velocity.add(dir.setZ(.5).mul(20));
+        //velocity.velocity = velocity.velocity.add(dir.setZ(.5).mul(20));
+        velocity.velocity = velocity.velocity.add(dir.mul(20));
         currentHealth -= damage;
         if (currentHealth <= 0) {
             getRoot().destroy();

@@ -211,12 +211,16 @@ public abstract class VoxelRenderer<T> {
 
     protected abstract Vec3d min();
 
-    public void render(Vec3d position, double rotation, double scale, Vec3d origin, Vec4d color) {
+    public void render(Vec3d position, Vec4d color) {
+        render(position, 0, 0, 1, new Vec3d(0, 0, 0), color);
+    }
+
+    public void render(Vec3d position, double rotation1, double rotation2, double scale, Vec3d origin, Vec4d color) {
         if (vaoMap.isEmpty()) {
             return;
         }
         setShaderUniforms(color);
-        Matrix4d worldMat = Camera.camera3d.getWorldMatrix(position, rotation, scale).translate(origin.toJOML().mul(-1));
+        Matrix4d worldMat = Camera.camera3d.getWorldMatrix(position, rotation1, rotation2, scale).translate(origin.toJOML().mul(-1));
         shader().setUniform("modelViewMatrix", worldMat);
         for (Vec3d dir : DIRS) {
             Vector4d newDir = new Vector4d(dir.x, dir.y, dir.z, 0).mul(worldMat);

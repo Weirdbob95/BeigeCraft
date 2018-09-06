@@ -74,11 +74,9 @@ public abstract class SpellShapeMissile extends SpellShapeInitial {
             for (CreatureBehavior c : CreatureBehavior.ALL) {
                 if (c != info.target.creature) {
                     if (c.physics.containsPoint(position.position)) {
-                        if (c != info.target.creature) {
-                            spellShape.hit(info.setTarget(c));
-                            getRoot().destroy();
-                            break;
-                        }
+                        spellShape.hit(info.setTarget(c));
+                        getRoot().destroy();
+                        break;
                     }
                 }
             }

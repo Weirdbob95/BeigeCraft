@@ -6,17 +6,17 @@ import opengl.Camera;
 
 public class Kitteh extends Behavior {
 
-    public final Creature creature = require(Creature.class);
+    public final MonsterBehavior monster = require(MonsterBehavior.class);
 
     @Override
     public void createInner() {
-        creature.model.model = Model.load("shadow.vox");
-        creature.jumpChance = 0;
-        creature.setHitboxFromModel();
+        monster.model.model = Model.load("shadow.vox");
+        monster.jumpChance = 0;
+        monster.setHitboxFromModel();
     }
 
     @Override
     public void update(double dt) {
-        creature.goal = Camera.camera3d.position;
+        monster.goal = Camera.camera3d.position;
     }
 }

@@ -1,14 +1,13 @@
 package game;
 
-import behaviors.AccelerationBehavior;
-import behaviors.PlayerPhysicsBehavior;
+import behaviors.PhysicsBehavior;
 import behaviors.PositionBehavior;
-import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
+import definitions.ItemType;
 import engine.Behavior;
 import engine.Input;
+import game.creatures.CreatureBehavior;
 import game.inventory.ItemSlot;
-import definitions.ItemType;
 import graphics.Animation;
 import graphics.Sprite;
 import static graphics.VoxelRenderer.DIRS;
@@ -22,6 +21,7 @@ import static opengl.Camera.camera3d;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_F;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
@@ -39,30 +39,63 @@ import static world.World.CHUNK_SIZE;
 
 public class Player extends Behavior {
 
-    public static final double PLAYER_SCALE = 2;
-
     public final PositionBehavior position = require(PositionBehavior.class);
     public final VelocityBehavior velocity = require(VelocityBehavior.class);
-    public final AccelerationBehavior acceleration = require(AccelerationBehavior.class);
-    public final PlayerPhysicsBehavior physics = require(PlayerPhysicsBehavior.class);
-    public final SpaceOccupierBehavior spaceOccupier = require(SpaceOccupierBehavior.class);
+    public final CreatureBehavior creature = require(CreatureBehavior.class);
+    public final PhysicsBehavior physics = require(PhysicsBehavior.class);
 
     public GUIManager gui;
     public boolean flying;
     public boolean breakingBlocks;
     public Map<Vec3d, Double> blocksToBreak = new HashMap();
 
+    public double sprintAmt;
+
+    public Vec3d computeIdealVel() {
+        Vec3d idealVel = new Vec3d(0, 0, 0);
+
+        if (!gui.freezeMovement()) {
+            Vec3d forwards = camera3d.facing();
+            if (!flying) {
+                forwards = forwards.setZ(0).normalize();
+            }
+            Vec3d sideways = camera3d.up.cross(forwards);
+
+            if (Input.keyDown(GLFW_KEY_W)) {
+                idealVel = idealVel.add(forwards);
+            }
+            if (Input.keyDown(GLFW_KEY_A)) {
+                idealVel = idealVel.add(sideways);
+            }
+            if (Input.keyDown(GLFW_KEY_S)) {
+                idealVel = idealVel.sub(forwards);
+            }
+            if (Input.keyDown(GLFW_KEY_D)) {
+                idealVel = idealVel.sub(sideways);
+            }
+            if (idealVel.lengthSquared() > 0) {
+                idealVel = idealVel.normalize().mul(creature.speed);
+            }
+        }
+
+        if (!flying) {
+            idealVel = idealVel.setZ(velocity.velocity.z);
+        }
+
+        return idealVel;
+    }
+
     @Override
     public void createInner() {
-        acceleration.acceleration = new Vec3d(0, 0, -32).mul(PLAYER_SCALE);
-        physics.hitboxSize1Stand = new Vec3d(.3, .3, .9).mul(PLAYER_SCALE);
-        physics.hitboxSize2Stand = new Vec3d(.3, .3, .9).mul(PLAYER_SCALE);
-        physics.hitboxSize1Crouch = new Vec3d(.3, .3, .9).mul(PLAYER_SCALE);
-        physics.hitboxSize2Crouch = new Vec3d(.3, .3, .5).mul(PLAYER_SCALE);
+        physics.canCrouch = true;
+        physics.hitboxSize1 = new Vec3d(.6, .6, 1.8);
+        physics.hitboxSize2 = new Vec3d(.6, .6, 1.8);
+        physics.hitboxSize1Crouch = new Vec3d(.6, .6, 1.8);
+        physics.hitboxSize2Crouch = new Vec3d(.6, .6, 1.0);
     }
 
     public RaycastHit firstSolid() {
-        List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 4 * PLAYER_SCALE);
+        List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 8);
         for (int i = 0; i < raycast.size(); i++) {
             if (physics.world.getBlock(raycast.get(i).hitPos) != null) {
                 return raycast.get(i);
@@ -72,7 +105,7 @@ public class Player extends Behavior {
     }
 
     public RaycastHit lastEmpty() {
-        List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 4 * PLAYER_SCALE);
+        List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 8);
         for (int i = 0; i < raycast.size() - 1; i++) {
             if (physics.world.getBlock(raycast.get(i).hitPos) != null) {
                 return null;
@@ -110,20 +143,17 @@ public class Player extends Behavior {
     @Override
     public void update(double dt) {
 
-//        if (dt > 1 / 20.) {
-//            System.out.println(dt);
-//        }
+        sprintAmt -= dt;
+
         breakingBlocks = false;
 
         gui.hud.setBiome(physics.world.heightmappedChunks
                 .get(physics.world.getChunkPos(position.position)).biomemap[(int) mod(position.position.x, CHUNK_SIZE)][(int) mod(position.position.y, CHUNK_SIZE)].plurality());
         gui.hud.setPos(position.position);
 
-        Vec3d desCamPos = position.position.add(new Vec3d(0, 0, physics.crouch ? .4 : .7).mul(PLAYER_SCALE));
-        //camera.position = desCamPos;
+        Vec3d desCamPos = position.position.add(new Vec3d(0, 0, physics.crouch ? .8 : 1.4));
+        //camera3d.position = desCamPos;
         camera3d.position = camera3d.position.lerp(desCamPos, 1 - Math.pow(1e-6, dt));
-
-        Vec3d idealVel = new Vec3d(0, 0, 0);
 
         if (!gui.freezeMouse()) {
             // Look around
@@ -139,47 +169,35 @@ public class Player extends Behavior {
         }
 
         if (!gui.freezeMovement()) {
-            // Move
+
             if (Input.keyJustPressed(GLFW_KEY_LEFT_CONTROL)) {
                 flying = !flying;
             }
-            double speed = (flying ? 100 : physics.crouch ? 2 : 4) * PLAYER_SCALE;
 
-            Vec3d forwards = camera3d.facing();
-            if (!flying) {
-                forwards = forwards.setZ(0).normalize();
-            }
-            Vec3d sideways = camera3d.up.cross(forwards);
-
-            if (Input.keyDown(GLFW_KEY_W)) {
-                idealVel = idealVel.add(forwards);
-            }
-            if (Input.keyDown(GLFW_KEY_A)) {
-                idealVel = idealVel.add(sideways);
-            }
-            if (Input.keyDown(GLFW_KEY_S)) {
-                idealVel = idealVel.sub(forwards);
-            }
-            if (Input.keyDown(GLFW_KEY_D)) {
-                idealVel = idealVel.sub(sideways);
-            }
-            if (idealVel.lengthSquared() > 0) {
-                idealVel = idealVel.normalize().mul(speed);
-            }
-
-            if (!flying) {
-                idealVel = idealVel.setZ(velocity.velocity.z);
-            }
-
-            // Jump
-            if (Input.keyDown(GLFW_KEY_SPACE)) {
-                if (physics.onGround || flying) {
-                    velocity.velocity = velocity.velocity.setZ((flying ? 100 : 12) * PLAYER_SCALE);
-                }
-            }
+            creature.speed = flying ? 200 : physics.crouch ? 4 : sprintAmt > 0 ? 40 : 8;
+            creature.jumpSpeed = flying ? 200 : 24;
 
             // Crouch
             physics.shouldCrouch = Input.keyDown(GLFW_KEY_LEFT_SHIFT);
+
+            if (Input.keyJustPressed(GLFW_KEY_F)) {
+                sprintAmt = .2;
+            }
+            if (Input.mouseJustPressed(1)) {
+                sprintAmt = .2;
+            }
+        }
+
+        velocity.velocity = computeIdealVel();
+        //velocity.velocity = velocity.velocity.lerp(idealVel, 1 - Math.pow(1e-4, dt));
+
+        if (!gui.freezeMovement()) {
+            // Jump
+            if (Input.keyDown(GLFW_KEY_SPACE)) {
+                if (physics.onGround || flying) {
+                    velocity.velocity = velocity.velocity.setZ(creature.jumpSpeed);
+                }
+            }
         }
 
         if (!gui.freezeMouse()) {
@@ -216,8 +234,5 @@ public class Player extends Behavior {
                 c.create();
             }
         }
-
-        velocity.velocity = velocity.velocity.lerp(idealVel, 1 - Math.pow(1e-4, dt));
     }
-
 }

@@ -100,23 +100,23 @@ public abstract class Main {
         onUpdate(0, dt -> {
             if (Input.keyJustPressed(GLFW_KEY_G)) {
                 Skeletor doot = new Skeletor();
-                doot.creature.position.position = p.position.position;
-                doot.creature.model.rotation = Camera.camera3d.horAngle;
-                doot.creature.physics.world = world;
+                doot.monster.position.position = p.position.position;
+                doot.monster.model.rotation = Camera.camera3d.horAngle;
+                doot.monster.physics.world = world;
                 doot.create();
             }
             if (Input.keyJustPressed(GLFW_KEY_H)) {
                 Kitteh shadow = new Kitteh();
-                shadow.creature.position.position = p.position.position;
-                shadow.creature.model.rotation = Camera.camera3d.horAngle;
-                shadow.creature.physics.world = world;
+                shadow.monster.position.position = p.position.position;
+                shadow.monster.model.rotation = Camera.camera3d.horAngle;
+                shadow.monster.physics.world = world;
                 shadow.create();
             }
             if (Input.keyJustPressed(GLFW_KEY_J) || Input.keyDown(GLFW_KEY_K)) {
                 Doggo ziggy = new Doggo();
-                ziggy.creature.position.position = p.position.position;
-                ziggy.creature.model.rotation = Camera.camera3d.horAngle;
-                ziggy.creature.physics.world = world;
+                ziggy.monster.position.position = p.position.position;
+                ziggy.monster.model.rotation = Camera.camera3d.horAngle;
+                ziggy.monster.physics.world = world;
                 ziggy.create();
             }
             if (Input.keyJustPressed(GLFW_KEY_L)) {

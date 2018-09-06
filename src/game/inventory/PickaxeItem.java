@@ -1,13 +1,12 @@
 package game.inventory;
 
+import definitions.BlockType;
+import static definitions.ItemType.getItemByBlock;
 import game.Player;
 import java.util.ArrayList;
 import java.util.List;
-import static util.MathUtils.ceil;
 import util.vectors.Vec3d;
-import definitions.BlockType;
 import world.Raycast;
-import static definitions.ItemType.getItemByBlock;
 
 public class PickaxeItem extends UsableItem {
 
@@ -17,10 +16,8 @@ public class PickaxeItem extends UsableItem {
         player.breakingBlocks = true;
         Raycast.RaycastHit block = player.firstSolid();
         if (block != null) {
-            int handSize = ceil(player.PLAYER_SCALE);
-            Vec3d origin = block.hitPos
-                    //.add(block.hitDir.mul(handSize / 2.))
-                    .sub(new Vec3d(1, 1, 1).mul(.5 * (handSize - 1)));
+            int handSize = 2;
+            Vec3d origin = block.hitPos.sub(new Vec3d(1, 1, 1).mul(.5 * (handSize - 1)));
             List<Vec3d> targets = new ArrayList();
             for (int x = 0; x < handSize; x++) {
                 for (int y = 0; y < handSize; y++) {

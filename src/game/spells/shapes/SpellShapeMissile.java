@@ -4,7 +4,7 @@ import behaviors.LifetimeBehavior;
 import behaviors.PositionBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
-import game.creatures.Creature;
+import game.creatures.CreatureBehavior;
 import game.spells.SpellInfo;
 import game.spells.SpellPart.SpellShapeInitial;
 import util.MathUtils;
@@ -71,12 +71,14 @@ public abstract class SpellShapeMissile extends SpellShapeInitial {
             if (info.world.getBlock(position.position) != null) {
                 getRoot().destroy();
             }
-            for (Creature c : Creature.ALL) {
-                if (c.physics.containsPoint(position.position)) {
-                    if (c != info.target.creature) {
-                        spellShape.hit(info.setTarget(c));
-                        getRoot().destroy();
-                        break;
+            for (CreatureBehavior c : CreatureBehavior.ALL) {
+                if (c != info.target.creature) {
+                    if (c.physics.containsPoint(position.position)) {
+                        if (c != info.target.creature) {
+                            spellShape.hit(info.setTarget(c));
+                            getRoot().destroy();
+                            break;
+                        }
                     }
                 }
             }

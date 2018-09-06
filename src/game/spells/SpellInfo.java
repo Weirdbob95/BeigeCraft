@@ -10,7 +10,7 @@ import world.World;
  * effects of a spell.
  *
  * The SpellInfo class stores the spell's target, the spell's direction, the
- * spell's power, and the world the spell lives in. The SpellInfo class is
+ * spell's power, and the world the spell lives in. The SpellInfo class is+
  * passed between all the parts of a spell, so that each part of the spell can
  * access necessary information about the instance of the spell. The SpellInfo
  * class is immutable.

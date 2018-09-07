@@ -1,7 +1,9 @@
 package game;
 
+import behaviors.PhysicsBehavior;
 import behaviors.PositionBehavior;
 import behaviors.PreviousPositionBehavior;
+import definitions.BlockType;
 import engine.Behavior;
 import engine.Input;
 import static game.GraphicsEffect.createGraphicsEffect;
@@ -54,13 +56,16 @@ public class SwordController extends Behavior {
         Vec3d facing = Camera.camera3d.facing();
         prevRealSwordPos = realSwordPos;
         realSwordPos = Camera3d.camera3d.position.add(swordPos.mul(swordExtension));
-        //swordPos = swordPos.add(velocity.velocity.mul(dt * -.5)).normalize();
+        // swordPos = swordPos.add(velocity.velocity.mul(dt * -.5)).normalize();
         swordPos = swordPos.add(position.position.sub(prevPos.prevPos).mul(-.25)).normalize();
 
         if (Input.mouseJustReleased(0)) {
-            slashTimer = .2;
-            slashGoal = facing.add(facing.sub(swordPos).mul(3)).normalize();
-            hit.clear();
+            if (slashTimer < -.05) {
+                slashTimer = .2;
+                slashGoal = facing.add(facing.sub(swordPos).mul(3)).normalize();
+                // swordPos = swordPos.add(swordPos.sub(slashGoal)).normalize();
+                hit.clear();
+            }
         }
 
         if (slashTimer <= 0) {
@@ -69,18 +74,21 @@ public class SwordController extends Behavior {
             } else {
                 moveToGoal(facing, .05, dt);
             }
-            swordExtension = Math.pow(1e-7, dt) * swordExtension + (1 - Math.pow(1e-7, dt)) * 2.5;
+            swordExtension = Math.pow(1e-8, dt) * swordExtension + (1 - Math.pow(1e-8, dt)) * 2.5;
         } else {
             moveToGoal(slashGoal, slashTimer, dt);
-            swordExtension = Math.pow(1e-7, dt) * swordExtension + (1 - Math.pow(1e-7, dt)) * 5;
-            for (CreatureBehavior c : new LinkedList<>(CreatureBehavior.ALL)) {
-                if (c != creature) {
-                    for (double i = 0; i < 1; i += .1) {
-                        Vec3d pos = realSwordPos.lerp(position.position, i);
+            swordExtension = Math.pow(1e-8, dt) * swordExtension + (1 - Math.pow(1e-8, dt)) * 5;
+            for (double i = 0; i < 1; i += .1) {
+                Vec3d pos = realSwordPos.lerp(position.position, i);
+                if (get(PhysicsBehavior.class).world.getBlock(pos) == BlockType.getBlock("leaves")) {
+                    get(PhysicsBehavior.class).world.setBlock(pos, null);
+                }
+                for (CreatureBehavior c : new LinkedList<>(CreatureBehavior.ALL)) {
+                    if (c != creature) {
                         if (c.physics.containsPoint(pos)) {
                             if (!hit.contains(c)) {
                                 hit.add(c);
-                                c.damage(2, realSwordPos.sub(prevRealSwordPos).normalize().mul(2));
+                                c.damage(2, realSwordPos.sub(prevRealSwordPos).mul(.02 / dt));
                                 createGraphicsEffect(.2, t -> {
                                     Model m = Model.load("fireball.vox");
                                     m.render(pos, 0, 0, 1 / 16., m.size().div(2), new Vec4d(1, 1, 1, 1 - 5 * t));
@@ -94,9 +102,9 @@ public class SwordController extends Behavior {
             Vec3d currentPos = realSwordPos;
             double direction1 = Camera.camera3d.horAngle * 0 + MathUtils.direction1(swordPos) * 1;
             double direction2 = -Math.PI / 2 + MathUtils.direction2(realSwordPos.sub(Camera.camera3d.position.sub(new Vec3d(0, 0, 1))));
-            double duration = .2;
+            double duration = .1;
             createGraphicsEffect(duration, t -> {
-                model.render(currentPos, direction1, direction2, 1 / 16., new Vec3d(16, 16, 32), new Vec4d(2, 2, 2, .3 * (1 - t / duration)));
+                model.render(currentPos, direction1, direction2, 1 / 16., new Vec3d(16, 16, 32), new Vec4d(2, 2, 2, .05 * (1 - t / duration)));
             });
         }
     }

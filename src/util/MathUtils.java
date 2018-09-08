@@ -47,6 +47,13 @@ public abstract class MathUtils {
         return (x % m + m) % m;
     }
 
+    public static Vec3d moveTowards(Vec3d pos, Vec3d goal, double linearSpeed, double expSpeed, double dt) {
+        Vec3d delta = goal.sub(pos);
+        double deltaLength = delta.length();
+        double moveLength = linearSpeed * dt + deltaLength * (1 - Math.pow(expSpeed, dt));
+        return pos.add(delta.mul(Math.min(moveLength / deltaLength, 1)));
+    }
+
     public static Vec3d randomInSphere() {
         while (true) {
             Vec3d v = new Vec3d(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);

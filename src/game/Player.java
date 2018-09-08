@@ -155,6 +155,7 @@ public class Player extends Behavior {
         Vec3d desCamPos = position.position.add(new Vec3d(0, 0, physics.crouch ? .8 : 1.4));
         //camera3d.position = desCamPos;
         camera3d.position = camera3d.position.lerp(desCamPos, 1 - Math.pow(1e-8, dt));
+        // camera3d.position = moveTowards(camera3d.position, desCamPos, 5, 1e-6, dt);
 
         if (!gui.freezeMouse()) {
             // Look around

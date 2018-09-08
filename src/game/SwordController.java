@@ -15,6 +15,7 @@ import java.util.Set;
 import opengl.Camera;
 import opengl.Camera.Camera3d;
 import util.MathUtils;
+import util.Quaternion;
 import util.vectors.Vec3d;
 import util.vectors.Vec4d;
 
@@ -25,44 +26,47 @@ public class SwordController extends Behavior {
     //public final VelocityBehavior velocity = require(VelocityBehavior.class);
     public final CreatureBehavior creature = require(CreatureBehavior.class);
 
-    public Vec3d swordPos = new Vec3d(1, 0, 0);
+    public Quaternion swordPos = Quaternion.IDENTITY;
+    public Quaternion slashGoal = Quaternion.IDENTITY;
     public double swordExtension = 2;
     public double slashTimer;
-    public Vec3d slashGoal;
+    public Vec3d swordVel = new Vec3d(0, 0, 0);
 
-    public Vec3d realSwordPos;
-    public Vec3d prevRealSwordPos;
     public Set<CreatureBehavior> hit = new HashSet();
 
     public Model model = Model.load("sword.vox");
 
-    private void moveToGoal(Vec3d goal, double secs, double dt) {
+    private Vec3d getRealSwordPos() {
+        return Camera3d.camera3d.position.add(swordPos.applyToForwards().mul(swordExtension));
+    }
+
+    private void moveToGoal(Quaternion goal, double secs, double dt) {
         if (dt > secs) {
             dt = secs;
         }
-        swordPos = swordPos.add(goal.sub(swordPos).mul(dt / secs)).normalize();
+        swordPos = swordPos.lerp(goal, dt / secs);
     }
 
     @Override
     public void render() {
-        double direction1 = MathUtils.direction1(swordPos) * 1;
-        double direction2 = -Math.PI / 2 + MathUtils.direction2(realSwordPos.sub(Camera.camera3d.position.sub(new Vec3d(0, 0, 1))));
-        model.render(realSwordPos, direction1, direction2, 1 / 16., new Vec3d(16, 16, 32), new Vec4d(1, 1, 1, 1));
+        double direction1 = swordPos.direction1();
+        double direction2 = -Math.PI / 2 + MathUtils.direction2(getRealSwordPos().sub(Camera.camera3d.position.sub(new Vec3d(0, 0, 1))));
+        model.render(getRealSwordPos(), direction1, direction2, 1 / 16., new Vec3d(16, 16, 32), new Vec4d(1, 1, 1, 1));
     }
 
     @Override
     public void update(double dt) {
         slashTimer -= dt;
-        Vec3d facing = Camera.camera3d.facing();
-        prevRealSwordPos = realSwordPos;
-        realSwordPos = Camera3d.camera3d.position.add(swordPos.mul(swordExtension));
-        // swordPos = swordPos.add(velocity.velocity.mul(dt * -.5)).normalize();
-        swordPos = swordPos.add(position.position.sub(prevPos.prevPos).mul(-.25)).normalize();
+        Quaternion facing = Quaternion.fromEulerAngles(Camera.camera3d.horAngle, Camera.camera3d.vertAngle, 0);
+        Vec3d realSwordPos = getRealSwordPos();
+        Vec3d posChange = swordPos.applyToForwards().add(position.position.sub(prevPos.prevPos).mul(0 * -.25));
+        swordPos = Quaternion.fromEulerAngles(MathUtils.direction1(posChange), MathUtils.direction2(posChange), 0);
+        //swordPos = swordPos.add(position.position.sub(prevPos.prevPos).mul(-.25)).normalize();
 
         if (Input.mouseJustReleased(0)) {
             if (slashTimer < -.05) {
                 slashTimer = .2;
-                slashGoal = facing.add(facing.sub(swordPos).mul(3)).normalize();
+                slashGoal = facing.mul(facing.div(swordPos).pow(1));
                 // swordPos = swordPos.add(swordPos.sub(slashGoal)).normalize();
                 hit.clear();
             }
@@ -79,7 +83,7 @@ public class SwordController extends Behavior {
             moveToGoal(slashGoal, slashTimer, dt);
             swordExtension = Math.pow(1e-8, dt) * swordExtension + (1 - Math.pow(1e-8, dt)) * 5;
             for (double i = 0; i < 1; i += .1) {
-                Vec3d pos = realSwordPos.lerp(position.position, i);
+                Vec3d pos = getRealSwordPos().lerp(position.position, i);
                 if (get(PhysicsBehavior.class).world.getBlock(pos) == BlockType.getBlock("leaves")) {
                     get(PhysicsBehavior.class).world.setBlock(pos, null);
                 }
@@ -88,7 +92,8 @@ public class SwordController extends Behavior {
                         if (c.physics.containsPoint(pos)) {
                             if (!hit.contains(c)) {
                                 hit.add(c);
-                                c.damage(2, realSwordPos.sub(prevRealSwordPos).mul(.02 / dt));
+                                c.damage(2, swordVel.mul(.02));
+                                //c.damage(2, getRealSwordPos().sub(prevRealSwordPos).mul(.02 / dt));
                                 createGraphicsEffect(.2, t -> {
                                     Model m = Model.load("fireball.vox");
                                     m.render(pos, 0, 0, 1 / 16., m.size().div(2), new Vec4d(1, 1, 1, 1 - 5 * t));
@@ -99,14 +104,15 @@ public class SwordController extends Behavior {
                 }
             }
 
-            Vec3d currentPos = realSwordPos;
-            double direction1 = Camera.camera3d.horAngle * 0 + MathUtils.direction1(swordPos) * 1;
-            double direction2 = -Math.PI / 2 + MathUtils.direction2(realSwordPos.sub(Camera.camera3d.position.sub(new Vec3d(0, 0, 1))));
-            double duration = .1;
+            Vec3d currentPos = getRealSwordPos();
+            double direction1 = swordPos.direction1();
+            double direction2 = -Math.PI / 2 + MathUtils.direction2(getRealSwordPos().sub(Camera.camera3d.position.sub(new Vec3d(0, 0, 1))));
+            double duration = 5.1;
             createGraphicsEffect(duration, t -> {
-                model.render(currentPos, direction1, direction2, 1 / 16., new Vec3d(16, 16, 32), new Vec4d(2, 2, 2, .05 * (1 - t / duration)));
+                model.render(currentPos, direction1, direction2, 1 / 16., new Vec3d(16, 16, 32), new Vec4d(2, 2, 2, .5 * (1 - t / duration)));
             });
         }
+        swordVel = getRealSwordPos().sub(realSwordPos).div(dt);
     }
 
     @Override

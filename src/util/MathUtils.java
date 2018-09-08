@@ -32,7 +32,7 @@ public abstract class MathUtils {
     }
 
     public static double direction2(Vec3d v) {
-        return Math.atan2(v.z, Math.sqrt(v.x * v.x + v.y * v.y));
+        return -Math.atan2(v.z, Math.sqrt(v.x * v.x + v.y * v.y));
     }
 
     public static int floor(double x) {

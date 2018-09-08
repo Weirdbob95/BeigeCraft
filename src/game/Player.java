@@ -76,6 +76,11 @@ public class Player extends Behavior {
             }
             if (idealVel.lengthSquared() > 0) {
                 idealVel = idealVel.normalize().mul(creature.speed);
+            } else {
+                if (sprintAmt > 0) {
+                    idealVel = idealVel.add(forwards);
+                    idealVel = idealVel.normalize().mul(creature.speed);
+                }
             }
         }
 

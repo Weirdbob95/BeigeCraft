@@ -1,5 +1,6 @@
 package util;
 
+import static util.MathUtils.mod;
 import util.vectors.Vec3d;
 
 public class Quaternion {
@@ -16,6 +17,9 @@ public class Quaternion {
     }
 
     public double angle() {
+        if (a < 0) {
+            return negate().angle();
+        }
         return 2 * Math.atan2(Math.sqrt(b * b + c * c + d * d), a);
     }
 
@@ -30,22 +34,31 @@ public class Quaternion {
     }
 
     public Vec3d axis() {
+        if (a < 0) {
+            return negate().axis();
+        }
         if (new Vec3d(b, c, d).lengthSquared() < 1e-12) {
             return new Vec3d(1, 0, 0);
         }
         return new Vec3d(b, c, d).normalize();
     }
 
-    public double direction1() {
-        return MathUtils.direction1(applyToForwards());
-    }
-
-    public double direction2() {
-        return MathUtils.direction2(applyToForwards());
-    }
-
+//    public double direction1() {
+//        return MathUtils.direction1(applyToForwards());
+//    }
+//
+//    public double direction2() {
+//        return MathUtils.direction2(applyToForwards());
+//    }
     public Quaternion div(Quaternion other) {
         return other.inverse().mul(this);
+    }
+
+    public static Quaternion fromAngleAxis(Vec3d axis) {
+        if (axis.length() < 1e-12) {
+            return IDENTITY;
+        }
+        return fromAngleAxis(axis.length(), axis);
     }
 
     public static Quaternion fromAngleAxis(double angle, Vec3d axis) {
@@ -55,6 +68,9 @@ public class Quaternion {
     }
 
     public static Quaternion fromEulerAngles(double yaw, double pitch, double roll) {
+        yaw = mod(yaw, Math.PI * 2);
+        pitch = mod(pitch, Math.PI * 2);
+        roll = mod(roll, Math.PI * 2);
         double sinYaw = Math.sin(yaw / 2), cosYaw = Math.cos(yaw / 2);
         double sinPitch = Math.sin(pitch / 2), cosPitch = Math.cos(pitch / 2);
         double sinRoll = Math.sin(roll / 2), cosRoll = Math.cos(roll / 2);
@@ -65,11 +81,26 @@ public class Quaternion {
                 sinYaw * cosPitch * cosRoll - cosYaw * sinPitch * sinRoll);
     }
 
+    public double getPitch() {
+        return Math.asin(2 * (a * c - b * d));
+    }
+
+    public double getRoll() {
+        return Math.atan2(2 * (a * b + c * d), 1 - 2 * (b * b + c * c));
+    }
+
+    public double getYaw() {
+        return Math.atan2(2 * (a * d + b * c), 1 - 2 * (c * c + d * d));
+    }
+
     public Quaternion inverse() {
         return new Quaternion(a, -b, -c, -d);
     }
 
     public Quaternion lerp(Quaternion other, double amt) {
+        if (a * other.a + b * other.b + c * other.c + d * other.d < 0) {
+            other = other.negate();
+        }
         return new Quaternion(a * (1 - amt) + other.a * amt,
                 b * (1 - amt) + other.b * amt,
                 c * (1 - amt) + other.c * amt,
@@ -84,6 +115,10 @@ public class Quaternion {
                 a * other.d + b * other.c - c * other.b + d * other.a);
     }
 
+    private Quaternion negate() {
+        return new Quaternion(-a, -b, -c, -d);
+    }
+
     public Quaternion normalize() {
         double length = Math.sqrt(a * a + b * b + c * c + d * d);
         return new Quaternion(a / length, b / length, c / length, d / length);
@@ -93,8 +128,21 @@ public class Quaternion {
         return fromAngleAxis(t * angle(), axis());
     }
 
+    public Vec3d toAngleAxis() {
+        return axis().mul(angle());
+    }
+
     @Override
     public String toString() {
         return "Quaternion{" + "a=" + a + ", b=" + b + ", c=" + c + ", d=" + d + '}';
+    }
+
+    public static void main(String[] args) {
+        Quaternion q = fromAngleAxis(-14.2, new Vec3d(1, -5, 2));
+        System.out.println(q.getYaw() + " " + q.getPitch() + " " + q.getRoll());
+        q = fromEulerAngles(q.getYaw(), q.getPitch(), q.getRoll());
+        System.out.println(q.getYaw() + " " + q.getPitch() + " " + q.getRoll());
+        q = fromEulerAngles(MathUtils.direction1(q.applyToForwards()), MathUtils.direction2(q.applyToForwards()), 0);
+        System.out.println(q.getYaw() + " " + q.getPitch() + " " + q.getRoll());
     }
 }

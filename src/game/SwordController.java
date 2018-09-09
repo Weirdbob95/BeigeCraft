@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import opengl.Camera;
-import opengl.Camera.Camera3d;
 import util.MathUtils;
 import util.Quaternion;
 import util.vectors.Vec3d;
@@ -25,15 +24,13 @@ public class SwordController extends Behavior {
 
     public final PositionBehavior position = require(PositionBehavior.class);
     public final PreviousPositionBehavior prevPos = require(PreviousPositionBehavior.class);
-    //public final VelocityBehavior velocity = require(VelocityBehavior.class);
     public final CreatureBehavior creature = require(CreatureBehavior.class);
 
-    public Quaternion swordPos = Quaternion.IDENTITY;
+    public Vec3d swordPos = new Vec3d(0, 0, 0);
     public Vec3d swordVel = new Vec3d(0, 0, 0);
-    public double swordExtension = 2;
-    public double slashTimer;
-    public Vec3d slashGoalVel = new Vec3d(0, 0, 0);
     public Vec3d realSwordVel = new Vec3d(0, 0, 0);
+    public double slashTimer;
+    public SplineAnimation currentAnim;
 
     public Set<CreatureBehavior> hit = new HashSet();
 
@@ -87,77 +84,52 @@ public class SwordController extends Behavior {
 //        slashiness = .1;
     }
 
-    private Vec3d getRealSwordPos() {
-        return Camera3d.camera3d.position.add(swordPos.applyToForwards().mul(swordExtension));
-    }
-
-    private void moveToGoal(Quaternion goal, double secs, double dt) {
-        if (dt > secs) {
-            dt = secs;
-        }
-        swordPos = swordPos.lerp(goal, dt / secs);
-    }
-
     @Override
     public void render() {
-        double direction1 = swordPos.getYaw();
-        double direction2 = Math.PI / 2 + MathUtils.direction2(getRealSwordPos().sub(Camera.camera3d.position.sub(new Vec3d(0, 0, 1))));
-        model.render(getRealSwordPos(), direction1, direction2, 1 / 16., modelTip, new Vec4d(1, 1, 1, 1));
+        double direction1 = MathUtils.direction1(swordPos);
+        double direction2 = Math.PI / 2 + MathUtils.direction2(swordPos.add(new Vec3d(0, 0, 1)));
+        model.render(Camera.camera3d.position.add(swordPos), direction1, direction2, 1 / 16., modelTip, new Vec4d(1, 1, 1, 1));
     }
 
     @Override
     public void update(double dt) {
         slashTimer -= dt;
-        Quaternion facing = Quaternion.fromEulerAngles(Camera.camera3d.horAngle, Camera.camera3d.vertAngle, 0);
-        Vec3d realSwordPos = getRealSwordPos();
+        Vec3d facing = Camera.camera3d.facing();
+        Vec3d prevSwordPos = swordPos;
 
         if (Input.mouseJustReleased(0)) {
-            if (slashTimer < -.05) {
-                slashTimer = slashDuration;
-                double angleBetween = Math.acos(facing.applyToForwards().dot(swordPos.applyToForwards()));
-                swordVel = facing.applyToForwards().cross(swordPos.applyToForwards()).normalize().mul(angleBetween * 2 / slashDuration);
-                Vec3d swordVel2 = facing.applyToForwards().cross(swordPos.applyToForwards()).normalize().mul(-angleBetween);
-                slashGoalVel = swordVel.mul(-5);
-//                swordVel = facing.div(swordPos).toAngleAxis().mul(-2 / slashDuration);
-//                slashGoalVel = facing.div(swordPos).toAngleAxis().mul(10 / slashDuration);
-                hit.clear();
+            if (slashTimer < -.1) {
+                Vec3d normSwordPos = swordPos.normalize();
+                double slashAngle = Math.acos(normSwordPos.dot(facing));
+                slashAngle = Math.pow(slashAngle / Math.PI, Math.pow(slashiness, -.5)) * 2.5;
+                Vec3d slashRotation = normSwordPos.cross(facing).normalize().mul(slashAngle);
+                Vec3d startPos = Quaternion.fromAngleAxis(slashRotation).inverse().applyTo(facing);
+                Vec3d endPos = Quaternion.fromAngleAxis(slashRotation).applyTo(facing);
+                Vec3d slashGoalVel = slashRotation.mul(2 * ext2 / (slashDuration * .5));
 
-                SplineAnimation sa = new SplineAnimation();
-                sa.addKeyframe(0, swordPos.applyToForwards().mul(swordExtension), swordVel);
-                sa.addKeyframe(slashDuration * .5, swordPos.applyToForwards().mul(ext2), slashGoalVel.cross(swordPos.applyToForwards()).mul(2));
-                sa.addKeyframe(slashDuration * .75, facing.applyToForwards().mul(ext2), slashGoalVel.cross(facing.applyToForwards()).mul(2));
-                Vec3d endPos = Quaternion.fromAngleAxis(swordVel2).mul(facing).applyToForwards();
-                sa.addKeyframe(slashDuration, endPos.mul(ext2), slashGoalVel.cross(endPos).mul(2));
-                sa.addKeyframe(slashDuration * 1.5, swordPos.applyToForwards().mul(swordExtension), new Vec3d(0, 0, 0));
-                for (double time = 0; time < slashDuration; time += slashDuration / 100) {
-                    System.out.println(time + " " + sa.getPosition(time));
-                    Vec3d currentPos = Camera3d.camera3d.position.add(sa.getPosition(time));
-                    double direction1 = MathUtils.direction1(sa.getPosition(time));
-                    double direction2 = Math.PI / 2 + MathUtils.direction2(sa.getPosition(time));
-                    double duration = 5.1;
-                    createGraphicsEffect(duration, t -> {
-                        model.render(currentPos, direction1, direction2, 1 / 16., modelTip, new Vec4d(2, 2, 2, .5 * (1 - t / duration)));
-                    });
-                }
+                currentAnim = new SplineAnimation();
+                currentAnim.addKeyframe(0, swordPos, swordVel);
+                currentAnim.addKeyframe(slashDuration * .5, startPos.mul(ext2), slashGoalVel.cross(startPos));
+                currentAnim.addKeyframe(slashDuration * .75, facing.mul(ext2), slashGoalVel.cross(facing));
+                currentAnim.addKeyframe(slashDuration, endPos.mul(ext2), slashGoalVel.cross(endPos));
+
+                slashTimer = slashDuration;
+                hit.clear();
             }
         }
 
         if (slashTimer <= 0) {
-            Vec3d posChange = new Vec3d(1, 0, 0).add(swordPos.inverse().applyTo(position.position.sub(prevPos.prevPos).mul(-.25)));
-            swordPos = swordPos.mul(Quaternion.fromEulerAngles(MathUtils.direction1(posChange), MathUtils.direction2(posChange), 0));
-            if (Input.mouseDown(0)) {
-                moveToGoal(facing, .5, dt / slashiness);
-            } else {
-                moveToGoal(facing, .05, dt / slashiness);
-            }
-            swordExtension = Math.pow(1e-8, dt * .2 / slashDuration) * swordExtension + (1 - Math.pow(1e-8, dt * .2 / slashDuration)) * ext1;
+            swordPos = swordPos.add(position.position.sub(prevPos.prevPos).mul(-1 / Math.max(slashiness, 1)));
+            currentAnim = new SplineAnimation();
+            currentAnim.addKeyframe(0, swordPos, swordVel);
+            currentAnim.addKeyframe(Input.mouseDown(0) ? (.5 * Math.min(slashiness, 1)) : (.05 * Math.max(slashiness, 1)), facing.mul(ext1), new Vec3d(0, 0, 0));
+            swordPos = currentAnim.getPosition(dt);
+            swordVel = currentAnim.getVelocity(dt);
         } else {
-            //swordPos = swordPos.mul(Quaternion.fromAngleAxis(swordVel.mul(dt)));
-            swordPos = Quaternion.fromAngleAxis(swordVel.mul(dt)).mul(swordPos);
-            swordVel = swordVel.lerp(slashGoalVel, 1 - Math.pow(.01, .2 * dt / slashDuration));
-            swordExtension = Math.pow(1e-8, dt * .2 / slashDuration) * swordExtension + (1 - Math.pow(1e-8, dt * .2 / slashDuration)) * ext2;
+            swordPos = currentAnim.getPosition(slashDuration - slashTimer);
+            swordVel = currentAnim.getVelocity(slashDuration - slashTimer);
             for (double i = 0; i < 1; i += .1) {
-                Vec3d pos = getRealSwordPos().lerp(position.position, i);
+                Vec3d pos = Camera.camera3d.position.add(swordPos).lerp(position.position, i);
                 if (get(PhysicsBehavior.class).world.getBlock(pos) == BlockType.getBlock("leaves")) {
                     get(PhysicsBehavior.class).world.setBlock(pos, null);
                 }
@@ -177,15 +149,15 @@ public class SwordController extends Behavior {
                 }
             }
 
-//            Vec3d currentPos = getRealSwordPos();
-//            double direction1 = swordPos.getYaw();
-//            double direction2 = Math.PI / 2 + MathUtils.direction2(getRealSwordPos().sub(Camera.camera3d.position.sub(new Vec3d(0, 0, 1))));
-//            double duration = 5.1;
-//            createGraphicsEffect(duration, t -> {
-//                model.render(currentPos, direction1, direction2, 1 / 16., modelTip, new Vec4d(2, 2, 2, .5 * (1 - t / duration)));
-//            });
+            Vec3d currentPos = Camera.camera3d.position.add(swordPos);
+            double direction1 = MathUtils.direction1(swordPos);
+            double direction2 = Math.PI / 2 + MathUtils.direction2(swordPos.add(new Vec3d(0, 0, 1)));
+            double duration = .1;
+            createGraphicsEffect(duration, t -> {
+                model.render(currentPos, direction1, direction2, 1 / 16., modelTip, new Vec4d(2, 2, 2, .05 * .2 / slashDuration * (1 - t / duration)));
+            });
         }
-        realSwordVel = getRealSwordPos().sub(realSwordPos).div(dt);
+        realSwordVel = swordPos.sub(prevSwordPos).div(dt);
     }
 
     @Override
@@ -215,7 +187,6 @@ public class SwordController extends Behavior {
             Vec3d a = v1.sub(p2.sub(p1));
             Vec3d b = v2.mul(-1).add(p2.sub(p1));
             return p2.sub(p1).add(a.lerp(b, t).mul(1 - 2 * t)).add(b.sub(a).mul(t * (1 - t)));
-//            return p1.lerp(p2, t).add(a.lerp(b, t).mul(t * (1 - t)));
         }
 
         public Vec3d getPosition(double time) {

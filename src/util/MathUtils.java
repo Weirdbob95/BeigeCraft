@@ -23,6 +23,12 @@ public abstract class MathUtils {
         return new Vec3d(clamp(v.x, lower.x, upper.x), clamp(v.y, lower.y, upper.y), clamp(v.z, lower.z, upper.z));
     }
 
+    public static double cubicSpline(double t, double p1, double v1, double p2, double v2) {
+        double a = v1 - (p2 - p1);
+        double b = -v2 + (p2 - p1);
+        return lerp(p1, p2, t) + lerp(a, b, t) * (t * (1 - t));
+    }
+
     public static double direction(Vec2d v) {
         return Math.atan2(v.y, v.x);
     }
@@ -37,6 +43,10 @@ public abstract class MathUtils {
 
     public static int floor(double x) {
         return (int) Math.floor(x);
+    }
+
+    public static double lerp(double x, double y, double amt) {
+        return x * (1 - amt) + y * amt;
     }
 
     public static double mod(double x, double m) {

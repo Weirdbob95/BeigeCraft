@@ -4,6 +4,7 @@ import engine.Input;
 import game.inventory.ItemSlot;
 import graphics.Font;
 import static util.MathUtils.ceil;
+import static org.lwjgl.glfw.GLFW.*;
 import util.vectors.Vec2d;
 import util.vectors.Vec4d;
 
@@ -44,38 +45,56 @@ public class InventoryRoot extends GUIRoot {
     @Override
     protected void render() {
         super.render();
-        if (Input.mouseJustPressed(0)) {
-            if (manager.selected instanceof GUIInventorySquare) {
-                if (ItemSlot.GRABBED.isEmpty()) {
-                    dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
-                    dragSource.moveItemsTo(ItemSlot.GRABBED);
-                } else {
-                    ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
-                    newSlot.moveItemsTo(ItemSlot.GRABBED);
-                    ItemSlot.GRABBED.swapItems(newSlot);
+        if (Input.keyDown(GLFW_KEY_LEFT_SHIFT)) {
+
+            if (Input.mouseJustPressed(0)) {
+                if (manager.selected instanceof GUIInventorySquare) {
+                    ItemSlot.MAIN_HAND = ((GUIInventorySquare) manager.selected).itemSlot;
                 }
-            } else if (manager.selected instanceof GUICraftingOutput) {
-                GUICraftingOutput gco = (GUICraftingOutput) manager.selected;
-                if (gco.outputItem != null) {
-                    for (int i = 0; i < gco.outputNum; i++) {
-                        ItemSlot.addToInventory(gco.outputItem);
+
+            }
+
+            if (Input.mouseJustPressed(1)) {
+                if (manager.selected instanceof GUIInventorySquare) {
+                    ItemSlot.OFF_HAND = ((GUIInventorySquare) manager.selected).itemSlot;
+                }
+
+            }
+
+        } else {
+            if (Input.mouseJustPressed(0)) {
+                if (manager.selected instanceof GUIInventorySquare) {
+                    if (ItemSlot.GRABBED.isEmpty()) {
+                        dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
+                        dragSource.moveItemsTo(ItemSlot.GRABBED);
+                    } else {
+                        ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
+                        newSlot.moveItemsTo(ItemSlot.GRABBED);
+                        ItemSlot.GRABBED.swapItems(newSlot);
                     }
-                    for (ItemSlot is : gco.craftingSlots) {
-                        if (!is.isEmpty()) {
-                            is.removeItem();
+                } else if (manager.selected instanceof GUICraftingOutput) {
+                    GUICraftingOutput gco = (GUICraftingOutput) manager.selected;
+                    if (gco.outputItem != null) {
+                        for (int i = 0; i < gco.outputNum; i++) {
+                            ItemSlot.addToInventory(gco.outputItem);
+                        }
+                        for (ItemSlot is : gco.craftingSlots) {
+                            if (!is.isEmpty()) {
+                                is.removeItem();
+                            }
                         }
                     }
                 }
             }
-        }
-        if (Input.mouseJustPressed(1)) {
-            if (manager.selected instanceof GUIInventorySquare) {
-                if (ItemSlot.GRABBED.isEmpty()) {
-                    dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
-                    dragSource.moveItemsTo(ItemSlot.GRABBED, ceil(dragSource.count() / 2.));
-                } else {
-                    ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
-                    ItemSlot.GRABBED.moveItemsTo(newSlot, 1);
+            if (Input.mouseJustPressed(1)) {
+                if (manager.selected instanceof GUIInventorySquare) {
+                    if (ItemSlot.GRABBED.isEmpty()) {
+                        dragSource = ((GUIInventorySquare) manager.selected).itemSlot;
+                        dragSource.moveItemsTo(ItemSlot.GRABBED, ceil(dragSource.count() / 2.));
+                    } else {
+                        ItemSlot newSlot = ((GUIInventorySquare) manager.selected).itemSlot;
+                        ItemSlot.GRABBED.moveItemsTo(newSlot, 1);
+                    }
                 }
             }
         }

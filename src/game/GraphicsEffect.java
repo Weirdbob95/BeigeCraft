@@ -25,4 +25,9 @@ public class GraphicsEffect extends Behavior {
     public void render() {
         onRender.accept(lifetime.lifetime);
     }
+
+    @Override
+    public double renderLayer() {
+        return 2;
+    }
 }

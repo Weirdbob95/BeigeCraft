@@ -6,6 +6,9 @@ import behaviors.VelocityBehavior;
 import definitions.ItemType;
 import engine.Behavior;
 import engine.Input;
+import static game.abilities.Ability.DO_NOTHING;
+import game.abilities.AbilityController;
+import game.abilities.WeaponChargeAbility;
 import game.creatures.CreatureBehavior;
 import game.inventory.ItemSlot;
 import graphics.Animation;
@@ -43,7 +46,8 @@ public class Player extends Behavior {
     public final VelocityBehavior velocity = require(VelocityBehavior.class);
     public final CreatureBehavior creature = require(CreatureBehavior.class);
     public final PhysicsBehavior physics = require(PhysicsBehavior.class);
-    public final SwordController swordController = require(SwordController.class);
+    public final HeldItemController heldItemController = require(HeldItemController.class);
+    public final AbilityController abilityController = require(AbilityController.class);
 
     public GUIManager gui;
     public boolean flying;
@@ -98,6 +102,7 @@ public class Player extends Behavior {
         physics.hitboxSize2 = new Vec3d(.6, .6, 1.8);
         physics.hitboxSize1Crouch = new Vec3d(.6, .6, 1.8);
         physics.hitboxSize2Crouch = new Vec3d(.6, .6, 1.0);
+        heldItemController.eye.eyePos = () -> Camera.camera3d.position;
     }
 
     public RaycastHit firstSolid() {
@@ -148,19 +153,23 @@ public class Player extends Behavior {
 
     @Override
     public void update(double dt) {
-
         sprintAmt -= dt;
-
         breakingBlocks = false;
+
+        heldItemController.eye.facing = Camera.camera3d.facing();
+        if (Input.mouseJustPressed(0)) {
+            abilityController.attemptAbility(new WeaponChargeAbility());
+        }
+        if (!Input.mouseDown(0)) {
+            abilityController.attemptAbility(DO_NOTHING);
+        }
 
         gui.hud.setBiome(physics.world.heightmappedChunks
                 .get(physics.world.getChunkPos(position.position)).biomemap[(int) mod(position.position.x, CHUNK_SIZE)][(int) mod(position.position.y, CHUNK_SIZE)].plurality());
         gui.hud.setPos(position.position);
 
         Vec3d desCamPos = position.position.add(new Vec3d(0, 0, physics.crouch ? .8 : 1.4));
-        //camera3d.position = desCamPos;
         camera3d.position = camera3d.position.lerp(desCamPos, 1 - Math.pow(1e-8, dt));
-        // camera3d.position = moveTowards(camera3d.position, desCamPos, 5, 1e-6, dt);
 
         if (!gui.freezeMouse()) {
             // Look around
@@ -196,7 +205,6 @@ public class Player extends Behavior {
         }
 
         velocity.velocity = computeIdealVel();
-        //velocity.velocity = velocity.velocity.lerp(idealVel, 1 - Math.pow(1e-4, dt));
 
         if (!gui.freezeMovement()) {
             // Jump

@@ -24,13 +24,11 @@ import static opengl.Camera.camera3d;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_F;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-import static util.MathUtils.mod;
 import static util.MathUtils.round;
 import static util.MathUtils.vecMap;
 import util.vectors.Vec2d;
@@ -38,7 +36,6 @@ import util.vectors.Vec3d;
 import util.vectors.Vec4d;
 import world.Raycast.RaycastHit;
 import static world.Raycast.raycastDistance;
-import static world.World.CHUNK_SIZE;
 
 public class Player extends Behavior {
 
@@ -54,7 +51,8 @@ public class Player extends Behavior {
     public boolean breakingBlocks;
     public Map<Vec3d, Double> blocksToBreak = new HashMap();
 
-    public double sprintAmt;
+    public double sprintTimer;
+    public double parryTimer;
 
     public Vec3d computeIdealVel() {
         Vec3d idealVel = new Vec3d(0, 0, 0);
@@ -81,7 +79,7 @@ public class Player extends Behavior {
             if (idealVel.lengthSquared() > 0) {
                 idealVel = idealVel.normalize().mul(creature.speed);
             } else {
-                if (sprintAmt > 0) {
+                if (sprintTimer > 0) {
                     idealVel = idealVel.add(forwards);
                     idealVel = idealVel.normalize().mul(creature.speed);
                 }
@@ -97,6 +95,12 @@ public class Player extends Behavior {
 
     @Override
     public void createInner() {
+        creature.damageCallback = (damage, dir) -> {
+            if (parryTimer <= 0) {
+                creature.damageInner(damage, dir);
+            }
+        };
+
         physics.canCrouch = true;
         physics.hitboxSize1 = new Vec3d(.6, .6, 1.8);
         physics.hitboxSize2 = new Vec3d(.6, .6, 1.8);
@@ -153,20 +157,10 @@ public class Player extends Behavior {
 
     @Override
     public void update(double dt) {
-        sprintAmt -= dt;
+        sprintTimer -= dt;
+        parryTimer -= dt;
         breakingBlocks = false;
-
-        heldItemController.eye.facing = Camera.camera3d.facing();
-        if (Input.mouseJustPressed(0)) {
-            abilityController.attemptAbility(new WeaponChargeAbility());
-        }
-        if (!Input.mouseDown(0)) {
-            abilityController.attemptAbility(DO_NOTHING);
-        }
-
-        gui.hud.setBiome(physics.world.heightmappedChunks
-                .get(physics.world.getChunkPos(position.position)).biomemap[(int) mod(position.position.x, CHUNK_SIZE)][(int) mod(position.position.y, CHUNK_SIZE)].plurality());
-        gui.hud.setPos(position.position);
+        gui.hud.update(this);
 
         Vec3d desCamPos = position.position.add(new Vec3d(0, 0, physics.crouch ? .8 : 1.4));
         camera3d.position = camera3d.position.lerp(desCamPos, 1 - Math.pow(1e-8, dt));
@@ -184,23 +178,29 @@ public class Player extends Behavior {
             }
         }
 
+        heldItemController.eye.facing = Camera.camera3d.facing();
+        if (Input.mouseJustPressed(0)) {
+            abilityController.attemptAbility(new WeaponChargeAbility());
+        }
+        if (!Input.mouseDown(0)) {
+            abilityController.attemptAbility(DO_NOTHING);
+        }
+
         if (!gui.freezeMovement()) {
 
             if (Input.keyJustPressed(GLFW_KEY_LEFT_CONTROL)) {
                 flying = !flying;
             }
 
-            creature.speed = flying ? 200 : physics.crouch ? 4 : sprintAmt > 0 ? 40 : 8;
+            creature.speed = flying ? 200 : physics.crouch ? 4 : sprintTimer > 0 ? 40 : 8;
             creature.jumpSpeed = flying ? 200 : 24;
 
             // Crouch
             physics.shouldCrouch = Input.keyDown(GLFW_KEY_LEFT_SHIFT);
 
-            if (Input.keyJustPressed(GLFW_KEY_F)) {
-                sprintAmt = .2;
-            }
             if (Input.mouseJustPressed(1)) {
-                sprintAmt = .2;
+//                sprintTimer = .2;
+                parryTimer = .4;
             }
         }
 

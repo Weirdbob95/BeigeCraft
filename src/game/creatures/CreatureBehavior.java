@@ -7,6 +7,7 @@ import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
 import java.util.Collection;
+import java.util.function.BiConsumer;
 import util.vectors.Vec3d;
 
 public class CreatureBehavior extends Behavior {
@@ -25,12 +26,18 @@ public class CreatureBehavior extends Behavior {
     public double speed = 6;
     public double jumpSpeed = 15;
 
+    public BiConsumer<Double, Vec3d> damageCallback = this::damageInner;
+
     @Override
     public void createInner() {
         acceleration.acceleration = new Vec3d(0, 0, -64);
     }
 
     public void damage(double damage, Vec3d dir) {
+        damageCallback.accept(damage, dir);
+    }
+
+    public void damageInner(double damage, Vec3d dir) {
 //        velocity.velocity = velocity.velocity.add(dir.setZ(.5).mul(5 * damage));
         //velocity.velocity = velocity.velocity.add(dir.setZ(.5).mul(20));
         velocity.velocity = velocity.velocity.add(dir.mul(20));

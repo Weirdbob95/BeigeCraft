@@ -5,8 +5,8 @@ import static game.abilities.Ability.DO_NOTHING;
 
 public class AbilityController extends Behavior {
 
-    private Ability nextAbility = null;
-    private Ability currentAbility = DO_NOTHING;
+    public Ability nextAbility = null;
+    public Ability currentAbility = DO_NOTHING;
 
     public void attemptAbility(Ability ability) {
         if (ability == currentAbility) {

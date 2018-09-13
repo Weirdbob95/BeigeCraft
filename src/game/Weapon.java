@@ -54,8 +54,8 @@ public class Weapon {
         // Spear
         SPEAR.model = Model.load("spear.vox");
         SPEAR.modelTip = new Vec3d(4, 4, 64);
-        SPEAR.ext1 = 4.5;
-        SPEAR.ext2 = 8;
+        SPEAR.ext1 = 3.5;
+        SPEAR.ext2 = 6;
         SPEAR.slashDuration = .25;
         SPEAR.weight = 1;
         SPEAR.slashiness = .1;

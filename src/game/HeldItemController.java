@@ -25,6 +25,7 @@ public class HeldItemController extends Behavior {
     public Weapon heldItemType = Weapon.SWORD;
     public boolean makeTrail;
     public double reorientSpeed = .5;
+    public Vec4d color = new Vec4d(1, 1, 1, 1);
 
     private SplineAnimation currentAnim;
     private double animTime;
@@ -42,9 +43,9 @@ public class HeldItemController extends Behavior {
 
     @Override
     public void render() {
-        double direction1 = MathUtils.direction1(heldItemPos);
+        double direction1 = MathUtils.direction1(heldItemPos.add(eye.facing.cross(new Vec3d(0, 0, 1)).mul(-.5)));
         double direction2 = Math.PI / 2 + MathUtils.direction2(heldItemPos.add(new Vec3d(0, 0, 1)));
-        heldItemType.model.render(eye.eyePos.get().add(heldItemPos), direction1, direction2, 1 / 16., heldItemType.modelTip, new Vec4d(1, 1, 1, 1));
+        heldItemType.model.render(eye.eyePos.get().add(heldItemPos), direction1, direction2, 1 / 16., heldItemType.modelTip, color);
     }
 
     @Override
@@ -58,9 +59,9 @@ public class HeldItemController extends Behavior {
             anim.addKeyframe(0, heldItemPos, heldItemVel);
             anim.addKeyframe(1, heldItemPos.normalize().lerp(eye.facing, reorientSpeed).mul(heldItemType.ext1), new Vec3d(0, 0, 0));
 
-            double animTime = 1 - Math.exp(-dt * 20 / heldItemType.slashiness);
-            heldItemPos = anim.getPosition(animTime);
-            heldItemVel = anim.getVelocity(animTime);
+            double t = 1 - Math.exp(-dt * 20 / heldItemType.slashiness);
+            heldItemPos = anim.getPosition(t);
+            heldItemVel = anim.getVelocity(t);
         } else {
             animTime += dt;
             heldItemPos = currentAnim.getPosition(animTime);
@@ -69,7 +70,7 @@ public class HeldItemController extends Behavior {
 
         if (makeTrail) {
             Vec3d currentPos = eye.eyePos.get().add(heldItemPos);
-            double direction1 = MathUtils.direction1(heldItemPos);
+            double direction1 = MathUtils.direction1(heldItemPos.add(eye.facing.cross(new Vec3d(0, 0, 1)).mul(-.5)));
             double direction2 = Math.PI / 2 + MathUtils.direction2(heldItemPos.add(new Vec3d(0, 0, 1)));
             double duration = .1;
             createGraphicsEffect(duration, t -> {

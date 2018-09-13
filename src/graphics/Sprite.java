@@ -77,6 +77,10 @@ public class Sprite {
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
 
+    public void drawBillboard(Vec3d position, Vec2d size, Vec4d color) {
+        draw3d(position, Camera.camera3d.position.sub(position), 0, size, color);
+    }
+
     public int getHeight() {
         return texture.getHeight();
     }

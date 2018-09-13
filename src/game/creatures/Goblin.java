@@ -1,5 +1,6 @@
 package game.creatures;
 
+import game.combat.Enemy;
 import engine.Behavior;
 import graphics.Model;
 import opengl.Camera;

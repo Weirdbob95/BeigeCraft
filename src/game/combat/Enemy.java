@@ -1,7 +1,8 @@
-package game.creatures;
+package game.combat;
 
 import engine.Behavior;
 import game.combat.Strike;
+import game.creatures.MonsterBehavior;
 import opengl.Camera;
 
 public class Enemy extends Behavior {

@@ -40,11 +40,8 @@ public class WeaponSwingAbility extends Ability {
         Vec3d normSwordPos = heldItemController.heldItemPos.normalize();
         Vec3d facing = heldItemController.eye.facing;
         double slashAngle = Math.acos(normSwordPos.dot(facing));
-        slashAngle = Math.pow(clamp(slashAngle / MAX_SLASH_ANGLE, 0, 1), Math.pow(heldItemController.heldItemType.slashiness, -.5)) * MAX_SLASH_ANGLE;
+        slashAngle = Math.pow(clamp(slashAngle / MAX_SLASH_ANGLE, 0, 1), Math.pow(heldItemController.heldItemType.slashiness * 2, -.5)) * MAX_SLASH_ANGLE;
         Vec3d slashRotation = normSwordPos.cross(facing).normalize().mul(slashAngle);
-        if (slashAngle < 1) {
-            slashRotation = new Vec3d(0, 0, 0);
-        }
         Vec3d startPos = Quaternion.fromAngleAxis(slashRotation).inverse().applyTo(facing);
         Vec3d endPos = Quaternion.fromAngleAxis(slashRotation).applyTo(facing);
         double slashTime = (slashAngle / 3 + .8) * heldItemController.heldItemType.slashDuration * .67;

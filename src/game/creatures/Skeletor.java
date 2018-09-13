@@ -41,10 +41,10 @@ public class Skeletor extends Behavior {
         if (monster.goal != null) {
             heldItemController.eye.facing = monster.goal.sub(monster.position.position).normalize();
             if (!timerOn) {
-                if (Math.random() < 4 * dt) {
+                if (Math.random() < 1 * dt) {
                     if (abilityController.currentAbility == DO_NOTHING) {
                         abilityController.attemptAbility(new WeaponChargeAbility());
-                    } else {
+                    } else if (abilityController.currentAbility instanceof WeaponChargeAbility) {
                         timerOn = true;
                         attackTimer = .4;
                     }

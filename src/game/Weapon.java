@@ -26,7 +26,7 @@ public class Weapon {
         SWORD.ext2 = 5;
         SWORD.slashDuration = .2;
         SWORD.weight = .5;
-        SWORD.slashiness = 1;
+        SWORD.slashiness = 2;
         // Dagger
         DAGGER.model = Model.load("dagger.vox");
         DAGGER.modelTip = new Vec3d(4, 4, 16);

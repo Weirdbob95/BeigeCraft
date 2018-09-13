@@ -43,13 +43,6 @@ public class Quaternion {
         return new Vec3d(b, c, d).normalize();
     }
 
-//    public double direction1() {
-//        return MathUtils.direction1(applyToForwards());
-//    }
-//
-//    public double direction2() {
-//        return MathUtils.direction2(applyToForwards());
-//    }
     public Quaternion div(Quaternion other) {
         return other.inverse().mul(this);
     }
@@ -135,14 +128,5 @@ public class Quaternion {
     @Override
     public String toString() {
         return "Quaternion{" + "a=" + a + ", b=" + b + ", c=" + c + ", d=" + d + '}';
-    }
-
-    public static void main(String[] args) {
-        Quaternion q = fromAngleAxis(-14.2, new Vec3d(1, -5, 2));
-        System.out.println(q.getYaw() + " " + q.getPitch() + " " + q.getRoll());
-        q = fromEulerAngles(q.getYaw(), q.getPitch(), q.getRoll());
-        System.out.println(q.getYaw() + " " + q.getPitch() + " " + q.getRoll());
-        q = fromEulerAngles(MathUtils.direction1(q.applyToForwards()), MathUtils.direction2(q.applyToForwards()), 0);
-        System.out.println(q.getYaw() + " " + q.getPitch() + " " + q.getRoll());
     }
 }

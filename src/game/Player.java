@@ -8,6 +8,7 @@ import engine.Behavior;
 import engine.Input;
 import static game.abilities.Ability.DO_NOTHING;
 import game.abilities.AbilityController;
+import game.abilities.ParryAbility;
 import game.abilities.WeaponChargeAbility;
 import game.creatures.CreatureBehavior;
 import game.inventory.ItemSlot;
@@ -52,7 +53,6 @@ public class Player extends Behavior {
     public Map<Vec3d, Double> blocksToBreak = new HashMap();
 
     public double sprintTimer;
-    public double parryTimer;
 
     public Vec3d computeIdealVel() {
         Vec3d idealVel = new Vec3d(0, 0, 0);
@@ -95,12 +95,6 @@ public class Player extends Behavior {
 
     @Override
     public void createInner() {
-        creature.damageCallback = (damage, dir) -> {
-            if (parryTimer <= 0) {
-                creature.damageInner(damage, dir);
-            }
-        };
-
         physics.canCrouch = true;
         physics.hitboxSize1 = new Vec3d(.6, .6, 1.8);
         physics.hitboxSize2 = new Vec3d(.6, .6, 1.8);
@@ -158,7 +152,6 @@ public class Player extends Behavior {
     @Override
     public void update(double dt) {
         sprintTimer -= dt;
-        parryTimer -= dt;
         breakingBlocks = false;
         gui.hud.update(this);
 
@@ -182,8 +175,11 @@ public class Player extends Behavior {
         if (Input.mouseJustPressed(0)) {
             abilityController.attemptAbility(new WeaponChargeAbility());
         }
-        if (!Input.mouseDown(0)) {
+        if (Input.mouseJustReleased(0)) {
             abilityController.attemptAbility(DO_NOTHING);
+        }
+        if (Input.mouseJustPressed(1)) {
+            abilityController.attemptAbility(new ParryAbility());
         }
 
         if (!gui.freezeMovement()) {
@@ -198,10 +194,10 @@ public class Player extends Behavior {
             // Crouch
             physics.shouldCrouch = Input.keyDown(GLFW_KEY_LEFT_SHIFT);
 
-            if (Input.mouseJustPressed(1)) {
-//                sprintTimer = .2;
-                parryTimer = .4;
-            }
+//            if (Input.mouseJustPressed(1)) {
+////                sprintTimer = .2;
+//                parryTimer = .4;
+//            }
         }
 
         velocity.velocity = computeIdealVel();

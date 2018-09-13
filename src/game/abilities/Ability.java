@@ -104,6 +104,28 @@ public class Ability {
         public abstract void use();
     }
 
+    public static abstract class TimedAbility extends Ability {
+
+        public double timer;
+
+        @Override
+        public Ability attemptTransitionTo(Ability nextAbility) {
+            return (nextAbility != null || timer <= 0) ? nextAbility : this;
+        }
+
+        public abstract double duration();
+
+        @Override
+        public void onStartUse() {
+            timer = duration();
+        }
+
+        @Override
+        public void onContinuousUse(double dt) {
+            timer -= dt;
+        }
+    }
+
     public static class Wait extends ContinuousAbility {
 
         private double timer;

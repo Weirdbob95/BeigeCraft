@@ -53,7 +53,8 @@ public class HeldItemController extends Behavior {
         Vec3d prevSwordPos = heldItemPos;
 
         if (currentAnim == null) {
-            heldItemPos = heldItemPos.add(position.position.sub(prevPos.prevPos).mul(-1 / Math.max(heldItemType.slashiness, 1)));
+            //heldItemPos = heldItemPos.add(position.position.sub(prevPos.prevPos).mul(-1 / Math.max(heldItemType.slashiness, 1)));
+            heldItemPos = heldItemPos.add(position.position.sub(prevPos.prevPos).mul(-1));
 
             SplineAnimation anim = new SplineAnimation();
             anim.addKeyframe(0, heldItemPos, heldItemVel);

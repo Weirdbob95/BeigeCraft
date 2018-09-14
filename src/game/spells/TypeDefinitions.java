@@ -46,7 +46,12 @@ public abstract class TypeDefinitions {
         ICE,
         WIND,
         STONE,
-        LIGHTNING
+        LIGHTNING,
+        LIFE,
+        CORRUPTION,
+        SPACE,
+        LIGHT,
+        FORCE
     }
 
     /**

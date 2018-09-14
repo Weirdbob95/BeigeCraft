@@ -21,8 +21,8 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import util.Multithreader;
 import util.Resources;
-import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import util.math.Vec3d;
+import util.math.Vec4d;
 import world.ChunkPos;
 import world.World;
 

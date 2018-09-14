@@ -3,6 +3,7 @@ package game.abilities;
 import game.HeldItemController;
 import game.abilities.Ability.TimedAbility;
 import game.creatures.CreatureBehavior;
+import game.creatures.Skeletor;
 import util.math.SplineAnimation;
 import util.math.Vec3d;
 
@@ -31,6 +32,12 @@ public class ParryAbility extends TimedAbility {
 
         SplineAnimation anim = heldItemController.newAnim();
         anim.addKeyframe(.1, heldItemController.eye.facing.mul(heldItemController.heldItemType.ext1 * .6), new Vec3d(0, 0, 0));
+
+        for (Skeletor s : Skeletor.ALL) {
+            if (s.monster.position.position.sub(creature.position.position).length() < 5) {
+                s.attackParried = true;
+            }
+        }
 
         creature.damageTakenMultiplier = 0;
         creature.speedMultiplier = .5;

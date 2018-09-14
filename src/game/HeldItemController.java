@@ -22,7 +22,7 @@ public class HeldItemController extends Behavior {
     public Vec3d heldItemVel = new Vec3d(0, 0, 0);
     public Vec3d realHeldItemVel = new Vec3d(0, 0, 0);
 
-    public Weapon heldItemType = Weapon.HAMMER;
+    public Weapon heldItemType = Weapon.SWORD;
     public boolean makeTrail;
     public double reorientSpeed = .5;
     public Vec4d color = new Vec4d(1, 1, 1, 1);

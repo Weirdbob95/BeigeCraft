@@ -7,11 +7,14 @@ import game.abilities.AbilityController;
 import game.abilities.WeaponChargeAbility;
 import graphics.Model;
 import graphics.Sprite;
+import java.util.Collection;
 import util.math.Vec2d;
 import util.math.Vec3d;
 import util.math.Vec4d;
 
 public class Skeletor extends Behavior {
+
+    public static final Collection<Skeletor> ALL = track(Skeletor.class);
 
     public final MonsterBehavior monster = require(MonsterBehavior.class);
     public final HeldItemController heldItemController = require(HeldItemController.class);
@@ -19,6 +22,7 @@ public class Skeletor extends Behavior {
 
     public boolean timerOn;
     public double attackTimer;
+    public boolean attackParried;
 
     @Override
     public void createInner() {
@@ -31,7 +35,8 @@ public class Skeletor extends Behavior {
     @Override
     public void render() {
         if (attackTimer > 0) {
-            Sprite.load("item_sword.png").drawBillboard(monster.position.position.add(new Vec3d(0, 0, 2.5)), new Vec2d(1, 1), new Vec4d(1, .5 + attackTimer * .5 / .4, .5, 1));
+            Vec4d color = attackParried ? new Vec4d(.5, 1, .5, 1) : new Vec4d(1, .5 + attackTimer * .5 / .4, .5, 1);
+            Sprite.load("item_sword.png").drawBillboard(monster.position.position.add(new Vec3d(0, 0, 2.5)), new Vec2d(1, 1), color);
         }
     }
 
@@ -47,6 +52,7 @@ public class Skeletor extends Behavior {
                     } else if (abilityController.currentAbility instanceof WeaponChargeAbility) {
                         timerOn = true;
                         attackTimer = .4;
+                        attackParried = false;
                     }
                 }
             }

@@ -22,7 +22,9 @@ public class AbilityController extends Behavior {
         if (newAbility != currentAbility) {
             currentAbility.onEndUse();
             currentAbility = newAbility == null ? DO_NOTHING : newAbility;
-            nextAbility = null;
+            if (newAbility == nextAbility) {
+                nextAbility = null;
+            }
             currentAbility.abilityController = this;
             currentAbility.onStartUse();
         }

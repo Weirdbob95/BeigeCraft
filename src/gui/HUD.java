@@ -4,10 +4,10 @@ import engine.Input;
 import game.Player;
 import static game.Settings.SHOW_DEBUG_HUD;
 import game.inventory.ItemSlot;
-import static util.MathUtils.mod;
-import util.vectors.Vec2d;
-import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import static util.math.MathUtils.mod;
+import util.math.Vec2d;
+import util.math.Vec3d;
+import util.math.Vec4d;
 import static world.World.CHUNK_SIZE;
 import world.biomes.Biome;
 

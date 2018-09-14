@@ -3,7 +3,7 @@ package gui;
 import graphics.Font;
 import graphics.Font.FontText;
 import java.util.Objects;
-import util.vectors.Vec4d;
+import util.math.Vec4d;
 
 public class GUIText extends GUIItem {
 

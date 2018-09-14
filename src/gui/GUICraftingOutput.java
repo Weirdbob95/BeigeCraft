@@ -4,8 +4,8 @@ import definitions.ItemType;
 import definitions.Recipe;
 import game.inventory.ItemSlot;
 import static gui.GUIInventorySquare.INVENTORY_SQUARE_SIZE;
-import util.vectors.Vec2d;
-import util.vectors.Vec4d;
+import util.math.Vec2d;
+import util.math.Vec4d;
 
 public class GUICraftingOutput extends GUIRectangle {
 

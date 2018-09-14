@@ -20,8 +20,8 @@ import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import util.Resources;
-import util.vectors.Vec2d;
-import util.vectors.Vec4d;
+import util.math.Vec2d;
+import util.math.Vec4d;
 
 public class Font {
 

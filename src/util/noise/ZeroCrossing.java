@@ -3,7 +3,7 @@ package util.noise;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.IntToDoubleFunction;
-import static util.MathUtils.ceil;
+import static util.math.MathUtils.ceil;
 
 public class ZeroCrossing {
 

@@ -1,7 +1,7 @@
 package gui;
 
 import graphics.Graphics;
-import util.vectors.Vec4d;
+import util.math.Vec4d;
 
 public class GUIRectangle extends GUIItem {
 

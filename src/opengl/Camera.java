@@ -5,8 +5,8 @@ import org.joml.Matrix4d;
 import org.joml.Matrix4f;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
-import util.vectors.Vec2d;
-import util.vectors.Vec3d;
+import util.math.Vec2d;
+import util.math.Vec3d;
 
 public interface Camera {
 

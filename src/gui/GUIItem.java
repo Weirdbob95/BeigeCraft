@@ -3,7 +3,7 @@ package gui;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
-import util.vectors.Vec2d;
+import util.math.Vec2d;
 
 public abstract class GUIItem {
 

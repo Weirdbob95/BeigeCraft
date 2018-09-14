@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import util.YAMLObject;
-import util.vectors.Vec2d;
-import util.vectors.Vec3d;
+import util.math.Vec2d;
+import util.math.Vec3d;
 
 public class BlockType {
 

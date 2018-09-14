@@ -1,4 +1,4 @@
-package util.vectors;
+package util.math;
 
 public class Vec4d {
 

@@ -2,7 +2,7 @@ package world.chunks;
 
 import java.util.Random;
 import util.noise.Noise;
-import util.vectors.Vec3d;
+import util.math.Vec3d;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;

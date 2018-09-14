@@ -1,9 +1,7 @@
-package util;
+package util.math;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import util.vectors.Vec2d;
-import util.vectors.Vec3d;
 
 public abstract class MathUtils {
 

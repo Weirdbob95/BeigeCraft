@@ -1,7 +1,6 @@
-package util;
+package util.math;
 
-import static util.MathUtils.mod;
-import util.vectors.Vec3d;
+import static util.math.MathUtils.mod;
 
 public class Quaternion {
 

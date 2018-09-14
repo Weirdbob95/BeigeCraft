@@ -5,7 +5,7 @@ import static game.GraphicsEffect.createGraphicsEffect;
 import game.spells.SpellInfo;
 import graphics.Graphics;
 import java.util.LinkedList;
-import util.vectors.Vec3d;
+import util.math.Vec3d;
 
 /**
  * The S_Ray class represents a Ray initial shape, as described in the

@@ -1,8 +1,8 @@
 package game.spells;
 
 import game.creatures.CreatureBehavior;
-import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import util.math.Vec3d;
+import util.math.Vec4d;
 import world.World;
 
 /**

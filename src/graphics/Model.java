@@ -10,12 +10,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import opengl.Camera;
 import opengl.ShaderProgram;
-import static util.MathUtils.mod;
+import static util.math.MathUtils.mod;
 import util.Resources;
 import util.rlestorage.IntConverter.IntegerConverter;
 import util.rlestorage.RLEArrayStorage;
-import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import util.math.Vec3d;
+import util.math.Vec4d;
 
 public class Model extends VoxelRenderer<Integer> {
 

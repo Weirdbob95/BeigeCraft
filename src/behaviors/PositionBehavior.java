@@ -1,7 +1,7 @@
 package behaviors;
 
 import engine.Behavior;
-import util.vectors.Vec3d;
+import util.math.Vec3d;
 
 public class PositionBehavior extends Behavior {
 

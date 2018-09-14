@@ -1,7 +1,7 @@
 package gui;
 
 import engine.Core;
-import util.vectors.Vec2d;
+import util.math.Vec2d;
 
 public class MenuRoot extends GUIRoot {
 

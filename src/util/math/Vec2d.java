@@ -1,4 +1,4 @@
-package util.vectors;
+package util.math;
 
 import org.joml.Vector2d;
 

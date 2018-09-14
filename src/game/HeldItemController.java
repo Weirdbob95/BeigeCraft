@@ -6,10 +6,10 @@ import engine.Behavior;
 import static game.GraphicsEffect.createGraphicsEffect;
 import game.creatures.CreatureBehavior;
 import game.creatures.EyeBehavior;
-import util.MathUtils;
-import util.SplineAnimation;
-import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import util.math.MathUtils;
+import util.math.SplineAnimation;
+import util.math.Vec3d;
+import util.math.Vec4d;
 
 public class HeldItemController extends Behavior {
 
@@ -22,7 +22,7 @@ public class HeldItemController extends Behavior {
     public Vec3d heldItemVel = new Vec3d(0, 0, 0);
     public Vec3d realHeldItemVel = new Vec3d(0, 0, 0);
 
-    public Weapon heldItemType = Weapon.SWORD;
+    public Weapon heldItemType = Weapon.HAMMER;
     public boolean makeTrail;
     public double reorientSpeed = .5;
     public Vec4d color = new Vec4d(1, 1, 1, 1);
@@ -53,8 +53,8 @@ public class HeldItemController extends Behavior {
         Vec3d prevSwordPos = heldItemPos;
 
         if (currentAnim == null) {
-            //heldItemPos = heldItemPos.add(position.position.sub(prevPos.prevPos).mul(-1 / Math.max(heldItemType.slashiness, 1)));
-            heldItemPos = heldItemPos.add(position.position.sub(prevPos.prevPos).mul(-1));
+            heldItemPos = heldItemPos.add(position.position.sub(prevPos.prevPos).mul(-1 / Math.max(heldItemType.slashiness, 1)));
+            //heldItemPos = heldItemPos.add(position.position.sub(prevPos.prevPos).mul(-1));
 
             SplineAnimation anim = new SplineAnimation();
             anim.addKeyframe(0, heldItemPos, heldItemVel);

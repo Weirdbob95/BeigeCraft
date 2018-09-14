@@ -2,7 +2,7 @@ package behaviors;
 
 import engine.Behavior;
 import graphics.Model;
-import util.vectors.Vec4d;
+import util.math.Vec4d;
 
 public class ModelBehavior extends Behavior {
 

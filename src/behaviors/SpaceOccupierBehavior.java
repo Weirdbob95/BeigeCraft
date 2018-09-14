@@ -3,7 +3,7 @@ package behaviors;
 import engine.Behavior;
 import static engine.Behavior.track;
 import java.util.Collection;
-import util.vectors.Vec3d;
+import util.math.Vec3d;
 
 public class SpaceOccupierBehavior extends Behavior {
 

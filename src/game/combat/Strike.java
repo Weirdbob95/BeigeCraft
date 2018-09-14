@@ -6,7 +6,7 @@ import behaviors.PositionBehavior;
 import engine.Behavior;
 import game.creatures.CreatureBehavior;
 import graphics.Model;
-import util.vectors.Vec3d;
+import util.math.Vec3d;
 
 public class Strike extends Behavior {
 

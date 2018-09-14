@@ -3,7 +3,7 @@ package gui;
 import static game.Settings.RENDER_DISTANCE;
 import static game.Settings.SHOW_DEBUG_HUD;
 import java.util.function.Supplier;
-import util.vectors.Vec2d;
+import util.math.Vec2d;
 import world.World;
 
 public class OptionsRoot extends GUIRoot {

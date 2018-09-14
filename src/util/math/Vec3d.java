@@ -1,4 +1,4 @@
-package util.vectors;
+package util.math;
 
 import org.joml.Vector3d;
 
@@ -11,7 +11,7 @@ public class Vec3d {
         this.y = y;
         this.z = z;
     }
-    
+
     public Vec3d add(double a) {
         return new Vec3d(x + a, y + a, z + a);
     }
@@ -95,6 +95,14 @@ public class Vec3d {
 
     public Vec3d normalize() {
         return div(length());
+    }
+
+    public Vec3d setLength(double l) {
+        if (l == 0) {
+            return new Vec3d(0, 0, 0);
+        } else {
+            return mul(l / length());
+        }
     }
 
     public Vec3d setX(double x) {

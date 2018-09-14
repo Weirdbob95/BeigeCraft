@@ -1,8 +1,8 @@
 package gui;
 
 import game.inventory.ItemSlot;
-import util.vectors.Vec2d;
-import util.vectors.Vec4d;
+import util.math.Vec2d;
+import util.math.Vec4d;
 
 public class GUIInventorySquare extends GUIRectangle {
 

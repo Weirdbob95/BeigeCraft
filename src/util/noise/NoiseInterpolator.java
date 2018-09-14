@@ -1,8 +1,8 @@
 package util.noise;
 
-import static util.MathUtils.ceil;
-import static util.MathUtils.floor;
-import util.vectors.Vec3d;
+import static util.math.MathUtils.ceil;
+import static util.math.MathUtils.floor;
+import util.math.Vec3d;
 
 public class NoiseInterpolator {
 

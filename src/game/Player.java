@@ -30,11 +30,11 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-import static util.MathUtils.round;
-import static util.MathUtils.vecMap;
-import util.vectors.Vec2d;
-import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import static util.math.MathUtils.round;
+import static util.math.MathUtils.vecMap;
+import util.math.Vec2d;
+import util.math.Vec3d;
+import util.math.Vec4d;
 import world.Raycast.RaycastHit;
 import static world.Raycast.raycastDistance;
 
@@ -77,11 +77,11 @@ public class Player extends Behavior {
                 idealVel = idealVel.sub(sideways);
             }
             if (idealVel.lengthSquared() > 0) {
-                idealVel = idealVel.normalize().mul(creature.speed);
+                idealVel = idealVel.setLength(creature.getSpeed());
             } else {
                 if (sprintTimer > 0) {
                     idealVel = idealVel.add(forwards);
-                    idealVel = idealVel.normalize().mul(creature.speed);
+                    idealVel = idealVel.setLength(creature.getSpeed());
                 }
             }
         }

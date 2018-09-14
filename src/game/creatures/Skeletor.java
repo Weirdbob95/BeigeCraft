@@ -7,9 +7,9 @@ import game.abilities.AbilityController;
 import game.abilities.WeaponChargeAbility;
 import graphics.Model;
 import graphics.Sprite;
-import util.vectors.Vec2d;
-import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import util.math.Vec2d;
+import util.math.Vec3d;
+import util.math.Vec4d;
 
 public class Skeletor extends Behavior {
 
@@ -39,9 +39,9 @@ public class Skeletor extends Behavior {
     public void update(double dt) {
         attackTimer -= dt;
         if (monster.goal != null) {
-            heldItemController.eye.facing = monster.goal.sub(monster.position.position).normalize();
+            heldItemController.eye.lookAt(monster.goal);
             if (!timerOn) {
-                if (Math.random() < 1 * dt) {
+                if (Math.random() < 4 * dt) {
                     if (abilityController.currentAbility == DO_NOTHING) {
                         abilityController.attemptAbility(new WeaponChargeAbility());
                     } else if (abilityController.currentAbility instanceof WeaponChargeAbility) {

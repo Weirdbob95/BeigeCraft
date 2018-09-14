@@ -1,6 +1,6 @@
 package gui;
 
-import util.vectors.Vec4d;
+import util.math.Vec4d;
 
 public class GUIButton extends GUIRectangle {
 

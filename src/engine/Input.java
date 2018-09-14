@@ -3,7 +3,7 @@ package engine;
 import java.util.BitSet;
 import opengl.Window;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
-import util.vectors.Vec2d;
+import util.math.Vec2d;
 
 public abstract class Input {
 

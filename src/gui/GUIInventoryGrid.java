@@ -2,7 +2,7 @@ package gui;
 
 import game.inventory.ItemSlot;
 import static gui.GUIInventorySquare.INVENTORY_SQUARE_SIZE;
-import util.vectors.Vec2d;
+import util.math.Vec2d;
 
 public class GUIInventoryGrid extends GUIRectangle {
 

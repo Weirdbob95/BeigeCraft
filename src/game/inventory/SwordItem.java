@@ -4,7 +4,7 @@ import game.Player;
 import game.creatures.CreatureBehavior;
 import java.util.ArrayList;
 import opengl.Camera;
-import util.vectors.Vec3d;
+import util.math.Vec3d;
 
 public class SwordItem extends UsableItem {
 

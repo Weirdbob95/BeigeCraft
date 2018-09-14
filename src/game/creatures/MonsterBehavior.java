@@ -5,8 +5,8 @@ import behaviors.PhysicsBehavior;
 import behaviors.PositionBehavior;
 import engine.Behavior;
 import opengl.Camera;
-import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import util.math.Vec3d;
+import util.math.Vec4d;
 
 public class MonsterBehavior extends Behavior {
 
@@ -16,7 +16,7 @@ public class MonsterBehavior extends Behavior {
     public final ModelBehavior model = require(ModelBehavior.class);
 
     public Vec3d goal;
-    public double minDist = 6;
+    public double minDist = 4;
     public double jumpChance = 1;
 
     @Override
@@ -36,7 +36,7 @@ public class MonsterBehavior extends Behavior {
         if (goal != null) {
             Vec3d delta = goal.sub(position.position).setZ(0);
             if (delta.length() > minDist) {
-                idealVel = delta.normalize().mul(creature.speed);
+                idealVel = delta.setLength(creature.getSpeed());
                 if (physics.onGround && (physics.hitWall || Math.random() < dt * jumpChance)) {
                     creature.velocity.velocity = creature.velocity.velocity.setZ(creature.jumpSpeed);
                 }

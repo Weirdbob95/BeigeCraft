@@ -1,8 +1,8 @@
 package gui;
 
 import opengl.Window;
-import util.vectors.Vec2d;
-import util.vectors.Vec4d;
+import util.math.Vec2d;
+import util.math.Vec4d;
 
 public abstract class GUIRoot extends GUIRectangle {
 

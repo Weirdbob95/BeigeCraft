@@ -7,7 +7,7 @@ import engine.Behavior;
 import game.creatures.CreatureBehavior;
 import game.spells.SpellInfo;
 import game.spells.SpellPart.SpellShapeInitial;
-import util.MathUtils;
+import util.math.MathUtils;
 
 /**
  * The SpellShapeMissile class represents one of a Projectile, Ray, or Lob
@@ -43,7 +43,7 @@ public abstract class SpellShapeMissile extends SpellShapeInitial {
                 MissileBehavior mb = b.get(MissileBehavior.class);
                 mb.position.position = info.position();
                 mb.velocity.velocity = (isMultishot ? info.direction.normalize().add(MathUtils.randomInSphere().mul(.2)) : info.direction)
-                        .normalize().mul(velocity);
+                        .setLength(velocity);
                 mb.spellShape = this;
                 mb.info = info.multiplyPower(isMultishot ? .25 : 1);
                 b.create();

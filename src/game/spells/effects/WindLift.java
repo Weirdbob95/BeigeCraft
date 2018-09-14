@@ -4,7 +4,7 @@ import game.spells.SpellInfo;
 import game.spells.SpellPart.SpellEffect;
 import game.spells.TypeDefinitions.SpellElement;
 import static game.spells.TypeDefinitions.SpellElement.WIND;
-import util.vectors.Vec3d;
+import util.math.Vec3d;
 
 /**
  *

@@ -3,11 +3,11 @@ package world.biomes;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import static util.MathUtils.ceil;
-import static util.MathUtils.clamp;
-import static util.MathUtils.floor;
-import static util.MathUtils.mod;
-import static util.MathUtils.round;
+import static util.math.MathUtils.ceil;
+import static util.math.MathUtils.clamp;
+import static util.math.MathUtils.floor;
+import static util.math.MathUtils.mod;
+import static util.math.MathUtils.round;
 import world.World;
 import static world.biomes.Biome.*;
 

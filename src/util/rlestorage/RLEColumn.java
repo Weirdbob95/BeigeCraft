@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import static util.MathUtils.mod;
+import static util.math.MathUtils.mod;
 
 public class RLEColumn<T> implements Iterable<Entry<Integer, T>> {
 

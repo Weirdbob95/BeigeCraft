@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import util.YAMLObject;
-import util.vectors.Vec2d;
+import util.math.Vec2d;
 
 public class Recipe {
 

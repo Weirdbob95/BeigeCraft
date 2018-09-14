@@ -1,7 +1,7 @@
 package gui;
 
 import graphics.Sprite;
-import util.vectors.Vec4d;
+import util.math.Vec4d;
 
 public class GUISprite extends GUIItem {
 

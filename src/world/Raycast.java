@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import static util.MathUtils.mod;
-import static util.MathUtils.vecMap;
+import static util.math.MathUtils.mod;
+import static util.math.MathUtils.vecMap;
 import util.Mutable;
-import util.vectors.Vec3d;
+import util.math.Vec3d;
 
 public class Raycast {
 

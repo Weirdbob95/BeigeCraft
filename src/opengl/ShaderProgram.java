@@ -4,9 +4,9 @@ import java.util.HashMap;
 import org.joml.Matrix4d;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
-import util.vectors.Vec2d;
-import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import util.math.Vec2d;
+import util.math.Vec3d;
+import util.math.Vec4d;
 
 public class ShaderProgram extends GLObject {
 

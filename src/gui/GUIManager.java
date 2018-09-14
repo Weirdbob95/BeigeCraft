@@ -8,7 +8,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import util.vectors.Vec2d;
+import util.math.Vec2d;
 
 public class GUIManager extends Behavior {
 

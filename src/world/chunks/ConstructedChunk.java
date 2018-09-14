@@ -4,7 +4,7 @@ import util.noise.NoiseInterpolator;
 import util.noise.ZeroCrossing;
 import util.rlestorage.IntConverter.BlockTypeConverter;
 import util.rlestorage.RLEArrayStorage;
-import util.vectors.Vec3d;
+import util.math.Vec3d;
 import definitions.BlockType;
 import world.ChunkPos;
 import world.World;

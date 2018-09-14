@@ -5,7 +5,7 @@ import static definitions.ItemType.getItemByBlock;
 import game.Player;
 import java.util.ArrayList;
 import java.util.List;
-import util.vectors.Vec3d;
+import util.math.Vec3d;
 import world.Raycast;
 
 public class PickaxeItem extends UsableItem {

@@ -3,10 +3,10 @@ package gui;
 import engine.Input;
 import game.inventory.ItemSlot;
 import graphics.Graphics;
-import util.MathUtils;
-import static util.MathUtils.mod;
-import util.vectors.Vec2d;
-import util.vectors.Vec4d;
+import util.math.MathUtils;
+import static util.math.MathUtils.mod;
+import util.math.Vec2d;
+import util.math.Vec4d;
 
 public class QAWRoot extends GUIRoot {
 

@@ -15,9 +15,9 @@ import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import util.vectors.Vec2d;
-import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import util.math.Vec2d;
+import util.math.Vec3d;
+import util.math.Vec4d;
 import definitions.BlockType;
 import static world.World.TERRAIN_TEXTURE;
 

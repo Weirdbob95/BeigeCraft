@@ -10,15 +10,15 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import util.MathUtils;
-import static util.MathUtils.direction;
-import static util.MathUtils.direction1;
-import static util.MathUtils.direction2;
-import static util.MathUtils.rotate;
+import util.math.MathUtils;
+import static util.math.MathUtils.direction;
+import static util.math.MathUtils.direction1;
+import static util.math.MathUtils.direction2;
+import static util.math.MathUtils.rotate;
 import util.Resources;
-import util.vectors.Vec2d;
-import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import util.math.Vec2d;
+import util.math.Vec3d;
+import util.math.Vec4d;
 
 public class Graphics {
 

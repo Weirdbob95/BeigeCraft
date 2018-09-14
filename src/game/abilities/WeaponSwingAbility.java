@@ -9,17 +9,18 @@ import graphics.Model;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
-import static util.MathUtils.clamp;
-import util.Quaternion;
-import util.SplineAnimation;
-import util.vectors.Vec3d;
-import util.vectors.Vec4d;
+import static util.math.MathUtils.clamp;
+import util.math.Quaternion;
+import util.math.SplineAnimation;
+import util.math.Vec3d;
+import util.math.Vec4d;
 import world.World;
 
 public class WeaponSwingAbility extends Ability {
 
     private static final double MAX_SLASH_ANGLE = 2.5;
 
+    public CreatureBehavior creature;
     public HeldItemController heldItemController;
     public World world;
 
@@ -34,14 +35,15 @@ public class WeaponSwingAbility extends Ability {
 
     @Override
     public void onStartUse() {
+        creature = abilityController.get(CreatureBehavior.class);
         heldItemController = abilityController.get(HeldItemController.class);
         world = abilityController.get(PhysicsBehavior.class).world;
 
         Vec3d normSwordPos = heldItemController.heldItemPos.normalize();
         Vec3d facing = heldItemController.eye.facing;
-        double slashAngle = Math.acos(normSwordPos.dot(facing));
+        double slashAngle = Math.acos(clamp(normSwordPos.dot(facing), -1, 1));
         slashAngle = Math.pow(clamp(slashAngle / MAX_SLASH_ANGLE, 0, 1), Math.pow(heldItemController.heldItemType.slashiness * 2, -.5)) * MAX_SLASH_ANGLE;
-        Vec3d slashRotation = normSwordPos.cross(facing).normalize().mul(slashAngle);
+        Vec3d slashRotation = normSwordPos.cross(facing).setLength(slashAngle);
         Vec3d startPos = Quaternion.fromAngleAxis(slashRotation).inverse().applyTo(facing);
         Vec3d endPos = Quaternion.fromAngleAxis(slashRotation).applyTo(facing);
         double slashTime = (slashAngle / 3 + .8) * heldItemController.heldItemType.slashDuration * .67;
@@ -55,6 +57,8 @@ public class WeaponSwingAbility extends Ability {
 
         slashDuration = timer = heldItemController.heldItemType.slashDuration * .33 + slashTime;
         hit.clear();
+
+        creature.speedMultiplier = .8;
     }
 
     @Override
@@ -87,5 +91,7 @@ public class WeaponSwingAbility extends Ability {
     public void onEndUse() {
         heldItemController.clearAnim();
         heldItemController.makeTrail = false;
+
+        creature.speedMultiplier = 1;
     }
 }

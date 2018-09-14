@@ -1,8 +1,7 @@
-package util;
+package util.math;
 
 import java.util.ArrayList;
 import java.util.List;
-import util.vectors.Vec3d;
 
 public class SplineAnimation {
 

@@ -1,10 +1,10 @@
 package behaviors;
 
 import engine.Behavior;
-import static util.MathUtils.ceil;
-import static util.MathUtils.floor;
-import static util.MathUtils.mod;
-import util.vectors.Vec3d;
+import static util.math.MathUtils.ceil;
+import static util.math.MathUtils.floor;
+import static util.math.MathUtils.mod;
+import util.math.Vec3d;
 import world.World;
 import static world.World.CHUNK_SIZE;
 import world.chunks.ConstructedChunk;

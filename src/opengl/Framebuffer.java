@@ -29,7 +29,7 @@ import static org.lwjgl.opengl.GL30.GL_UNSIGNED_INT_24_8;
 import static org.lwjgl.opengl.GL30.glDeleteFramebuffers;
 import static org.lwjgl.opengl.GL30.glFramebufferTexture2D;
 import static org.lwjgl.opengl.GL30.glGenFramebuffers;
-import util.vectors.Vec4d;
+import util.math.Vec4d;
 
 public class Framebuffer extends GLObject {
 

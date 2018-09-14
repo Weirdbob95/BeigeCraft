@@ -7,7 +7,7 @@ import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
 import java.util.Collection;
-import util.vectors.Vec3d;
+import util.math.Vec3d;
 
 public class CreatureBehavior extends Behavior {
 
@@ -25,7 +25,8 @@ public class CreatureBehavior extends Behavior {
     public double speed = 6;
     public double jumpSpeed = 15;
 
-    public double damageMultiplier = 1;
+    public double damageTakenMultiplier = 1;
+    public double speedMultiplier = 1;
 
     @Override
     public void createInner() {
@@ -33,14 +34,14 @@ public class CreatureBehavior extends Behavior {
     }
 
     public void damage(double damage, Vec3d dir) {
-        damage *= damageMultiplier;
-        dir = dir.mul(damageMultiplier);
-//        velocity.velocity = velocity.velocity.add(dir.setZ(.5).mul(5 * damage));
-        //velocity.velocity = velocity.velocity.add(dir.setZ(.5).mul(20));
-        velocity.velocity = velocity.velocity.add(dir.mul(20));
-        currentHealth -= damage;
+        velocity.velocity = velocity.velocity.add(dir.mul(20 * damageTakenMultiplier));
+        currentHealth -= damage * damageTakenMultiplier;
         if (currentHealth <= 0) {
             getRoot().destroy();
         }
+    }
+
+    public double getSpeed() {
+        return speed * speedMultiplier;
     }
 }

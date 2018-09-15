@@ -1,17 +1,15 @@
 package game;
 
+import game.items.HeldItemController;
+import game.items.PlayerAbilityManager;
 import behaviors.PhysicsBehavior;
 import behaviors.PositionBehavior;
 import behaviors.VelocityBehavior;
-import definitions.ItemType;
 import engine.Behavior;
 import engine.Input;
 import static game.abilities.Ability.DO_NOTHING;
 import game.abilities.AbilityController;
-import game.abilities.ParryAbility;
-import game.abilities.WeaponChargeAbility;
 import game.creatures.CreatureBehavior;
-import game.inventory.ItemSlot;
 import graphics.Animation;
 import graphics.Sprite;
 import static graphics.VoxelRenderer.DIRS;
@@ -101,6 +99,7 @@ public class Player extends Behavior {
         physics.hitboxSize1Crouch = new Vec3d(.6, .6, 1.8);
         physics.hitboxSize2Crouch = new Vec3d(.6, .6, 1.0);
         heldItemController.eye.eyePos = () -> Camera.camera3d.position;
+        PlayerAbilityManager.player = this;
     }
 
     public RaycastHit firstSolid() {
@@ -155,9 +154,6 @@ public class Player extends Behavior {
         breakingBlocks = false;
         gui.hud.update(this);
 
-        Vec3d desCamPos = position.position.add(new Vec3d(0, 0, physics.crouch ? .8 : 1.4));
-        camera3d.position = camera3d.position.lerp(desCamPos, 1 - Math.pow(1e-8, dt));
-
         if (!gui.freezeMouse()) {
             // Look around
             camera3d.horAngle -= Input.mouseDelta().x / 300;
@@ -171,16 +167,9 @@ public class Player extends Behavior {
             }
         }
 
+        Vec3d desCamPos = position.position.add(new Vec3d(0, 0, physics.crouch ? .8 : 1.4));
+        camera3d.position = camera3d.position.lerp(desCamPos, 1 - Math.pow(1e-8, dt));
         heldItemController.eye.facing = Camera.camera3d.facing();
-        if (Input.mouseJustPressed(0)) {
-            abilityController.attemptAbility(new WeaponChargeAbility());
-        }
-        if (Input.mouseJustReleased(0)) {
-            abilityController.attemptAbility(DO_NOTHING);
-        }
-        if (Input.mouseJustPressed(1)) {
-            abilityController.attemptAbility(new ParryAbility());
-        }
 
         if (!gui.freezeMovement()) {
 
@@ -193,11 +182,6 @@ public class Player extends Behavior {
 
             // Crouch
             physics.shouldCrouch = Input.keyDown(GLFW_KEY_LEFT_SHIFT);
-
-//            if (Input.mouseJustPressed(1)) {
-////                sprintTimer = .2;
-//                parryTimer = .4;
-//            }
         }
 
         velocity.velocity = computeIdealVel();
@@ -213,27 +197,18 @@ public class Player extends Behavior {
 
         if (!gui.freezeMouse()) {
             // Use items
-            ItemType mainItem = ItemSlot.MAIN_HAND == null ? null : ItemSlot.MAIN_HAND.item();
+            PlayerAbilityManager.updateAbilities();
             if (Input.mouseJustPressed(0)) {
-                if (mainItem != null) {
-                    mainItem.use().useItemPress(this, true);
-                }
+                abilityController.attemptAbility(PlayerAbilityManager.primary);
             }
-            if (Input.mouseDown(0)) {
-                if (mainItem != null) {
-                    mainItem.use().useItemHold(this, true, dt);
-                }
+            if (Input.mouseJustReleased(0)) {
+                abilityController.attemptAbility(DO_NOTHING);
             }
-            ItemType offItem = ItemSlot.OFF_HAND == null ? null : ItemSlot.OFF_HAND.item();
             if (Input.mouseJustPressed(1)) {
-                if (offItem != null) {
-                    offItem.use().useItemPress(this, false);
-                }
+                abilityController.attemptAbility(PlayerAbilityManager.secondary);
             }
-            if (Input.mouseDown(1)) {
-                if (offItem != null) {
-                    offItem.use().useItemHold(this, false, dt);
-                }
+            if (Input.mouseJustReleased(1)) {
+                abilityController.attemptAbility(DO_NOTHING);
             }
         }
 

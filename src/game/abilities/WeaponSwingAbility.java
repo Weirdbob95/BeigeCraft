@@ -1,7 +1,8 @@
 package game.abilities;
 
 import behaviors.PhysicsBehavior;
-import game.HeldItemController;
+import engine.Behavior;
+import game.items.HeldItemController;
 import game.combat.WeaponAttack;
 import game.creatures.CreatureBehavior;
 import java.util.HashSet;
@@ -16,33 +17,32 @@ public class WeaponSwingAbility extends Ability {
 
     private static final double MAX_SLASH_ANGLE = 2.5;
 
-    public CreatureBehavior creature;
-    public HeldItemController heldItemController;
-    public World world;
+    public final CreatureBehavior creature = user.get(CreatureBehavior.class);
+    public final HeldItemController heldItemController = user.get(HeldItemController.class);
+    public final World world = user.get(PhysicsBehavior.class).world;
 
-    public WeaponAttack weaponAttack;
+    public final WeaponAttack weaponAttack;
+
     public double slashDuration;
     public double timer;
     public Set<CreatureBehavior> hit = new HashSet();
 
-    public WeaponSwingAbility(WeaponAttack weaponAttack) {
+    public WeaponSwingAbility(Behavior user, WeaponAttack weaponAttack) {
+        super(user);
         this.weaponAttack = weaponAttack;
     }
 
     @Override
     public Ability attemptTransitionTo(Ability nextAbility) {
         if (!weaponAttack.haveParriedThis.isEmpty()) {
-            return new Wait(.5 + slashDuration / 2);
+            return new Wait(user, .5 + slashDuration / 2);
         }
-        return timer < 0 ? new Wait(slashDuration / 2) : this;
+        return timer < 0 ? nextAbility : this;
+        //return timer < 0 ? new Wait(slashDuration / 2) : this;
     }
 
     @Override
     public void onStartUse() {
-        creature = abilityController.get(CreatureBehavior.class);
-        heldItemController = abilityController.get(HeldItemController.class);
-        world = abilityController.get(PhysicsBehavior.class).world;
-
         Vec3d normSwordPos = heldItemController.heldItemPos.normalize();
         Vec3d facing = heldItemController.eye.facing;
         double slashAngle = Math.acos(clamp(normSwordPos.dot(facing), -1, 1));
@@ -68,8 +68,8 @@ public class WeaponSwingAbility extends Ability {
     @Override
     public void onContinuousUse(double dt) {
         timer -= dt;
-        for (double i = 0; i < 1; i += .1) {
-            Vec3d pos = heldItemController.eye.eyePos.get().add(heldItemController.heldItemPos).lerp(heldItemController.position.position, i);
+        for (double i = .2; i <= 1; i += .05) {
+            Vec3d pos = heldItemController.eye.eyePos.get().add(heldItemController.heldItemPos).lerp(heldItemController.position.position, 1 - i);
             weaponAttack.knockback = heldItemController.realHeldItemVel.mul(.02 * heldItemController.heldItemType.weight);
             weaponAttack.hitAtPos(pos);
         }

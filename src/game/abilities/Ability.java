@@ -1,10 +1,16 @@
 package game.abilities;
 
+import engine.Behavior;
+
 public class Ability {
 
-    public static final Ability DO_NOTHING = new Ability();
+    public static final Ability DO_NOTHING = new Ability(null);
 
-    public AbilityController abilityController;
+    public final Behavior user;
+
+    public Ability(Behavior user) {
+        this.user = user;
+    }
 
     public Ability attemptTransitionTo(Ability nextAbility) {
         return nextAbility == null ? this : nextAbility;
@@ -22,6 +28,10 @@ public class Ability {
     public static abstract class ChanneledAbility extends Ability {
 
         private double chargeTime;
+
+        public ChanneledAbility(Behavior user) {
+            super(user);
+        }
 
         @Override
         public void onStartUse() {
@@ -45,6 +55,10 @@ public class Ability {
     public static abstract class ChargedAbility extends Ability {
 
         public double charge;
+
+        public ChargedAbility(Behavior user) {
+            super(user);
+        }
 
         public abstract boolean autoUseOnMaxCharge();
 
@@ -81,6 +95,10 @@ public class Ability {
 
     public static abstract class ContinuousAbility extends Ability {
 
+        public ContinuousAbility(Behavior user) {
+            super(user);
+        }
+
         @Override
         public void onContinuousUse(double dt) {
             use(dt);
@@ -90,6 +108,10 @@ public class Ability {
     }
 
     public static abstract class InstantAbility extends Ability {
+
+        public InstantAbility(Behavior user) {
+            super(user);
+        }
 
         @Override
         public Ability attemptTransitionTo(Ability nextAbility) {
@@ -107,6 +129,10 @@ public class Ability {
     public static abstract class TimedAbility extends Ability {
 
         public double timer;
+
+        public TimedAbility(Behavior user) {
+            super(user);
+        }
 
         @Override
         public Ability attemptTransitionTo(Ability nextAbility) {
@@ -130,7 +156,8 @@ public class Ability {
 
         private double timer;
 
-        public Wait(double timer) {
+        public Wait(Behavior user, double timer) {
+            super(user);
             this.timer = timer;
         }
 

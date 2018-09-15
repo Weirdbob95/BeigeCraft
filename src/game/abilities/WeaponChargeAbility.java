@@ -1,19 +1,24 @@
 package game.abilities;
 
 import definitions.BlockType;
-import game.HeldItemController;
+import engine.Behavior;
+import game.items.HeldItemController;
 import game.combat.WeaponAttack;
 
 public class WeaponChargeAbility extends Ability {
 
-    public HeldItemController heldItemController;
+    public HeldItemController heldItemController = user.get(HeldItemController.class);
 
     public WeaponAttack weaponAttack;
+
+    public WeaponChargeAbility(Behavior user) {
+        super(user);
+    }
 
     @Override
     public Ability attemptTransitionTo(Ability nextAbility) {
         if (nextAbility == DO_NOTHING) {
-            return new WeaponSwingAbility(weaponAttack);
+            return new WeaponSwingAbility(user, weaponAttack);
         } else {
             return super.attemptTransitionTo(nextAbility);
         }
@@ -21,7 +26,6 @@ public class WeaponChargeAbility extends Ability {
 
     @Override
     public void onStartUse() {
-        heldItemController = abilityController.get(HeldItemController.class);
         heldItemController.reorientSpeed = .1;
 
         weaponAttack = new WeaponAttack();

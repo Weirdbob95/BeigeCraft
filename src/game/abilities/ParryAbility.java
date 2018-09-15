@@ -1,6 +1,7 @@
 package game.abilities;
 
-import game.HeldItemController;
+import engine.Behavior;
+import game.items.HeldItemController;
 import game.combat.WeaponAttack;
 import game.creatures.CreatureBehavior;
 import game.creatures.Skeletor;
@@ -11,16 +12,20 @@ import util.math.Vec3d;
 
 public class ParryAbility extends Ability {
 
-    public CreatureBehavior creature;
-    public HeldItemController heldItemController;
+    public final CreatureBehavior creature = user.get(CreatureBehavior.class);
+    public final HeldItemController heldItemController = user.get(HeldItemController.class);
 
     public boolean failed;
     public Set<WeaponAttack> attacksToParry = new HashSet();
 
+    public ParryAbility(Behavior user) {
+        super(user);
+    }
+
     @Override
     public Ability attemptTransitionTo(Ability nextAbility) {
         if (nextAbility instanceof ParryAbility || failed) {
-            return new Wait(.5);
+            return new Wait(user, .5);
         }
         return attacksToParry.isEmpty() ? nextAbility : this;
     }
@@ -38,9 +43,6 @@ public class ParryAbility extends Ability {
 
     @Override
     public void onStartUse() {
-        creature = abilityController.get(CreatureBehavior.class);
-        heldItemController = abilityController.get(HeldItemController.class);
-
         SplineAnimation anim = heldItemController.newAnim();
         anim.addKeyframe(.1, heldItemController.eye.facing.mul(heldItemController.heldItemType.ext1 * .6), new Vec3d(0, 0, 0));
 

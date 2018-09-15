@@ -25,7 +25,6 @@ public class AbilityController extends Behavior {
             if (newAbility == nextAbility) {
                 nextAbility = null;
             }
-            currentAbility.abilityController = this;
             currentAbility.onStartUse();
         }
         currentAbility.onContinuousUse(dt);

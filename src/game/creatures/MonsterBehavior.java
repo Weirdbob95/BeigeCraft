@@ -19,9 +19,13 @@ public class MonsterBehavior extends Behavior {
     public double minDist = 4;
     public double jumpChance = 1;
 
+    public double prevHealth;
+    public double redness = 0;
+
     @Override
     public void render() {
-        model.color = new Vec4d(1, creature.currentHealth / creature.maxHealth, creature.currentHealth / creature.maxHealth, 1);
+        model.color = new Vec4d(1, creature.currentHealth / creature.maxHealth, creature.currentHealth / creature.maxHealth, 1)
+                .lerp(new Vec4d(1, 1 - redness, 1 - redness, 1), .75);
     }
 
     public void setHitboxFromModel() {
@@ -44,5 +48,11 @@ public class MonsterBehavior extends Behavior {
             }
         }
         creature.velocity.velocity = creature.velocity.velocity.lerp(idealVel.setZ(creature.velocity.velocity.z), 1 - Math.pow(.005, dt));
+
+        redness *= Math.pow(.01, dt);
+        if (creature.currentHealth < prevHealth) {
+            redness += (prevHealth - creature.currentHealth) * .5;
+        }
+        prevHealth = creature.currentHealth;
     }
 }

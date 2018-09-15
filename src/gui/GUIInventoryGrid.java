@@ -1,6 +1,6 @@
 package gui;
 
-import game.inventory.ItemSlot;
+import game.items.ItemSlot;
 import static gui.GUIInventorySquare.INVENTORY_SQUARE_SIZE;
 import util.math.Vec2d;
 

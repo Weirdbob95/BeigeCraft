@@ -1,4 +1,4 @@
-package game;
+package game.items;
 
 import graphics.Model;
 import util.math.Vec3d;

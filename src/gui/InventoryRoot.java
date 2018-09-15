@@ -1,7 +1,7 @@
 package gui;
 
 import engine.Input;
-import game.inventory.ItemSlot;
+import game.items.ItemSlot;
 import graphics.Font;
 import static util.math.MathUtils.ceil;
 import static org.lwjgl.glfw.GLFW.*;

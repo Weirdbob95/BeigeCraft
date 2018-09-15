@@ -1,7 +1,7 @@
 package game.creatures;
 
 import engine.Behavior;
-import game.HeldItemController;
+import game.items.HeldItemController;
 import static game.abilities.Ability.DO_NOTHING;
 import game.abilities.Ability.Wait;
 import game.abilities.AbilityController;
@@ -54,7 +54,7 @@ public class Skeletor extends Behavior {
             if (!timerOn) {
                 if (Math.random() < 4 * dt) {
                     if (abilityController.currentAbility == DO_NOTHING) {
-                        abilityController.attemptAbility(new WeaponChargeAbility());
+                        abilityController.attemptAbility(new WeaponChargeAbility(this));
                     } else if (abilityController.currentAbility instanceof WeaponChargeAbility) {
                         timerOn = true;
                         attackTimer = .4;

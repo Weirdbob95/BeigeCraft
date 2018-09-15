@@ -1,12 +1,11 @@
 package game.combat;
 
 import definitions.BlockType;
-import static game.GraphicsEffect.createGraphicsEffect;
+import game.ParticleBurst;
 import game.abilities.Ability;
 import game.abilities.WeaponChargeAbility;
 import game.abilities.WeaponSwingAbility;
 import game.creatures.CreatureBehavior;
-import graphics.Model;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -42,6 +41,14 @@ public class WeaponAttack {
         World world = attacker.physics.world;
         if (blocksToBreak.contains(world.getBlock(pos))) {
             world.setBlock(pos, null);
+            ParticleBurst pb = new ParticleBurst();
+            pb.position.position = pos;
+            pb.acceleration.acceleration = new Vec3d(0, 0, -16);
+            pb.lifetime.lifetime = .2;
+            pb.maxLifetime = .2;
+            pb.color = new Vec4d(.1, .4, .1, 1);
+            pb.spawn(10, 5, 10);
+            pb.create();
         }
         for (CreatureBehavior c : new LinkedList<>(CreatureBehavior.ALL)) {
             if (c != attacker) {
@@ -50,12 +57,24 @@ public class WeaponAttack {
                         targetsHit.add(c);
                         if (wantToParryThis.contains(c)) {
                             haveParriedThis.add(c);
+                            ParticleBurst pb = new ParticleBurst();
+                            pb.position.position = pos;
+                            pb.acceleration.acceleration = new Vec3d(0, 0, -16);
+                            pb.lifetime.lifetime = .15;
+                            pb.maxLifetime = .15;
+                            pb.color = new Vec4d(.7, .7, .7, 1);
+                            pb.spawn(10, 5, 10);
+                            pb.create();
                         } else {
                             c.damage(damage, knockback);
-                            createGraphicsEffect(.2, t -> {
-                                Model m = Model.load("fireball.vox");
-                                m.render(pos, 0, 0, 1 / 16., m.size().div(2), new Vec4d(1, 1, 1, 1 - 5 * t));
-                            });
+                            ParticleBurst pb = new ParticleBurst();
+                            pb.position.position = pos;
+                            pb.acceleration.acceleration = new Vec3d(0, 0, -16);
+                            pb.lifetime.lifetime = .15;
+                            pb.maxLifetime = .15;
+                            pb.color = new Vec4d(.8, .1, .1, 1);
+                            pb.spawn(10, 5, 10);
+                            pb.create();
                         }
                     }
                 }

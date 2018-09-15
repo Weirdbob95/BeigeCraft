@@ -1,4 +1,4 @@
-package game.inventory;
+package game.items;
 
 import definitions.ItemType;
 import static definitions.ItemType.getItem;

@@ -1,11 +1,5 @@
 package definitions;
 
-import game.inventory.BlockItem;
-import game.inventory.PickaxeItem;
-import game.inventory.SwordItem;
-import game.inventory.UsableItem;
-import game.inventory.WandItem;
-import game.inventory.WaterBucketItem;
 import graphics.BlockGUI;
 import graphics.Sprite;
 import java.util.ArrayList;
@@ -98,6 +92,10 @@ public class ItemType {
     private ItemType() {
     }
 
+    public BlockType blockType() {
+        return blockType;
+    }
+
     public String displayName() {
         return displayName;
     }
@@ -136,22 +134,26 @@ public class ItemType {
         }
     }
 
-    public UsableItem use() {
-        switch (useType) {
-            case "none":
-                return new UsableItem();
-            case "tool":
-                return new PickaxeItem();
-            case "sword":
-                return new SwordItem();
-            case "wand":
-                return new WandItem();
-            case "water_bucket":
-                return new WaterBucketItem();
-            case "block":
-                return new BlockItem(blockType);
-            default:
-                throw new RuntimeException("Unknown use type: " + useType);
-        }
+    public String useType() {
+        return useType;
     }
+
+//    public UsableItem use() {
+//        switch (useType) {
+//            case "none":
+//                return new UsableItem();
+//            case "tool":
+//                return new PickaxeItem();
+//            case "sword":
+//                return new SwordItem();
+//            case "wand":
+//                return new WandItem();
+//            case "water_bucket":
+//                return new WaterBucketItem();
+//            case "block":
+//                return new BlockItem(blockType);
+//            default:
+//                throw new RuntimeException("Unknown use type: " + useType);
+//        }
+//    }
 }

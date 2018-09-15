@@ -11,6 +11,22 @@ public class Vec4d {
         this.w = w;
     }
 
+    public Vec4d add(double a) {
+        return new Vec4d(x + a, y + a, z + a, w + a);
+    }
+
+    public Vec4d add(Vec4d other) {
+        return new Vec4d(x + other.x, y + other.y, z + other.z, w + other.w);
+    }
+
+    public Vec4d div(double a) {
+        return new Vec4d(x / a, y / a, z / a, w / a);
+    }
+
+    public Vec4d div(Vec4d other) {
+        return new Vec4d(x / other.x, y / other.y, z / other.z, w / other.w);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -46,6 +62,26 @@ public class Vec4d {
         hash = 89 * hash + (int) (Double.doubleToLongBits(this.z) ^ (Double.doubleToLongBits(this.z) >>> 32));
         hash = 89 * hash + (int) (Double.doubleToLongBits(this.w) ^ (Double.doubleToLongBits(this.w) >>> 32));
         return hash;
+    }
+
+    public Vec4d lerp(Vec4d other, double amt) {
+        return mul(1 - amt).add(other.mul(amt));
+    }
+
+    public Vec4d mul(double a) {
+        return new Vec4d(x * a, y * a, z * a, w * a);
+    }
+
+    public Vec4d mul(Vec4d other) {
+        return new Vec4d(x * other.x, y * other.y, z * other.z, w * other.w);
+    }
+
+    public Vec4d sub(double a) {
+        return new Vec4d(x - a, y - a, z - a, w - a);
+    }
+
+    public Vec4d sub(Vec4d other) {
+        return new Vec4d(x - other.x, y - other.y, z - other.z, w - other.w);
     }
 
     @Override

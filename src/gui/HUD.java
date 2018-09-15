@@ -3,7 +3,7 @@ package gui;
 import engine.Input;
 import game.Player;
 import static game.Settings.SHOW_DEBUG_HUD;
-import game.inventory.ItemSlot;
+import game.items.ItemSlot;
 import static util.math.MathUtils.mod;
 import util.math.Vec2d;
 import util.math.Vec3d;

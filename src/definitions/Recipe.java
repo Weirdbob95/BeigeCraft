@@ -1,7 +1,7 @@
 package definitions;
 
 import static definitions.ItemType.getItem;
-import game.inventory.ItemSlot;
+import game.items.ItemSlot;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

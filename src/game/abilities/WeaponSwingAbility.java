@@ -1,19 +1,15 @@
 package game.abilities;
 
 import behaviors.PhysicsBehavior;
-import definitions.BlockType;
-import static game.GraphicsEffect.createGraphicsEffect;
 import game.HeldItemController;
+import game.combat.WeaponAttack;
 import game.creatures.CreatureBehavior;
-import graphics.Model;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 import static util.math.MathUtils.clamp;
 import util.math.Quaternion;
 import util.math.SplineAnimation;
 import util.math.Vec3d;
-import util.math.Vec4d;
 import world.World;
 
 public class WeaponSwingAbility extends Ability {
@@ -24,12 +20,20 @@ public class WeaponSwingAbility extends Ability {
     public HeldItemController heldItemController;
     public World world;
 
+    public WeaponAttack weaponAttack;
     public double slashDuration;
     public double timer;
     public Set<CreatureBehavior> hit = new HashSet();
 
+    public WeaponSwingAbility(WeaponAttack weaponAttack) {
+        this.weaponAttack = weaponAttack;
+    }
+
     @Override
     public Ability attemptTransitionTo(Ability nextAbility) {
+        if (!weaponAttack.haveParriedThis.isEmpty()) {
+            return new Wait(.5 + slashDuration / 2);
+        }
         return timer < 0 ? new Wait(slashDuration / 2) : this;
     }
 
@@ -64,26 +68,10 @@ public class WeaponSwingAbility extends Ability {
     @Override
     public void onContinuousUse(double dt) {
         timer -= dt;
-
         for (double i = 0; i < 1; i += .1) {
             Vec3d pos = heldItemController.eye.eyePos.get().add(heldItemController.heldItemPos).lerp(heldItemController.position.position, i);
-            if (world.getBlock(pos) == BlockType.getBlock("leaves")) {
-                world.setBlock(pos, null);
-            }
-            for (CreatureBehavior c : new LinkedList<>(CreatureBehavior.ALL)) {
-                if (c != heldItemController.creature) {
-                    if (c.physics.containsPoint(pos)) {
-                        if (!hit.contains(c)) {
-                            hit.add(c);
-                            c.damage(2, heldItemController.realHeldItemVel.mul(.02 * heldItemController.heldItemType.weight));
-                            createGraphicsEffect(.2, t -> {
-                                Model m = Model.load("fireball.vox");
-                                m.render(pos, 0, 0, 1 / 16., m.size().div(2), new Vec4d(1, 1, 1, 1 - 5 * t));
-                            });
-                        }
-                    }
-                }
-            }
+            weaponAttack.knockback = heldItemController.realHeldItemVel.mul(.02 * heldItemController.heldItemType.weight);
+            weaponAttack.hitAtPos(pos);
         }
     }
 
@@ -93,5 +81,6 @@ public class WeaponSwingAbility extends Ability {
         heldItemController.makeTrail = false;
 
         creature.speedMultiplier = 1;
+        weaponAttack.hasFinished = true;
     }
 }

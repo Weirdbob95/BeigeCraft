@@ -3,11 +3,14 @@ package game.creatures;
 import engine.Behavior;
 import game.HeldItemController;
 import static game.abilities.Ability.DO_NOTHING;
+import game.abilities.Ability.Wait;
 import game.abilities.AbilityController;
 import game.abilities.WeaponChargeAbility;
+import game.combat.WeaponAttack;
 import graphics.Model;
 import graphics.Sprite;
 import java.util.Collection;
+import static util.math.MathUtils.clamp;
 import util.math.Vec2d;
 import util.math.Vec3d;
 import util.math.Vec4d;
@@ -22,7 +25,6 @@ public class Skeletor extends Behavior {
 
     public boolean timerOn;
     public double attackTimer;
-    public boolean attackParried;
 
     @Override
     public void createInner() {
@@ -34,9 +36,13 @@ public class Skeletor extends Behavior {
 
     @Override
     public void render() {
-        if (attackTimer > 0) {
-            Vec4d color = attackParried ? new Vec4d(.5, 1, .5, 1) : new Vec4d(1, .5 + attackTimer * .5 / .4, .5, 1);
+        WeaponAttack wa = WeaponAttack.getFromAbility(abilityController.currentAbility);
+        if (wa != null && wa.isParryable) {
+            Vec4d color = !wa.wantToParryThis.isEmpty() ? new Vec4d(.5, 1, .5, 1) : new Vec4d(1, .5 + clamp(attackTimer * .5 / .4, 0, .5), .5, 1);
             Sprite.load("item_sword.png").drawBillboard(monster.position.position.add(new Vec3d(0, 0, 2.5)), new Vec2d(1, 1), color);
+        }
+        if (abilityController.currentAbility instanceof Wait) {
+            Sprite.load("swirl.png").drawBillboard(monster.position.position.add(new Vec3d(0, 0, 2.5)), new Vec2d(1, 1), new Vec4d(.8, .8, .2, 1));
         }
     }
 
@@ -52,7 +58,7 @@ public class Skeletor extends Behavior {
                     } else if (abilityController.currentAbility instanceof WeaponChargeAbility) {
                         timerOn = true;
                         attackTimer = .4;
-                        attackParried = false;
+                        WeaponAttack.getFromAbility(abilityController.currentAbility).isParryable = true;
                     }
                 }
             }

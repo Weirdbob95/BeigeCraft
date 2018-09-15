@@ -1,7 +1,7 @@
 package game.abilities;
 
+import static definitions.Loader.getItemByBlock;
 import definitions.BlockType;
-import static definitions.ItemType.getItemByBlock;
 import engine.Behavior;
 import game.Player;
 import game.abilities.Ability.ContinuousAbility;

@@ -1,7 +1,6 @@
 package gui;
 
 import definitions.ItemType;
-import definitions.Recipe;
 import game.items.ItemSlot;
 import static gui.GUIInventorySquare.INVENTORY_SQUARE_SIZE;
 import util.math.Vec2d;
@@ -39,19 +38,19 @@ public class GUICraftingOutput extends GUIRectangle {
     @Override
     public void render() {
         super.render();
-        Recipe r = Recipe.findMatching(craftingSlots);
-        if (r != null) {
-            outputItem = r.output();
-            outputNum = r.outputNum();
-            outputItem.renderGUI(center());
-            if (outputNum > 1) {
-                count.setText("" + outputNum);
-            } else {
-                count.setText(null);
-            }
-        } else {
-            outputItem = null;
-            count.setText(null);
-        }
+//        Recipe r = Recipe.findMatching(craftingSlots);
+//        if (r != null) {
+//            outputItem = r.output();
+//            outputNum = r.outputNum();
+//            outputItem.renderGUI(center());
+//            if (outputNum > 1) {
+//                count.setText("" + outputNum);
+//            } else {
+//                count.setText(null);
+//            }
+//        } else {
+//            outputItem = null;
+//            count.setText(null);
+//        }
     }
 }

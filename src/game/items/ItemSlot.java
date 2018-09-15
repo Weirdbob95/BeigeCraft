@@ -1,7 +1,7 @@
 package game.items;
 
 import definitions.ItemType;
-import static definitions.ItemType.getItem;
+import static definitions.Loader.getItem;
 
 public class ItemSlot {
 
@@ -14,9 +14,12 @@ public class ItemSlot {
     static {
         addToInventory(
                 getItem("sword"),
+                getItem("dagger"),
+                getItem("hammer"),
+                getItem("spear"),
                 getItem("pickaxe"),
                 getItem("wand"),
-                getItem("water_bucket"),
+                getItem("waterBucket"),
                 getItem("block.lava"));
     }
 
@@ -28,7 +31,7 @@ public class ItemSlot {
 
     private boolean addItem(ItemType i) {
         if (i != null) {
-            if (item == null || (item.equals(i) && count < item.maxStackSize())) {
+            if (item == null || (item.equals(i) && count < item.maxStackSize)) {
                 item = i;
                 count++;
                 return true;

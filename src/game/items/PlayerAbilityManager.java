@@ -1,8 +1,8 @@
 package game.items;
 
+import definitions.WeaponType;
 import game.Player;
 import game.abilities.Ability;
-import static game.abilities.Ability.DO_NOTHING;
 import game.abilities.BlockBreakAbility;
 import game.abilities.BlockPlaceAbility;
 import game.abilities.LiquidPlaceAbility;
@@ -21,22 +21,22 @@ public class PlayerAbilityManager {
         if (is == null || is.item() == null) {
             return new WeaponChargeAbility(player);
         }
-        switch (is.item().useType()) {
-            case "none":
-                return DO_NOTHING;
-            case "tool":
-                return new BlockBreakAbility(player);
-            case "sword":
-                return new WeaponChargeAbility(player);
-            case "wand":
-                return new SpellcastAbility(player);
-            case "water_bucket":
-                return new LiquidPlaceAbility(player);
-            case "block":
-                return new BlockPlaceAbility(player, ItemSlot.MAIN_HAND.item().blockType());
-            default:
-                throw new RuntimeException("Unknown use type: " + ItemSlot.MAIN_HAND.item().useType());
+        if (is.item().weapon != null) {
+            return new WeaponChargeAbility(player);
         }
+        if (is.item().tool != null) {
+            return new BlockBreakAbility(player);
+        }
+        if (is.item().blockType != null) {
+            return new BlockPlaceAbility(player, is.item().blockType);
+        }
+        if (is.item().gameName.equals("wand")) {
+            return new SpellcastAbility(player);
+        }
+        if (is.item().gameName.equals("waterBucket")) {
+            return new LiquidPlaceAbility(player);
+        }
+        throw new RuntimeException("Unknown ability for item: " + is.item().gameName);
     }
 
     public static void updateAbilities() {
@@ -44,6 +44,19 @@ public class PlayerAbilityManager {
         secondary = itemSlotToAbility(ItemSlot.OFF_HAND);
         if (primary.getClass().equals(secondary.getClass())) {
             secondary = new ParryAbility(player);
+        }
+        if (primary instanceof WeaponChargeAbility) {
+            if (ItemSlot.MAIN_HAND != null && ItemSlot.MAIN_HAND.item() != null) {
+                player.heldItemController.heldItemType = ItemSlot.MAIN_HAND.item().weapon;
+            } else {
+                player.heldItemController.heldItemType = WeaponType.FIST;
+            }
+        } else {
+            if (ItemSlot.OFF_HAND != null && ItemSlot.OFF_HAND.item() != null) {
+                player.heldItemController.heldItemType = ItemSlot.OFF_HAND.item().weapon;
+            } else {
+                player.heldItemController.heldItemType = WeaponType.FIST;
+            }
         }
     }
 }

@@ -1,16 +1,15 @@
 package world.chunks;
 
+import definitions.BlockType;
+import static definitions.Loader.getBlock;
+import util.math.Vec3d;
 import util.noise.NoiseInterpolator;
 import util.noise.ZeroCrossing;
 import util.rlestorage.IntConverter.BlockTypeConverter;
 import util.rlestorage.RLEArrayStorage;
-import util.math.Vec3d;
-import definitions.BlockType;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
-import static definitions.BlockType.getBlock;
-import static definitions.BlockType.getBlockByID;
 
 public class ConstructedChunk extends AbstractChunk {
 

@@ -1,147 +1,53 @@
 package definitions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import util.YAMLObject;
-import util.math.Vec2d;
+import definitions.Beans.Vec2dBean;
 import util.math.Vec3d;
 
 public class BlockType {
 
-    private static final Map<String, BlockType> BLOCK_MAP = new HashMap();
-    private static final ArrayList<BlockType> BLOCK_LIST = new ArrayList();
-
-    static {
-        YAMLObject root = YAMLObject.parse("definitions/block_definitions.txt");
-        BLOCK_LIST.add(null);
-        for (YAMLObject block : root.contents) {
-            BlockType bt = new BlockType();
-            bt.id = BLOCK_LIST.size();
-            bt.gameName = block.name;
-            processParams(bt, root, block.contents);
-            BLOCK_MAP.put(bt.gameName, bt);
-            BLOCK_LIST.add(bt);
-        }
-    }
-
-    private static void processParams(BlockType bt, YAMLObject root, List<YAMLObject> params) {
-        for (YAMLObject param : params) {
-            switch (param.name) {
-                case "include":
-                    processParams(bt, root, root.getSubObject(param.value).contents);
-                    break;
-                case "name":
-                    bt.displayName = param.value;
-                    break;
-                case "texture":
-                    for (YAMLObject texParam : param.contents) {
-                        switch (texParam.name) {
-                            case "type":
-                                bt.textureType = texParam.value;
-                                break;
-                            case "pos":
-                                bt.pos = texParam.valueToVec2d();
-                                break;
-                            case "side":
-                                bt.side = texParam.valueToVec2d();
-                                break;
-                            case "top":
-                                bt.top = texParam.valueToVec2d();
-                                break;
-                            case "bottom":
-                                bt.bottom = texParam.valueToVec2d();
-                                break;
-                        }
-                    }
-                    break;
-                case "durability":
-                    bt.durability = param.valueToDouble();
-                    break;
-                case "tool":
-                    bt.tool = param.value;
-                    break;
-                case "tool_level":
-                    bt.toolLevel = param.valueToInt();
-                    break;
-                case "on_break":
-                    switch (param.value) {
-                        case "none":
-                            bt.onBreak = null;
-                            break;
-                        case "self":
-                            bt.onBreak = bt;
-                            break;
-                        default:
-                            bt.onBreak = getBlock(param.value);
-                            break;
-                    }
-                    break;
-                default:
-                    throw new RuntimeException("Unknown parameter: " + param.name);
-            }
-        }
-    }
-
-    private int id;
-    private String gameName;
-    private String displayName;
-    private String textureType;
-    private Vec2d pos, side, top, bottom;
-    private double durability;
-    private String tool;
-    private int toolLevel;
-    private BlockType onBreak;
-
-    private BlockType() {
-    }
-
-    public String displayName() {
-        return displayName;
-    }
-
-    public String gameName() {
-        return gameName;
-    }
-
-    public static List<BlockType> getAllBlocks() {
-        return BLOCK_LIST.subList(1, BLOCK_LIST.size());
-    }
-
-    public static BlockType getBlock(String name) {
-        if (!BLOCK_MAP.containsKey(name)) {
-            throw new RuntimeException("Unknown block type: " + name);
-        }
-        return BLOCK_MAP.get(name);
-    }
-
-    public static BlockType getBlockByID(int id) {
-        return BLOCK_LIST.get(id);
-    }
+    public int id;
+    public String gameName = null;
+    public String displayName = "Missing name";
+    public DiffTopBotTextureType diffTopBotTexture = null;
+    public UniformTextureType uniformTexture = null;
+    public double durability = 1;
+    public String tool = null;
+    public int toolLevel = 0;
+    public String onBreak = "same";
 
     public BlockType getOnBreak() {
-        return onBreak;
+        if (onBreak.equals("none")) {
+            return null;
+        }
+        if (onBreak.equals("same")) {
+            return this;
+        }
+        return Loader.getBlock(onBreak);
     }
 
     public int getTexID(Vec3d dir) {
-        switch (textureType) {
-            case "uniform":
-                return (int) pos.x + (int) pos.y * 256;
-            case "diff_top_bot":
-                if (dir.z > 0) {
-                    return (int) top.x + (int) top.y * 256;
-                } else if (dir.z < 0) {
-                    return (int) bottom.x + (int) bottom.y * 256;
-                } else {
-                    return (int) side.x + (int) side.y * 256;
-                }
-            default:
-                throw new RuntimeException("Unknown texture type: " + textureType);
+        if (diffTopBotTexture != null) {
+            if (dir.z > 0) {
+                return (int) diffTopBotTexture.top.x + (int) diffTopBotTexture.top.y * 256;
+            } else if (dir.z < 0) {
+                return (int) diffTopBotTexture.bot.x + (int) diffTopBotTexture.bot.y * 256;
+            } else {
+                return (int) diffTopBotTexture.side.x + (int) diffTopBotTexture.side.y * 256;
+            }
         }
+        if (uniformTexture != null) {
+            return (int) uniformTexture.pos.x + (int) uniformTexture.pos.y * 256;
+        }
+        throw new RuntimeException("Texture not defined for block type: " + gameName);
     }
 
-    public int id() {
-        return id;
+    public static class DiffTopBotTextureType {
+
+        public Vec2dBean top, bot, side;
+    }
+
+    public static class UniformTextureType {
+
+        public Vec2dBean pos;
     }
 }

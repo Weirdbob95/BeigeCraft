@@ -2,9 +2,9 @@ package game.abilities;
 
 import behaviors.PhysicsBehavior;
 import engine.Behavior;
-import game.items.HeldItemController;
 import game.combat.WeaponAttack;
 import game.creatures.CreatureBehavior;
+import game.items.HeldItemController;
 import java.util.HashSet;
 import java.util.Set;
 import static util.math.MathUtils.clamp;
@@ -37,8 +37,8 @@ public class WeaponSwingAbility extends Ability {
         if (!weaponAttack.haveParriedThis.isEmpty()) {
             return new Wait(user, .5 + slashDuration / 2);
         }
-        return timer < 0 ? nextAbility : this;
-        //return timer < 0 ? new Wait(slashDuration / 2) : this;
+//        return timer < 0 ? nextAbility : this;
+        return timer < 0 ? new Wait(user, slashDuration / 2) : this;
     }
 
     @Override

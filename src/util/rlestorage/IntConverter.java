@@ -1,7 +1,7 @@
 package util.rlestorage;
 
 import definitions.BlockType;
-import static definitions.BlockType.getBlockByID;
+import static definitions.Loader.getBlockByID;
 
 public interface IntConverter<T> {
 
@@ -21,7 +21,7 @@ public interface IntConverter<T> {
             if (t == null) {
                 return 0;
             }
-            return t.id();
+            return t.id;
         }
     }
 

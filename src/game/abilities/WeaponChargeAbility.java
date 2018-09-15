@@ -1,9 +1,9 @@
 package game.abilities;
 
-import definitions.BlockType;
+import static definitions.Loader.getBlock;
 import engine.Behavior;
-import game.items.HeldItemController;
 import game.combat.WeaponAttack;
+import game.items.HeldItemController;
 
 public class WeaponChargeAbility extends Ability {
 
@@ -31,7 +31,7 @@ public class WeaponChargeAbility extends Ability {
         weaponAttack = new WeaponAttack();
         weaponAttack.attacker = heldItemController.creature;
         weaponAttack.damage = 2;
-        weaponAttack.blocksToBreak.add(BlockType.getBlock("leaves"));
+        weaponAttack.blocksToBreak.add(getBlock("leaves"));
     }
 
     @Override

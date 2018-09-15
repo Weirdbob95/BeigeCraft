@@ -2,6 +2,8 @@ package game.items;
 
 import behaviors.PositionBehavior;
 import behaviors.PreviousPositionBehavior;
+import static definitions.Loader.getItem;
+import definitions.WeaponType;
 import engine.Behavior;
 import static game.GraphicsEffect.createGraphicsEffect;
 import game.creatures.CreatureBehavior;
@@ -22,7 +24,7 @@ public class HeldItemController extends Behavior {
     public Vec3d heldItemVel = new Vec3d(0, 0, 0);
     public Vec3d realHeldItemVel = new Vec3d(0, 0, 0);
 
-    public Weapon heldItemType = Weapon.SWORD;
+    public WeaponType heldItemType = getItem("sword").weapon;
     public boolean makeTrail;
     public double reorientSpeed = .5;
     public Vec4d color = new Vec4d(1, 1, 1, 1);
@@ -45,7 +47,7 @@ public class HeldItemController extends Behavior {
     public void render() {
         double direction1 = MathUtils.direction1(heldItemPos.add(eye.facing.cross(new Vec3d(0, 0, 1)).mul(-.5)));
         double direction2 = Math.PI / 2 + MathUtils.direction2(heldItemPos.add(new Vec3d(0, 0, 1)));
-        heldItemType.model.render(eye.eyePos.get().add(heldItemPos), direction1, direction2, 1 / 16., heldItemType.modelTip, color);
+        heldItemType.getModel().render(eye.eyePos.get().add(heldItemPos), direction1, direction2, 1 / 16., heldItemType.getModelTip(), color);
     }
 
     @Override
@@ -75,7 +77,7 @@ public class HeldItemController extends Behavior {
             double direction2 = Math.PI / 2 + MathUtils.direction2(heldItemPos.add(new Vec3d(0, 0, 1)));
             double duration = .1;
             createGraphicsEffect(duration, t -> {
-                heldItemType.model.render(currentPos, direction1, direction2, 1 / 16., heldItemType.modelTip, new Vec4d(2, 2, 2, .05 * .2 / heldItemType.slashDuration * (1 - t / duration)));
+                heldItemType.getModel().render(currentPos, direction1, direction2, 1 / 16., heldItemType.getModelTip(), new Vec4d(2, 2, 2, .05 * .2 / heldItemType.slashDuration * (1 - t / duration)));
             });
         }
         realHeldItemVel = heldItemPos.sub(prevSwordPos).div(dt);

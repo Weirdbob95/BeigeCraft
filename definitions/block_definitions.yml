@@ -1,0 +1,87 @@
+gameName: dirt
+displayName: Dirt
+uniformTexture:
+    pos: {x: 1, y: 0}
+tool: shovel
+---
+gameName: grass0
+displayName: Grass
+diffTopBotTexture:
+    top: {x: 0, y: 0}
+    bot: {x: 1, y: 0}
+    side: {x: 3, y: 0}
+tool: shovel
+onBreak: dirt
+---
+gameName: grass1
+displayName: Grass
+diffTopBotTexture:
+    top: {x: 2, y: 2}
+    bot: {x: 1, y: 0}
+    side: {x: 3, y: 2}
+tool: shovel
+onBreak: dirt
+---
+gameName: grass2
+displayName: Grass
+diffTopBotTexture:
+    top: {x: 0, y: 2}
+    bot: {x: 1, y: 0}
+    side: {x: 1, y: 2}
+tool: shovel
+onBreak: dirt
+---
+gameName: log
+displayName: Log
+diffTopBotTexture:
+    top: {x: 1, y: 1}
+    bot: {x: 1, y: 1}
+    side: {x: 0, y: 1}
+tool: axe
+---
+gameName: leaves
+displayName: Leaves
+uniformTexture:
+    pos: {x: 2, y: 1}
+tool: axe
+onBreak: none
+---
+gameName: stone
+displayName: Stone
+uniformTexture:
+    pos: {x: 2, y: 0}
+tool: pickaxe
+toolLevel: 1
+---
+gameName: lava
+displayName: Lava
+uniformTexture:
+    pos: {x: 1, y: 3}
+onBreak: none
+---
+gameName: sand
+displayName: Sand
+uniformTexture:
+    pos: {x: 3, y: 1}
+tool: shovel
+---
+gameName: planks
+displayName: Wooden Planks
+uniformTexture:
+    pos: {x: 4, y: 1}
+tool: axe
+---
+gameName: cactus
+displayName: Cactus
+diffTopBotTexture:
+    top: {x: 4, y: 2}
+    bot: {x: 4, y: 2}
+    side: {x: 4, y: 1}
+tool: axe
+---
+gameName: ironOre
+displayName: Iron Ore
+uniformTexture:
+    pos: {x: 0, y: 3}
+tool: pickaxe
+toolLevel: 2

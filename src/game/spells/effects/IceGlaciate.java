@@ -14,7 +14,7 @@ public class IceGlaciate extends SpellEffect {
     @Override
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature) {
-          //info.target.creature.frzStatusTimer = 5;
+          info.target.creature.frzStatusTimer = 5;
             
         }
     }

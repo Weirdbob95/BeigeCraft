@@ -79,6 +79,14 @@ public abstract class Structure {
         }
     }
 
+    public static class Fern extends Structure {
+
+        public Fern(StructuredChunk sc, int x, int y, int z) {
+            super(sc, x, y, z);
+            terrainObjects.add(new TerrainObjectInstance(getTerrainObject("fern"), sc.pos, x, y, z));
+        }
+    }
+
     public static class Flower extends Structure {
 
         public Flower(StructuredChunk sc, int x, int y, int z) {

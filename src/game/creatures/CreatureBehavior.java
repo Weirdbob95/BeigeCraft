@@ -27,6 +27,7 @@ public class CreatureBehavior extends Behavior {
 
     public double damageTakenMultiplier = 1;
     public double speedMultiplier = 1;
+    public double frzStatusTimer = 0;
 
     @Override
     public void createInner() {

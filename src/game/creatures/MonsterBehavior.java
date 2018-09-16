@@ -24,8 +24,10 @@ public class MonsterBehavior extends Behavior {
 
     @Override
     public void render() {
-        model.color = new Vec4d(1, creature.currentHealth / creature.maxHealth, creature.currentHealth / creature.maxHealth, 1)
-                .lerp(new Vec4d(1, 1 - redness, 1 - redness, 1), .75);
+        if (creature.frzStatusTimer <= 0) {
+            model.color = new Vec4d(1, creature.currentHealth / creature.maxHealth, creature.currentHealth / creature.maxHealth, 1)
+                    .lerp(new Vec4d(1, 1 - redness, 1 - redness, 1), .75);
+        }
     }
 
     public void setHitboxFromModel() {
@@ -35,20 +37,25 @@ public class MonsterBehavior extends Behavior {
 
     @Override
     public void update(double dt) {
-        Vec3d idealVel = new Vec3d(0, 0, 0);
-        goal = Camera.camera3d.position;
-        if (goal != null) {
-            Vec3d delta = goal.sub(position.position).setZ(0);
-            if (delta.length() > minDist) {
-                idealVel = delta.setLength(creature.getSpeed());
-                if (physics.onGround && (physics.hitWall || Math.random() < dt * jumpChance)) {
-                    creature.velocity.velocity = creature.velocity.velocity.setZ(creature.jumpSpeed);
+        if (creature.frzStatusTimer > 0) {
+            model.color = new Vec4d(0, 0.5, 1, 1);
+            creature.velocity.velocity = creature.velocity.velocity.mul(Math.pow(.5, dt));
+            creature.frzStatusTimer -= dt;
+        } else {
+            Vec3d idealVel = new Vec3d(0, 0, 0);
+            goal = Camera.camera3d.position;
+            if (goal != null) {
+                Vec3d delta = goal.sub(position.position).setZ(0);
+                if (delta.length() > minDist) {
+                    idealVel = delta.setLength(creature.getSpeed());
+                    if (physics.onGround && (physics.hitWall || Math.random() < dt * jumpChance)) {
+                        creature.velocity.velocity = creature.velocity.velocity.setZ(creature.jumpSpeed);
+                    }
+                    model.rotation = Math.atan2(idealVel.y, idealVel.x);
                 }
-                model.rotation = Math.atan2(idealVel.y, idealVel.x);
             }
+            creature.velocity.velocity = creature.velocity.velocity.lerp(idealVel.setZ(creature.velocity.velocity.z), 1 - Math.pow(.005, dt));
         }
-        creature.velocity.velocity = creature.velocity.velocity.lerp(idealVel.setZ(creature.velocity.velocity.z), 1 - Math.pow(.005, dt));
-
         redness *= Math.pow(.01, dt);
         if (creature.currentHealth < prevHealth) {
             redness += (prevHealth - creature.currentHealth) * .5;

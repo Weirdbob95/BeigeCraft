@@ -20,6 +20,12 @@ public class ItemSlot {
                 getItem("pickaxe"),
                 getItem("wand"),
                 getItem("waterBucket"),
+                getItem("terrainobject.chest"),
+                getItem("terrainobject.chest"),
+                getItem("terrainobject.chest"),
+                getItem("terrainobject.chest"),
+                getItem("terrainobject.chest"),
+                getItem("terrainobject.chest"),
                 getItem("block.lava"));
     }
 

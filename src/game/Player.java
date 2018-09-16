@@ -21,15 +21,12 @@ import java.util.Map.Entry;
 import opengl.Camera;
 import static opengl.Camera.camera3d;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-import static util.math.MathUtils.round;
-import static util.math.MathUtils.vecMap;
 import util.math.Vec2d;
 import util.math.Vec3d;
 import util.math.Vec4d;
@@ -212,13 +209,13 @@ public class Player extends Behavior {
             }
         }
 
-        if (Input.keyJustPressed(GLFW_KEY_C)) {
-            RaycastHit block = firstSolid();
-            if (block != null) {
-                Chest c = new Chest();
-                c.model.position.position = vecMap(block.hitPos, x -> (double) round(x)).sub(block.hitDir);
-                c.create();
-            }
-        }
+//        if (Input.keyJustPressed(GLFW_KEY_C)) {
+//            RaycastHit block = firstSolid();
+//            if (block != null) {
+//                Chest c = new Chest();
+//                c.model.position.position = vecMap(block.hitPos, x -> (double) round(x)).sub(block.hitDir);
+//                c.create();
+//            }
+//        }
     }
 }

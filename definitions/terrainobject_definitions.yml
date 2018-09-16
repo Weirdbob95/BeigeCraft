@@ -7,3 +7,8 @@ gameName: fern
 displayName: Fern
 modelName: fern.vox
 durability: .5
+---
+gameName: chest
+displayName: Chest
+modelName: chest.vox
+solid: true

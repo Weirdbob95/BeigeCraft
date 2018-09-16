@@ -5,6 +5,7 @@ import static util.math.MathUtils.ceil;
 import static util.math.MathUtils.floor;
 import static util.math.MathUtils.mod;
 import util.math.Vec3d;
+import world.TerrainObjectInstance;
 import world.World;
 import static world.World.CHUNK_SIZE;
 import world.chunks.ConstructedChunk;
@@ -149,6 +150,12 @@ public class PhysicsBehavior extends Behavior {
                 ConstructedChunk cc = world.constructedChunks.get(world.getChunkPos(new Vec3d(x, y, 0)));
                 if (!cc.blockStorage.rangeEquals(mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE), floor(pos.z - hitboxSize1.z), ceil(pos.z + hitboxSize2.z) - 1, null)) {
                     return true;
+                }
+                for (int z = floor(pos.z - hitboxSize1.z); z < pos.z + hitboxSize2.z; z++) {
+                    TerrainObjectInstance toi = world.getTerrainObject(new Vec3d(x, y, z));
+                    if (toi != null && toi.type.solid) {
+                        return true;
+                    }
                 }
             }
         }

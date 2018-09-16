@@ -61,15 +61,20 @@ public class World extends Behavior {
 
     private final HashMap<String, Noise> noiseMap = new HashMap();
 
-    public void addTerrainObject(Vec3d pos, TerrainObjectType tot) {
+    public boolean addTerrainObject(Vec3d pos, TerrainObjectType tot) {
         TerrainObjectInstance toi = new TerrainObjectInstance(tot, getChunkPos(pos), (int) mod(pos.x, CHUNK_SIZE), (int) mod(pos.y, CHUNK_SIZE), floor(pos.z));
         for (Vec3d v : toi.getOccupancy()) {
             v = v.add(new Vec3d(toi.chunkPos.x, toi.chunkPos.y, 0).mul(CHUNK_SIZE));
-            setBlock(v, null);
-            removeTerrainObject(v);
+            if (getBlock(v) != null || getTerrainObject(v) != null) {
+                return false;
+            }
+        }
+        for (Vec3d v : toi.getOccupancy()) {
+            v = v.add(new Vec3d(toi.chunkPos.x, toi.chunkPos.y, 0).mul(CHUNK_SIZE));
             constructedChunks.get(getChunkPos(v)).terrainObjectOccupancyMap.put(new Vec3d((int) mod(v.x, CHUNK_SIZE), (int) mod(v.y, CHUNK_SIZE), floor(v.z)), toi);
         }
         constructedChunks.get(toi.chunkPos).terrainObjects.add(toi);
+        return true;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package world.water;
+package world;
 
 import engine.Behavior;
 import graphics.Graphics;

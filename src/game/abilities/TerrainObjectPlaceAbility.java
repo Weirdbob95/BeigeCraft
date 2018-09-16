@@ -1,21 +1,21 @@
 package game.abilities;
 
-import definitions.BlockType;
+import definitions.TerrainObjectType;
 import engine.Behavior;
 import game.Player;
 import game.abilities.Ability.InstantAbility;
 import game.items.ItemSlot;
 import world.Raycast.RaycastHit;
 
-public class BlockPlaceAbility extends InstantAbility {
+public class TerrainObjectPlaceAbility extends InstantAbility {
 
     public final Player player = user.get(Player.class);
 
-    public final BlockType blockType;
+    public final TerrainObjectType terrainObjectType;
 
-    public BlockPlaceAbility(Behavior user, BlockType blockType) {
+    public TerrainObjectPlaceAbility(Behavior user, TerrainObjectType terrainObjectType) {
         super(user);
-        this.blockType = blockType;
+        this.terrainObjectType = terrainObjectType;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class BlockPlaceAbility extends InstantAbility {
         if (block != null) {
             //(isMainHand ? ItemSlot.MAIN_HAND : ItemSlot.OFF_HAND).removeItem();
             ItemSlot.MAIN_HAND.removeItem();
-            player.physics.world.setBlock(block.hitPos, blockType);
+            player.physics.world.addTerrainObject(block.hitPos, terrainObjectType);
         }
     }
 }

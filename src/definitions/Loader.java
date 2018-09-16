@@ -14,9 +14,13 @@ public class Loader {
     private static final List<ItemType> ITEM_LIST = new ArrayList();
     private static final Map<String, ItemType> ITEM_MAP = new HashMap();
 
+    private static final List<TerrainObjectType> TERRAINOBJECT_LIST = new ArrayList();
+    private static final Map<String, TerrainObjectType> TERRAINOBJECT_MAP = new HashMap();
+
     static {
         BLOCK_LIST.add(null);
         ITEM_LIST.add(null);
+        TERRAINOBJECT_LIST.add(null);
 
         for (BlockType bt : Resources.loadYamlFile("definitions/block_definitions.yml", BlockType.class)) {
             bt.id = BLOCK_LIST.size();
@@ -32,7 +36,24 @@ public class Loader {
             ITEM_LIST.add(it);
             ITEM_MAP.put(it.gameName, it);
         }
+
         for (ItemType it : Resources.loadYamlFile("definitions/item_definitions.yml", ItemType.class)) {
+            it.id = ITEM_LIST.size();
+            ITEM_LIST.add(it);
+            ITEM_MAP.put(it.gameName, it);
+        }
+
+        for (TerrainObjectType tot : Resources.loadYamlFile("definitions/terrainobject_definitions.yml", TerrainObjectType.class)) {
+            tot.id = TERRAINOBJECT_LIST.size();
+            TERRAINOBJECT_LIST.add(tot);
+            TERRAINOBJECT_MAP.put(tot.gameName, tot);
+
+            ItemType it = new ItemType();
+            it.gameName = "terrainobject." + tot.gameName;
+            it.displayName = tot.displayName;
+            it.texture = "item_block.png";
+            it.terrainObjectType = tot;
+
             it.id = ITEM_LIST.size();
             ITEM_LIST.add(it);
             ITEM_MAP.put(it.gameName, it);
@@ -52,7 +73,6 @@ public class Loader {
 
     public static ItemType getItem(String name) {
         if (!ITEM_MAP.containsKey(name)) {
-            System.out.println(ITEM_MAP);
             throw new RuntimeException("Unknown item type: " + name);
         }
         return ITEM_MAP.get(name);
@@ -65,5 +85,21 @@ public class Loader {
             }
         }
         throw new RuntimeException("Could not find item corresponding to block type: " + bt.gameName);
+    }
+
+    public static ItemType getItemByTerrainObject(TerrainObjectType tot) {
+        for (ItemType it : ITEM_MAP.values()) {
+            if (it != null && it.terrainObjectType == tot) {
+                return it;
+            }
+        }
+        throw new RuntimeException("Could not find item corresponding to terrain object type: " + tot.gameName);
+    }
+
+    public static TerrainObjectType getTerrainObject(String name) {
+        if (!TERRAINOBJECT_MAP.containsKey(name)) {
+            throw new RuntimeException("Unknown terrain object type: " + name);
+        }
+        return TERRAINOBJECT_MAP.get(name);
     }
 }

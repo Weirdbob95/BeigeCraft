@@ -10,12 +10,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import opengl.Camera;
 import opengl.ShaderProgram;
-import static util.math.MathUtils.mod;
 import util.Resources;
-import util.rlestorage.IntConverter.IntegerConverter;
-import util.rlestorage.RLEArrayStorage;
+import static util.math.MathUtils.mod;
+import static util.math.MathUtils.vecMap;
 import util.math.Vec3d;
 import util.math.Vec4d;
+import util.rlestorage.IntConverter.IntegerConverter;
+import util.rlestorage.RLEArrayStorage;
 
 public class Model extends VoxelRenderer<Integer> {
 
@@ -51,12 +52,12 @@ public class Model extends VoxelRenderer<Integer> {
         0xff880000, 0xff770000, 0xff550000, 0xff440000, 0xff220000, 0xff110000, 0xffeeeeee, 0xffdddddd, 0xffbbbbbb, 0xffaaaaaa, 0xff888888, 0xff777777, 0xff555555, 0xff444444, 0xff222222, 0xff111111
     };
 
-    private Vec3d size;
+    private Vec3d originalSize;
+    private Vec3d max, min;
     private RLEArrayStorage<Integer> colors;
     private int[] colorPalette = DEFAULT_COLOR_PALETTE;
 
     private Model(String fileName) {
-        size = null;
         colors = null;
         colorPalette = DEFAULT_COLOR_PALETTE;
 
@@ -66,8 +67,8 @@ public class Model extends VoxelRenderer<Integer> {
             String chunkName = new String(bytes, pos, 4);
             int chunkSize = readInt(bytes, pos + 4);
             if (chunkName.equals("SIZE")) {
-                size = new Vec3d(readInt(bytes, pos + 12), readInt(bytes, pos + 16), readInt(bytes, pos + 20));
-                colors = new RLEArrayStorage(Math.max((int) size.x, (int) size.y), new IntegerConverter());
+                originalSize = new Vec3d(readInt(bytes, pos + 12), readInt(bytes, pos + 16), readInt(bytes, pos + 20));
+                colors = new RLEArrayStorage(Math.max((int) originalSize.x, (int) originalSize.y), new IntegerConverter());
             }
             if (chunkName.equals("XYZI")) {
                 int numBlocks = readInt(bytes, pos + 12);
@@ -77,6 +78,13 @@ public class Model extends VoxelRenderer<Integer> {
                     int z = mod(bytes[pos + 16 + 4 * i + 2], 256);
                     int colorID = mod(bytes[pos + 16 + 4 * i + 3], 256);
                     colors.set(x, y, z, colorID);
+                    if (max == null) {
+                        max = new Vec3d(x + 1, y + 1, z + 1);
+                        min = new Vec3d(x, y, z);
+                    } else {
+                        max = vecMap(max, new Vec3d(x + 1, y + 1, z + 1), Math::max);
+                        min = vecMap(min, new Vec3d(x, y, z), Math::min);
+                    }
                 }
             }
             if (chunkName.equals("RGBA")) {
@@ -88,17 +96,19 @@ public class Model extends VoxelRenderer<Integer> {
             pos += 12 + chunkSize;
         }
 
-        size = size.setZ(colors.maxZ() + 1);
-
         generate();
 
         colors = null;
         colorPalette = null;
     }
 
+    public Vec3d center() {
+        return max.lerp(min, .5);
+    }
+
     @Override
     protected Iterator<Entry<Integer, Integer>> columnAt(int x, int y) {
-        if (x < 0 || x >= size.x || y < 0 || y >= size.y) {
+        if (x < 0 || x >= originalSize.x || y < 0 || y >= originalSize.y) {
             return new ArrayList().iterator();
         }
         return colors.columnIterator(x, y);
@@ -118,12 +128,16 @@ public class Model extends VoxelRenderer<Integer> {
 
     @Override
     protected Vec3d max() {
-        return size;
+        return max;
     }
 
     @Override
     protected Vec3d min() {
-        return new Vec3d(0, 0, 0);
+        return min;
+    }
+
+    public Vec3d originalSize() {
+        return originalSize;
     }
 
     private static int readInt(byte[] bytes, int pos) {
@@ -145,7 +159,7 @@ public class Model extends VoxelRenderer<Integer> {
     }
 
     public Vec3d size() {
-        return size;
+        return max.sub(min);
     }
 
     @Override
@@ -155,7 +169,7 @@ public class Model extends VoxelRenderer<Integer> {
 
     @Override
     protected Integer voxelAt(int x, int y, int z) {
-        if (x < 0 || x >= size.x || y < 0 || y >= size.y || z < 0 || z >= size.z) {
+        if (x < 0 || x >= originalSize.x || y < 0 || y >= originalSize.y || z < 0 || z >= originalSize.z) {
             return null;
         }
         return colors.get(x, y, z);

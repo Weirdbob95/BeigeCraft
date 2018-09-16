@@ -1,6 +1,7 @@
 package world;
 
 import definitions.BlockType;
+import definitions.TerrainObjectType;
 import engine.Behavior;
 import static game.Settings.RENDER_DISTANCE;
 import java.util.Collections;
@@ -21,20 +22,19 @@ import opengl.Texture;
 import static org.lwjgl.opengl.GL20.glDrawBuffers;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT1;
-import static util.math.MathUtils.floor;
-import static util.math.MathUtils.mod;
 import util.Multithreader;
 import util.Resources;
-import util.noise.Noise;
+import static util.math.MathUtils.floor;
+import static util.math.MathUtils.mod;
 import util.math.Vec3d;
 import util.math.Vec4d;
+import util.noise.Noise;
 import world.chunks.AbstractChunk;
 import world.chunks.ConstructedChunk;
 import world.chunks.HeightmappedChunk;
 import world.chunks.PlannedChunk;
 import world.chunks.RenderedChunk;
 import world.chunks.StructuredChunk;
-import world.water.WaterManager;
 
 public class World extends Behavior {
 
@@ -60,6 +60,17 @@ public class World extends Behavior {
     public WaterManager waterManager;
 
     private final HashMap<String, Noise> noiseMap = new HashMap();
+
+    public void addTerrainObject(Vec3d pos, TerrainObjectType tot) {
+        TerrainObjectInstance toi = new TerrainObjectInstance(tot, getChunkPos(pos), (int) mod(pos.x, CHUNK_SIZE), (int) mod(pos.y, CHUNK_SIZE), floor(pos.z));
+        for (Vec3d v : toi.getOccupancy()) {
+            v = v.add(new Vec3d(toi.chunkPos.x, toi.chunkPos.y, 0).mul(CHUNK_SIZE));
+            setBlock(v, null);
+            removeTerrainObject(v);
+            constructedChunks.get(getChunkPos(v)).terrainObjectOccupancyMap.put(new Vec3d((int) mod(v.x, CHUNK_SIZE), (int) mod(v.y, CHUNK_SIZE), floor(v.z)), toi);
+        }
+        constructedChunks.get(toi.chunkPos).terrainObjects.add(toi);
+    }
 
     @Override
     public void createInner() {
@@ -96,11 +107,26 @@ public class World extends Behavior {
         return r;
     }
 
+    public TerrainObjectInstance getTerrainObject(Vec3d pos) {
+        return constructedChunks.get(getChunkPos(pos)).terrainObjectOccupancyMap.get(new Vec3d((int) mod(pos.x, CHUNK_SIZE), (int) mod(pos.y, CHUNK_SIZE), floor(pos.z)));
+    }
+
     public Noise noise(String id) {
         if (!noiseMap.containsKey(id)) {
             noiseMap.put(id, new Noise(new Random(seed + id.hashCode())));
         }
         return noiseMap.get(id);
+    }
+
+    public void removeTerrainObject(Vec3d pos) {
+        TerrainObjectInstance toi = getTerrainObject(pos);
+        if (toi != null) {
+            for (Vec3d v : toi.getOccupancy()) {
+                v = v.add(new Vec3d(toi.chunkPos.x, toi.chunkPos.y, 0).mul(CHUNK_SIZE));
+                constructedChunks.get(getChunkPos(v)).terrainObjectOccupancyMap.remove(new Vec3d((int) mod(v.x, CHUNK_SIZE), (int) mod(v.y, CHUNK_SIZE), floor(v.z)));
+            }
+            constructedChunks.get(toi.chunkPos).terrainObjects.remove(toi);
+        }
     }
 
     @Override

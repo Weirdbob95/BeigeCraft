@@ -8,6 +8,7 @@ import game.abilities.BlockPlaceAbility;
 import game.abilities.LiquidPlaceAbility;
 import game.abilities.ParryAbility;
 import game.abilities.SpellcastAbility;
+import game.abilities.TerrainObjectPlaceAbility;
 import game.abilities.WeaponChargeAbility;
 
 public class PlayerAbilityManager {
@@ -30,6 +31,9 @@ public class PlayerAbilityManager {
         if (is.item().blockType != null) {
             return new BlockPlaceAbility(player, is.item().blockType);
         }
+        if (is.item().terrainObjectType != null) {
+            return new TerrainObjectPlaceAbility(player, is.item().terrainObjectType);
+        }
         if (is.item().gameName.equals("wand")) {
             return new SpellcastAbility(player);
         }
@@ -51,12 +55,14 @@ public class PlayerAbilityManager {
             } else {
                 player.heldItemController.heldItemType = WeaponType.FIST;
             }
-        } else {
+        } else if (secondary instanceof WeaponChargeAbility) {
             if (ItemSlot.OFF_HAND != null && ItemSlot.OFF_HAND.item() != null) {
                 player.heldItemController.heldItemType = ItemSlot.OFF_HAND.item().weapon;
             } else {
                 player.heldItemController.heldItemType = WeaponType.FIST;
             }
+        } else {
+            player.heldItemController.heldItemType = WeaponType.FIST;
         }
     }
 }

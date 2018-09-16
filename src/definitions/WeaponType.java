@@ -10,10 +10,7 @@ public class WeaponType {
 
     static {
         FIST.modelName = "fist.vox";
-        FIST.modelTip = new Vec3dBean();
-        FIST.modelTip.x = -8;
-        FIST.modelTip.y = 2;
-        FIST.modelTip.z = 4;
+        FIST.modelTip = new Vec3dBean(-8, 2, 4);
         FIST.ext1 = 1;
         FIST.ext2 = 2.5;
         FIST.slashDuration = .15;

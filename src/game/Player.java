@@ -1,7 +1,5 @@
 package game;
 
-import game.items.HeldItemController;
-import game.items.PlayerAbilityManager;
 import behaviors.PhysicsBehavior;
 import behaviors.PositionBehavior;
 import behaviors.VelocityBehavior;
@@ -10,6 +8,8 @@ import engine.Input;
 import static game.abilities.Ability.DO_NOTHING;
 import game.abilities.AbilityController;
 import game.creatures.CreatureBehavior;
+import game.items.HeldItemController;
+import game.items.PlayerAbilityManager;
 import graphics.Animation;
 import graphics.Sprite;
 import static graphics.VoxelRenderer.DIRS;
@@ -33,8 +33,8 @@ import static util.math.MathUtils.vecMap;
 import util.math.Vec2d;
 import util.math.Vec3d;
 import util.math.Vec4d;
+import world.Raycast;
 import world.Raycast.RaycastHit;
-import static world.Raycast.raycastDistance;
 
 public class Player extends Behavior {
 
@@ -103,9 +103,9 @@ public class Player extends Behavior {
     }
 
     public RaycastHit firstSolid() {
-        List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 8);
+        List<RaycastHit> raycast = new Raycast(physics.world, Camera.camera3d.position, Camera.camera3d.facing(), 8).list();
         for (int i = 0; i < raycast.size(); i++) {
-            if (physics.world.getBlock(raycast.get(i).hitPos) != null) {
+            if (!raycast.get(i).isEmpty()) {
                 return raycast.get(i);
             }
         }
@@ -113,12 +113,12 @@ public class Player extends Behavior {
     }
 
     public RaycastHit lastEmpty() {
-        List<RaycastHit> raycast = raycastDistance(Camera.camera3d.position, Camera.camera3d.facing(), 8);
+        List<RaycastHit> raycast = new Raycast(physics.world, Camera.camera3d.position, Camera.camera3d.facing(), 8).list();
+        if (!raycast.get(0).isEmpty()) {
+            return null;
+        }
         for (int i = 0; i < raycast.size() - 1; i++) {
-            if (physics.world.getBlock(raycast.get(i).hitPos) != null) {
-                return null;
-            }
-            if (physics.world.getBlock(raycast.get(i + 1).hitPos) != null) {
+            if (!raycast.get(i + 1).isEmpty()) {
                 return raycast.get(i);
             }
         }

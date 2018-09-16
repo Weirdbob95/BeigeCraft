@@ -29,7 +29,7 @@ public class ParticleBurst extends Behavior {
     public void render() {
         for (Vec3d p : particles) {
             Vec3d pos = position.position.add(p.mul(maxLifetime - lifetime.lifetime));
-            SINGLE_VOXEL.render(pos, 0, 0, 1 / 16., SINGLE_VOXEL.size().div(2), color);
+            SINGLE_VOXEL.render(pos, 0, 0, 1 / 16., SINGLE_VOXEL.center(), color);
         }
     }
 

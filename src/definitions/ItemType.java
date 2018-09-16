@@ -15,6 +15,7 @@ public class ItemType {
     public WeaponType weapon = null;
     public ToolType tool = null;
     public BlockType blockType = null;
+    public TerrainObjectType terrainObjectType = null;
 
     public void renderGUI(Vec2d pos) {
         if (texture != null) {

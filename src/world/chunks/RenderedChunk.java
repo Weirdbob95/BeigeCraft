@@ -3,6 +3,7 @@ package world.chunks;
 import graphics.ChunkRenderer;
 import opengl.Camera;
 import world.ChunkPos;
+import world.TerrainObjectInstance;
 import world.World;
 import static world.World.CHUNK_SIZE;
 
@@ -10,6 +11,7 @@ public class RenderedChunk extends AbstractChunk {
 
     private ChunkRenderer chunkRenderer;
     public boolean shouldRegenerate;
+    public ConstructedChunk cc;
 
     public RenderedChunk(World world, ChunkPos pos) {
         super(world, pos);
@@ -29,6 +31,7 @@ public class RenderedChunk extends AbstractChunk {
         } else {
             chunkRenderer.generate();
         }
+        cc = world.constructedChunks.get(pos);
     }
 
     private boolean intersectsFrustum() {
@@ -45,5 +48,10 @@ public class RenderedChunk extends AbstractChunk {
             generateOuter();
         }
         chunkRenderer.render(worldPos(), null);
+        if (Camera.camera3d.position.sub(center()).length() < 200) {
+            for (TerrainObjectInstance toi : cc.terrainObjects) {
+                toi.render(worldPos());
+            }
+        }
     }
 }

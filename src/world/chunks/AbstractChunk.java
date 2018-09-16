@@ -1,18 +1,18 @@
 package world.chunks;
 
 import java.util.Random;
-import util.noise.Noise;
 import util.math.Vec3d;
+import util.noise.Noise;
 import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
 
 public abstract class AbstractChunk {
 
-    protected final World world;
-    protected final ChunkPos pos;
-    protected final Random random;
-    protected final Noise noise;
+    public final World world;
+    public final ChunkPos pos;
+    public final Random random;
+    public final Noise noise;
     private boolean isGenerated;
 
     public AbstractChunk(World world, ChunkPos pos) {

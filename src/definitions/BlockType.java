@@ -1,6 +1,6 @@
 package definitions;
 
-import definitions.Beans.Vec2dBean;
+import definitions.Beans.Vec2iBean;
 import util.math.Vec3d;
 
 public class BlockType {
@@ -43,11 +43,11 @@ public class BlockType {
 
     public static class DiffTopBotTextureType {
 
-        public Vec2dBean top, bot, side;
+        public Vec2iBean top, bot, side;
     }
 
     public static class UniformTextureType {
 
-        public Vec2dBean pos;
+        public Vec2iBean pos;
     }
 }

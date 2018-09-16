@@ -1,7 +1,8 @@
 package game.abilities;
 
-import static definitions.Loader.getItemByBlock;
 import definitions.BlockType;
+import static definitions.Loader.getItemByBlock;
+import static definitions.Loader.getItemByTerrainObject;
 import engine.Behavior;
 import game.Player;
 import game.abilities.Ability.ContinuousAbility;
@@ -9,7 +10,8 @@ import game.items.ItemSlot;
 import java.util.ArrayList;
 import java.util.List;
 import util.math.Vec3d;
-import world.Raycast;
+import world.Raycast.RaycastHit;
+import world.TerrainObjectInstance;
 
 public class BlockBreakAbility extends ContinuousAbility {
 
@@ -24,14 +26,15 @@ public class BlockBreakAbility extends ContinuousAbility {
     @Override
     public void use(double dt) {
         player.breakingBlocks = true;
-        Raycast.RaycastHit block = player.firstSolid();
+        RaycastHit block = player.firstSolid();
         if (block != null) {
             Vec3d origin = block.hitPos.sub(new Vec3d(1, 1, 1).mul(.5 * (handSize - 1)));
             List<Vec3d> targets = new ArrayList();
             for (int x = 0; x < handSize; x++) {
                 for (int y = 0; y < handSize; y++) {
                     for (int z = 0; z < handSize; z++) {
-                        if (player.physics.world.getBlock(origin.add(new Vec3d(x, y, z))) != null) {
+                        if (player.physics.world.getBlock(origin.add(new Vec3d(x, y, z))) != null
+                                || player.physics.world.getTerrainObject(origin.add(new Vec3d(x, y, z))) != null) {
                             targets.add(origin.add(new Vec3d(x, y, z)).floor());
                         }
                     }
@@ -46,11 +49,17 @@ public class BlockBreakAbility extends ContinuousAbility {
                 player.blocksToBreak.putIfAbsent(v, 0.);
                 player.blocksToBreak.put(v, player.blocksToBreak.get(v) + dt * 8 / targets.size());
                 if (player.blocksToBreak.get(v) > 1) {
-                    BlockType bt = player.physics.world.getBlock(v).getOnBreak();
-                    if (bt != null) {
-                        ItemSlot.addToInventory(getItemByBlock(player.physics.world.getBlock(v).getOnBreak()));
+                    if (player.physics.world.getBlock(v) != null) {
+                        BlockType bt = player.physics.world.getBlock(v).getOnBreak();
+                        if (bt != null) {
+                            ItemSlot.addToInventory(getItemByBlock(bt));
+                        }
+                        player.physics.world.setBlock(v, null);
+                    } else if (player.physics.world.getTerrainObject(v) != null) {
+                        TerrainObjectInstance toi = player.physics.world.getTerrainObject(v);
+                        ItemSlot.addToInventory(getItemByTerrainObject(toi.type));
+                        player.physics.world.removeTerrainObject(v);
                     }
-                    player.physics.world.setBlock(v, null);
                     player.blocksToBreak.remove(v);
                 }
             }

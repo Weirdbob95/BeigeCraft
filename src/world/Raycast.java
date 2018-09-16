@@ -1,22 +1,39 @@
 package world;
 
+import definitions.BlockType;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import util.Mutable;
 import static util.math.MathUtils.mod;
 import static util.math.MathUtils.vecMap;
-import util.Mutable;
 import util.math.Vec3d;
+import world.Raycast.RaycastHit;
 
-public class Raycast {
+public class Raycast implements Iterable<RaycastHit> {
 
-    public static Iterable<RaycastHit> raycast(Vec3d pos, Vec3d dir) {
+    public final World world;
+    public final Vec3d pos, dir;
+    public final double maxDist;
+
+    public Raycast(World world, Vec3d pos, Vec3d dir) {
+        this(world, pos, dir, -1);
+    }
+
+    public Raycast(World world, Vec3d pos, Vec3d dir, double maxDist) {
+        this.world = world;
+        this.pos = pos;
+        this.dir = dir;
+        this.maxDist = maxDist;
+    }
+
+    private Iterator<RaycastHit> infiniteIterator() {
         BinaryOperator<Double> timeToEdge = (x, d) -> (d < 0) ? -x / d : (1 - x) / d;
         Mutable<Vec3d> cp = new Mutable(pos);
-        return () -> new Iterator<RaycastHit>() {
+        return new Iterator<RaycastHit>() {
             @Override
             public boolean hasNext() {
                 return true;
@@ -34,23 +51,45 @@ public class Raycast {
         };
     }
 
-    public static List<RaycastHit> raycastDistance(Vec3d pos, Vec3d dir, double maxDist) {
-        ArrayList<RaycastHit> r = new ArrayList();
-        for (RaycastHit v : raycast(pos, dir)) {
-            if (pos.sub(v.hitPos).length() < maxDist) {
-                r.add(v);
-            } else {
-                break;
-            }
+    @Override
+    public Iterator<RaycastHit> iterator() {
+        if (maxDist == -1) {
+            return infiniteIterator();
         }
+        Iterator<RaycastHit> infiniteIterator = infiniteIterator();
+        Mutable<RaycastHit> prevResult = new Mutable(infiniteIterator.next());
+        return new Iterator<RaycastHit>() {
+            @Override
+            public boolean hasNext() {
+                return prevResult.o != null;
+            }
+
+            @Override
+            public RaycastHit next() {
+                RaycastHit t = prevResult.o;
+                prevResult.o = infiniteIterator.next();
+                if (prevResult.o.hitPos.sub(pos).length() > maxDist) {
+                    prevResult.o = null;
+                }
+                return t;
+            }
+        };
+    }
+
+    public List<RaycastHit> list() {
+        if (maxDist == -1) {
+            throw new RuntimeException("Cannot list an infinite raycast");
+        }
+        ArrayList r = new ArrayList();
+        forEach(r::add);
         return r;
     }
 
-    public static Stream<RaycastHit> raycastStream(Vec3d pos, Vec3d dir) {
-        return StreamSupport.stream(raycast(pos, dir).spliterator(), false);
+    public Stream<RaycastHit> stream() {
+        return StreamSupport.stream(spliterator(), false);
     }
 
-    public static class RaycastHit {
+    public class RaycastHit {
 
         public final Vec3d hitDir;
         public final Vec3d hitPos;
@@ -58,6 +97,18 @@ public class Raycast {
         public RaycastHit(Vec3d hitDir, Vec3d hitPos) {
             this.hitDir = hitDir;
             this.hitPos = hitPos;
+        }
+
+        public BlockType getBlock() {
+            return world.getBlock(hitPos);
+        }
+
+        public TerrainObjectInstance getTerrainObject() {
+            return world.getTerrainObject(hitPos);
+        }
+
+        public boolean isEmpty() {
+            return getBlock() == null && getTerrainObject() == null;
         }
     }
 }

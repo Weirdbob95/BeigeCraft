@@ -2,3 +2,8 @@ gameName: flower1
 displayName: Flower
 modelName: flower1_big.vox
 durability: .5
+---
+gameName: fern
+displayName: Fern
+modelName: fern.vox
+durability: .5

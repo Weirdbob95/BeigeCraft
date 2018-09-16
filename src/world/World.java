@@ -149,6 +149,9 @@ public class World extends Behavior {
     }
 
     public void setBlock(Vec3d pos, BlockType bt) {
+        if (bt != null) {
+            removeTerrainObject(pos);
+        }
         if (bt != getBlock(pos)) {
             constructedChunks.get(getChunkPos(pos)).blockStorage.set((int) mod(pos.x, CHUNK_SIZE), (int) mod(pos.y, CHUNK_SIZE), (int) Math.floor(pos.z), bt);
 

@@ -10,6 +10,7 @@ import static world.World.CHUNK_SIZE;
 import world.biomes.Biome;
 import world.structures.Structure;
 import world.structures.Structure.Cactus;
+import world.structures.Structure.Fern;
 import world.structures.Structure.Flower;
 import world.structures.Tree;
 
@@ -55,7 +56,14 @@ public class StructuredChunk extends AbstractChunk {
         for (int i = 0; i < CHUNK_SIZE * CHUNK_SIZE / 10.; i++) {
             int x = random.nextInt(CHUNK_SIZE);
             int y = random.nextInt(CHUNK_SIZE);
-            if (hc.biomemap[x][y].plurality().treeDensity > 0 && random.nextDouble() < hc.biomemap[x][y].averageTreeDensity() * .1) {
+            if (hc.biomemap[x][y].plurality().treeDensity > 0 && random.nextDouble() < hc.biomemap[x][y].averageTreeDensity() * .5) {
+                structures.add(new Fern(this, x, y, hc.elevationAt(x, y) + 1));
+            }
+        }
+        for (int i = 0; i < CHUNK_SIZE * CHUNK_SIZE / 10.; i++) {
+            int x = random.nextInt(CHUNK_SIZE);
+            int y = random.nextInt(CHUNK_SIZE);
+            if (hc.biomemap[x][y].plurality().treeDensity > 0 && random.nextDouble() < hc.biomemap[x][y].averageTreeDensity() * .5) {
                 structures.add(new Flower(this, x, y, hc.elevationAt(x, y) + 1));
             }
         }

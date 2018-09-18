@@ -14,7 +14,7 @@ public class WindGust extends SpellEffect {
     @Override
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature) {
-            info.target.creature.damage(2 * info.powerMultiplier, info.direction.mul(1.5));
+            info.target.creature.damage(2 * info.powerMultiplier, info.direction.mul(3));
         }
     }
 

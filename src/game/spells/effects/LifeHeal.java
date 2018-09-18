@@ -14,11 +14,9 @@ public class LifeHeal extends SpellEffect {
     @Override
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature) {
-            if (info.target.creature.currentHealth < info.target.creature.maxHealth){
-                info.target.creature.damage(-3 * info.powerMultiplier, info.direction.mul(0));
-                if (info.target.creature.currentHealth > info.target.creature.maxHealth) {
-                    info.target.creature.currentHealth = info.target.creature.maxHealth; 
-                }
+            if (info.target.creature.currentHealth.get() < info.target.creature.maxHealth.get()) {
+                info.target.creature.currentHealth.setBaseValue(Math.min(info.target.creature.maxHealth.get(),
+                        info.target.creature.currentHealth.getBaseValue() + 3 * info.powerMultiplier));
             }
         }
     }

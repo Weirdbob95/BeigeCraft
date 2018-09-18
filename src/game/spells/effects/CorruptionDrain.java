@@ -1,5 +1,5 @@
 package game.spells.effects;
-import game.Player;
+
 import game.spells.SpellInfo;
 import game.spells.SpellPart.SpellEffect;
 import game.spells.TypeDefinitions.SpellElement;
@@ -15,7 +15,6 @@ public class CorruptionDrain extends SpellEffect {
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature) {
             info.target.creature.damage(3 * info.powerMultiplier, info.direction);
-            //if (creature.currentHealth < creature.maxHealth)
         }
     }
 

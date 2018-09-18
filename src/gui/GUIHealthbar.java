@@ -17,7 +17,7 @@ public class GUIHealthbar extends GUIRectangle {
 
     @Override
     public void render() {
-        double healthPerc = clamp(creature.currentHealth / creature.maxHealth, 0, 1);
+        double healthPerc = clamp(creature.currentHealth.get() / creature.maxHealth.get(), 0, 1);
         Graphics.drawRectangle(getLowerLeft(), 0, size.mul(new Vec2d(healthPerc, 1)), new Vec4d(1 - healthPerc, healthPerc, 0, 1));
         super.render();
     }

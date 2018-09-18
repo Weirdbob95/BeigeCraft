@@ -111,6 +111,10 @@ public abstract class Behavior {
         return subBehaviors.keySet();
     }
 
+    public final boolean hasSubBehavior(Class<? extends Behavior> c) {
+        return getOrNull(c) != null;
+    }
+
     public final boolean isRoot() {
         return this == root;
     }

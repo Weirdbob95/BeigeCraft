@@ -51,8 +51,11 @@ public class Property<T> {
         return (modifiers == null || modifiers.shouldRemove()) && ((TreeSet) value).isEmpty();
     }
 
+    private static int maxModifierID;
+
     public class Modifier implements Comparable<Modifier> {
 
+        private final int id = maxModifierID++;
         private final double depth;
         private final Function<T, T> modFunction;
 
@@ -63,7 +66,10 @@ public class Property<T> {
 
         @Override
         public int compareTo(Modifier o) {
-            return Double.compare(depth, o.depth);
+            if (Double.compare(depth, o.depth) != 0) {
+                return Double.compare(depth, o.depth);
+            }
+            return Integer.compare(id, o.id);
         }
 
         public void remove() {

@@ -7,7 +7,11 @@ import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
 import engine.Property;
+import game.combat.Status;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 import util.math.Vec3d;
 
 public class CreatureBehavior extends Behavior {
@@ -20,14 +24,14 @@ public class CreatureBehavior extends Behavior {
     public final PhysicsBehavior physics = require(PhysicsBehavior.class);
     public final SpaceOccupierBehavior spaceOccupier = require(SpaceOccupierBehavior.class);
 
-    public double currentHealth = 10;
-    public double maxHealth = 10;
+    public Property<Double> currentHealth = new Property(10.);
+    public Property<Double> maxHealth = new Property(10.);
 
     public Property<Double> speed = new Property(6.);
-    public double jumpSpeed = 15;
+    public Property<Double> jumpSpeed = new Property(15.);
+    public Property<Boolean> canMove = new Property(true);
 
-    public double damageTakenMultiplier = 1;
-    public double frzStatusTimer = 0;
+    public Set<Status> statuses = new HashSet();
 
     @Override
     public void createInner() {
@@ -35,10 +39,15 @@ public class CreatureBehavior extends Behavior {
     }
 
     public void damage(double damage, Vec3d dir) {
-        velocity.velocity = velocity.velocity.add(dir.mul(20 * damageTakenMultiplier));
-        currentHealth -= damage * damageTakenMultiplier;
-        if (currentHealth <= 0) {
+        velocity.velocity = velocity.velocity.add(dir.mul(20));
+        currentHealth.setBaseValue(currentHealth.getBaseValue() - damage);
+        if (currentHealth.get() <= 0) {
             getRoot().destroy();
         }
+    }
+
+    @Override
+    public void update(double dt) {
+        new LinkedList<>(statuses).forEach(s -> s.update(dt));
     }
 }

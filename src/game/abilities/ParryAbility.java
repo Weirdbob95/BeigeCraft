@@ -1,10 +1,11 @@
 package game.abilities;
 
 import engine.Behavior;
-import game.items.HeldItemController;
+import engine.Property.Modifier;
 import game.combat.WeaponAttack;
 import game.creatures.CreatureBehavior;
 import game.creatures.Skeletor;
+import game.items.HeldItemController;
 import java.util.HashSet;
 import java.util.Set;
 import util.math.SplineAnimation;
@@ -18,6 +19,8 @@ public class ParryAbility extends Ability {
     public boolean failed;
     public Set<WeaponAttack> attacksToParry = new HashSet();
 
+    private Modifier speedModifier;
+
     public ParryAbility(Behavior user) {
         super(user);
     }
@@ -25,7 +28,7 @@ public class ParryAbility extends Ability {
     @Override
     public Ability attemptTransitionTo(Ability nextAbility) {
         if (nextAbility instanceof ParryAbility || failed) {
-            return new Wait(user, .5);
+            return new Stun(user, .5);
         }
         return attacksToParry.isEmpty() ? nextAbility : this;
     }
@@ -65,8 +68,7 @@ public class ParryAbility extends Ability {
             failed = true;
         }
 
-        //creature.damageTakenMultiplier = 0;
-        creature.speedMultiplier = .5;
+        speedModifier = creature.speed.addModifier(x -> x * .5);
         super.onStartUse();
     }
 
@@ -78,7 +80,6 @@ public class ParryAbility extends Ability {
     @Override
     public void onEndUse() {
         heldItemController.clearAnim();
-        //creature.damageTakenMultiplier = 1;
-        creature.speedMultiplier = 1;
+        speedModifier.remove();
     }
 }

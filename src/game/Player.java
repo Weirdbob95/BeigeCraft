@@ -72,11 +72,11 @@ public class Player extends Behavior {
                 idealVel = idealVel.sub(sideways);
             }
             if (idealVel.lengthSquared() > 0) {
-                idealVel = idealVel.setLength(creature.getSpeed());
+                idealVel = idealVel.setLength(creature.speed.get());
             } else {
                 if (sprintTimer > 0) {
                     idealVel = idealVel.add(forwards);
-                    idealVel = idealVel.setLength(creature.getSpeed());
+                    idealVel = idealVel.setLength(creature.speed.get());
                 }
             }
         }
@@ -174,7 +174,7 @@ public class Player extends Behavior {
                 flying = !flying;
             }
 
-            creature.speed = flying ? 200 : physics.crouch ? 4 : sprintTimer > 0 ? 40 : 8;
+            creature.speed.setBaseValue(flying ? 200 : physics.crouch ? 4 : sprintTimer > 0 ? 40 : 8.);
             creature.jumpSpeed = flying ? 200 : 24;
 
             // Crouch

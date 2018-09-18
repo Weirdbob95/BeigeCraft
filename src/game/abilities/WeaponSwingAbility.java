@@ -2,6 +2,7 @@ package game.abilities;
 
 import behaviors.PhysicsBehavior;
 import engine.Behavior;
+import engine.Property.Modifier;
 import game.combat.WeaponAttack;
 import game.creatures.CreatureBehavior;
 import game.items.HeldItemController;
@@ -27,6 +28,8 @@ public class WeaponSwingAbility extends Ability {
     public double timer;
     public Set<CreatureBehavior> hit = new HashSet();
 
+    private Modifier speedModifier;
+
     public WeaponSwingAbility(Behavior user, WeaponAttack weaponAttack) {
         super(user);
         this.weaponAttack = weaponAttack;
@@ -35,9 +38,8 @@ public class WeaponSwingAbility extends Ability {
     @Override
     public Ability attemptTransitionTo(Ability nextAbility) {
         if (!weaponAttack.haveParriedThis.isEmpty()) {
-            return new Wait(user, .5 + slashDuration / 2);
+            return new Stun(user, .5 + slashDuration / 2);
         }
-//        return timer < 0 ? nextAbility : this;
         return timer < 0 ? new Wait(user, slashDuration / 2) : this;
     }
 
@@ -62,7 +64,7 @@ public class WeaponSwingAbility extends Ability {
         slashDuration = timer = heldItemController.heldItemType.slashDuration * .33 + slashTime;
         hit.clear();
 
-        creature.speedMultiplier = .8;
+        speedModifier = creature.speed.addModifier(x -> x * .8);
     }
 
     @Override
@@ -80,7 +82,7 @@ public class WeaponSwingAbility extends Ability {
         heldItemController.clearAnim();
         heldItemController.makeTrail = false;
 
-        creature.speedMultiplier = 1;
+        speedModifier.remove();
         weaponAttack.hasFinished = true;
     }
 }

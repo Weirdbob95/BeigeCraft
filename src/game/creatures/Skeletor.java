@@ -1,12 +1,12 @@
 package game.creatures;
 
 import engine.Behavior;
-import game.items.HeldItemController;
 import static game.abilities.Ability.DO_NOTHING;
-import game.abilities.Ability.Wait;
 import game.abilities.AbilityController;
+import game.abilities.Stun;
 import game.abilities.WeaponChargeAbility;
 import game.combat.WeaponAttack;
+import game.items.HeldItemController;
 import graphics.Model;
 import graphics.Sprite;
 import java.util.Collection;
@@ -41,7 +41,7 @@ public class Skeletor extends Behavior {
             Vec4d color = !wa.wantToParryThis.isEmpty() ? new Vec4d(.5, 1, .5, 1) : new Vec4d(1, .5 + clamp(attackTimer * .5 / .4, 0, .5), .5, 1);
             Sprite.load("item_sword.png").drawBillboard(monster.position.position.add(new Vec3d(0, 0, 2.5)), new Vec2d(1, 1), color);
         }
-        if (abilityController.currentAbility instanceof Wait) {
+        if (abilityController.currentAbility instanceof Stun) {
             Sprite.load("swirl.png").drawBillboard(monster.position.position.add(new Vec3d(0, 0, 2.5)), new Vec2d(1, 1), new Vec4d(.8, .8, .2, 1));
         }
     }

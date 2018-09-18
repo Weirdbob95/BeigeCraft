@@ -11,7 +11,7 @@ public class Doggo extends Behavior {
     @Override
     public void createInner() {
         monster.model.model = Model.load("bigzig.vox");
-        monster.creature.speed = 9;
+        monster.creature.speed.setBaseValue(9.);
         monster.setHitboxFromModel();
     }
 

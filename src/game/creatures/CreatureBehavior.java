@@ -6,6 +6,7 @@ import behaviors.PositionBehavior;
 import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
+import engine.Property;
 import java.util.Collection;
 import util.math.Vec3d;
 
@@ -22,11 +23,10 @@ public class CreatureBehavior extends Behavior {
     public double currentHealth = 10;
     public double maxHealth = 10;
 
-    public double speed = 6;
+    public Property<Double> speed = new Property(6.);
     public double jumpSpeed = 15;
 
     public double damageTakenMultiplier = 1;
-    public double speedMultiplier = 1;
     public double frzStatusTimer = 0;
 
     @Override
@@ -40,9 +40,5 @@ public class CreatureBehavior extends Behavior {
         if (currentHealth <= 0) {
             getRoot().destroy();
         }
-    }
-
-    public double getSpeed() {
-        return speed * speedMultiplier;
     }
 }

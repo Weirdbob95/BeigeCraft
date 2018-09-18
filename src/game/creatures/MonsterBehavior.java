@@ -47,7 +47,7 @@ public class MonsterBehavior extends Behavior {
             if (goal != null) {
                 Vec3d delta = goal.sub(position.position).setZ(0);
                 if (delta.length() > minDist) {
-                    idealVel = delta.setLength(creature.getSpeed());
+                    idealVel = delta.setLength(creature.speed.get());
                     if (physics.onGround && (physics.hitWall || Math.random() < dt * jumpChance)) {
                         creature.velocity.velocity = creature.velocity.velocity.setZ(creature.jumpSpeed);
                     }

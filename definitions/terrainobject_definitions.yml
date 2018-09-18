@@ -5,7 +5,7 @@ durability: .5
 ---
 gameName: fern
 displayName: Fern
-modelName: fern.vox
+modelName: fern2_dark.vox
 durability: .5
 ---
 gameName: chest

@@ -1,7 +1,7 @@
 package game.creatures;
 
-import game.combat.Enemy;
 import engine.Behavior;
+import game.combat.Enemy;
 import graphics.Model;
 import opengl.Camera;
 
@@ -12,7 +12,7 @@ public class Goblin extends Behavior {
     @Override
     public void createInner() {
         enemy.monster.model.model = Model.load("goblin.vox");
-        enemy.monster.creature.speed = 5;
+        enemy.monster.creature.speed.setBaseValue(5.);
         enemy.monster.setHitboxFromModel();
     }
 

@@ -2,7 +2,7 @@ package world.structures;
 
 import definitions.BlockType;
 import static definitions.Loader.getBlock;
-import static definitions.Loader.getTerrainObject;
+import definitions.TerrainObjectType;
 import static graphics.VoxelRenderer.DIRS;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import static util.math.MathUtils.vecMap;
 import util.math.Vec3d;
 import util.rlestorage.IntConverter.BlockTypeConverter;
 import util.rlestorage.RLEMapStorage;
@@ -24,11 +25,55 @@ public abstract class Structure {
     public final RLEMapStorage<BlockType> blocks = new RLEMapStorage(new BlockTypeConverter());
     public final List<TerrainObjectInstance> terrainObjects = new LinkedList();
 
+    public boolean canBeOverwritten = false;
+
+    private Vec3d maxPos, minPos;
+
     public Structure(StructuredChunk sc, int x, int y, int z) {
         this.sc = sc;
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    private synchronized void computeMaxMin() {
+        if (maxPos == null) {
+            Set<Vec3d> occupancy = computeOccupancy();
+            maxPos = minPos = occupancy.iterator().next();
+            for (Vec3d v : occupancy) {
+                maxPos = vecMap(maxPos, v, Math::max);
+                minPos = vecMap(minPos, v, Math::min);
+            }
+        }
+    }
+
+    private Set<Vec3d> computeOccupancy() {
+        Set<Vec3d> r = new HashSet();
+        blocks.allColumns().forEach(c -> {
+            if (!c.isEmpty()) {
+                for (int z = c.minPos() + 1; z <= c.maxPos(); z++) {
+                    r.add(sc.worldPos(c.x, c.y, z));
+                }
+            }
+        });
+        terrainObjects.forEach(toi -> {
+            for (Vec3d v : toi.getOccupancy()) {
+                r.add(sc.worldPos().add(v));
+            }
+        });
+        return r;
+    }
+
+    public boolean intersects(Structure other) {
+        computeMaxMin();
+        other.computeMaxMin();
+        if (minPos.x > other.maxPos.x || minPos.y > other.maxPos.y || minPos.z > other.maxPos.z
+                || maxPos.x < other.minPos.x || maxPos.y < other.minPos.y || maxPos.z < other.minPos.z) {
+            return false;
+        }
+        Set<Vec3d> occupancy = new HashSet(computeOccupancy());
+        occupancy.retainAll(other.computeOccupancy());
+        return !occupancy.isEmpty();
     }
 
     public void removeDisconnected(Vec3d start) {
@@ -79,19 +124,12 @@ public abstract class Structure {
         }
     }
 
-    public static class Fern extends Structure {
+    public static class SingleTerrainObject extends Structure {
 
-        public Fern(StructuredChunk sc, int x, int y, int z) {
+        public SingleTerrainObject(StructuredChunk sc, int x, int y, int z, TerrainObjectType tot) {
             super(sc, x, y, z);
-            terrainObjects.add(new TerrainObjectInstance(getTerrainObject("fern"), sc.pos, x, y, z));
-        }
-    }
-
-    public static class Flower extends Structure {
-
-        public Flower(StructuredChunk sc, int x, int y, int z) {
-            super(sc, x, y, z);
-            terrainObjects.add(new TerrainObjectInstance(getTerrainObject("flower1"), sc.pos, x, y, z));
+            terrainObjects.add(new TerrainObjectInstance(tot, sc.pos, x, y, z));
+            canBeOverwritten = true;
         }
     }
 }

@@ -48,7 +48,7 @@ public class RenderedChunk extends AbstractChunk {
             generateOuter();
         }
         chunkRenderer.render(worldPos(), null);
-        if (Camera.camera3d.position.sub(center()).length() < 200) {
+        if (Camera.camera3d.position.sub(center()).setZ(0).length() < 200) {
             for (TerrainObjectInstance toi : cc.terrainObjects) {
                 toi.render(worldPos());
             }

@@ -63,8 +63,8 @@ public class ConstructedChunk extends AbstractChunk {
         }
 
         for (ChunkPos cp : world.getChunksNearby(pos)) {
-            StructuredChunk sc = world.structuredChunks.get(cp);
-            sc.constructIn(this);
+            FinalizedStructuredChunk fsc = world.finalizedStructuredChunks.get(cp);
+            fsc.constructIn(this);
         }
 
         hc.cavemap = null;

@@ -31,6 +31,7 @@ import util.math.Vec4d;
 import util.noise.Noise;
 import world.chunks.AbstractChunk;
 import world.chunks.ConstructedChunk;
+import world.chunks.FinalizedStructuredChunk;
 import world.chunks.HeightmappedChunk;
 import world.chunks.PlannedChunk;
 import world.chunks.RenderedChunk;
@@ -51,6 +52,7 @@ public class World extends Behavior {
     }
 
     public final ChunkMap<ConstructedChunk> constructedChunks = new ChunkMap<>(this, ConstructedChunk::new);
+    public final ChunkMap<FinalizedStructuredChunk> finalizedStructuredChunks = new ChunkMap<>(this, FinalizedStructuredChunk::new);
     public final ChunkMap<HeightmappedChunk> heightmappedChunks = new ChunkMap<>(this, HeightmappedChunk::new);
     public final ChunkMap<PlannedChunk> plannedChunks = new ChunkMap<>(this, PlannedChunk::new);
     public final ChunkMap<RenderedChunk> renderedChunks = new ChunkMap<>(this, RenderedChunk::new);

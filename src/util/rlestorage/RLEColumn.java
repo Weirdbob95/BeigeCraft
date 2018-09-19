@@ -1,6 +1,6 @@
 package util.rlestorage;
 
-import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -81,7 +81,7 @@ public class RLEColumn<T> implements Iterable<Entry<Integer, T>> {
             public Object next() {
                 int i = data[pos];
                 pos++;
-                return new AbstractMap.SimpleImmutableEntry(position(i), blockType(i));
+                return new SimpleImmutableEntry(position(i), blockType(i));
             }
 
         };
@@ -91,11 +91,11 @@ public class RLEColumn<T> implements Iterable<Entry<Integer, T>> {
         return mod(pos, 1 << 16) + (ic.toInt(t) << 16);
     }
 
-    int maxPos() {
+    public int maxPos() {
         return position(data[data.length - 1]);
     }
 
-    int minPos() {
+    public int minPos() {
         return position(data[0]);
     }
 

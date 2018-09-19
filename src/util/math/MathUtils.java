@@ -47,6 +47,22 @@ public abstract class MathUtils {
         return x * (1 - amt) + y * amt;
     }
 
+    public static int max(int... a) {
+        int r = a[0];
+        for (int i = 1; i < a.length; i++) {
+            r = Math.max(r, a[i]);
+        }
+        return r;
+    }
+
+    public static int min(int... a) {
+        int r = a[0];
+        for (int i = 1; i < a.length; i++) {
+            r = Math.min(r, a[i]);
+        }
+        return r;
+    }
+
     public static double mod(double x, double m) {
         return (x % m + m) % m;
     }

@@ -12,5 +12,6 @@ public class AccelerationBehavior extends Behavior {
     @Override
     public void update(double dt) {
         velocity.velocity = velocity.velocity.add(acceleration.mul(dt));
+        velocity.position.position = velocity.position.position.add(acceleration.mul(dt * dt / 2));
     }
 }

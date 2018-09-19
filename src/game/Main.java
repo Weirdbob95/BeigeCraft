@@ -21,10 +21,12 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import util.Multithreader;
 import util.Resources;
+import static util.math.MathUtils.max;
 import util.math.Vec3d;
 import util.math.Vec4d;
 import world.ChunkPos;
 import world.World;
+import static world.World.CHUNK_SIZE;
 
 public abstract class Main {
 
@@ -67,17 +69,20 @@ public abstract class Main {
             GLState.bindFramebuffer(null);
         });
 
-        new FPSBehavior().create();
-
         World world = new World();
         world.create();
+
+        new FPSBehavior().create();
 
         GUIManager gui = new GUIManager();
         gui.create();
 
         Player p = new Player();
-        p.position.position = new Vec3d(.4 + .2 * Math.random(), .4 + .2 * Math.random(),
-                world.heightmappedChunks.get(new ChunkPos(0, 0)).elevationAt(0, 0) + 2);
+        int maxHeight = max(world.heightmappedChunks.get(new ChunkPos(0, 0)).elevationAt(0, 0),
+                world.heightmappedChunks.get(new ChunkPos(-1, 0)).elevationAt(CHUNK_SIZE - 1, 0),
+                world.heightmappedChunks.get(new ChunkPos(0, -1)).elevationAt(0, CHUNK_SIZE - 1),
+                world.heightmappedChunks.get(new ChunkPos(-1, -1)).elevationAt(CHUNK_SIZE - 1, CHUNK_SIZE - 1));
+        p.position.position = new Vec3d(.4 * Math.random() - .2, .4 * Math.random() - .2, maxHeight + 4);
         Camera.camera3d.position = p.position.position;
         p.physics.world = world;
         p.gui = gui;

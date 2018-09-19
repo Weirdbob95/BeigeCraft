@@ -175,7 +175,7 @@ public class Player extends Behavior {
             }
 
             creature.speed.setBaseValue(flying ? 200 : physics.crouch ? 4 : sprintTimer > 0 ? 40 : 8.);
-            creature.jumpSpeed.setBaseValue(flying ? 200 : 24.);
+            creature.jumpSpeed.setBaseValue(flying ? 200 : 22.);
 
             // Crouch
             physics.shouldCrouch = Input.keyDown(GLFW_KEY_LEFT_SHIFT);

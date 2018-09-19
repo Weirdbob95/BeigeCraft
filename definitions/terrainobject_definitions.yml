@@ -12,3 +12,19 @@ gameName: chest
 displayName: Chest
 modelName: chest.vox
 solid: true
+---
+gameName: extraPlant1
+displayName: Flower
+modelName: flower1.vox
+---
+gameName: extraPlant2
+displayName: Flower
+modelName: flower2.vox
+---
+gameName: extraPlant3
+displayName: Flower
+modelName: flower3.vox
+---
+gameName: extraPlant4
+displayName: Fern
+modelName: fern.vox

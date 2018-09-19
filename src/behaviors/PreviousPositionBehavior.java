@@ -7,7 +7,12 @@ public class PreviousPositionBehavior extends Behavior {
 
     public final PositionBehavior position = require(PositionBehavior.class);
 
-    public Vec3d prevPos = new Vec3d(0, 0, 0);
+    public Vec3d prevPos;
+
+    @Override
+    public void createInner() {
+        prevPos = position.position;
+    }
 
     @Override
     public void update(double dt) {

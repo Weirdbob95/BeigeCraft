@@ -40,7 +40,7 @@ import world.chunks.StructuredChunk;
 public class World extends Behavior {
 
     public static final int CHUNK_SIZE = 32;
-    public static final int UNLOAD_DISTANCE = 4;
+    public static final int UNLOAD_DISTANCE = 8;
 
     public static final ShaderProgram TERRAIN_SHADER = Resources.loadShaderProgramGeom("terrain");
     public static final Texture TERRAIN_TEXTURE = Texture.load("blockSpritesheet.png");

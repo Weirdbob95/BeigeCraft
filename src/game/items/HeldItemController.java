@@ -20,7 +20,7 @@ public class HeldItemController extends Behavior {
     public final CreatureBehavior creature = require(CreatureBehavior.class);
     public final EyeBehavior eye = require(EyeBehavior.class);
 
-    public Vec3d heldItemPos = new Vec3d(0, 0, 0);
+    public Vec3d heldItemPos = MathUtils.randomInSphere();
     public Vec3d heldItemVel = new Vec3d(0, 0, 0);
     public Vec3d realHeldItemVel = new Vec3d(0, 0, 0);
 

@@ -55,9 +55,9 @@ weapon:
     modelTip: {x: 8, y: 8, z: 32}
     ext1: 1.5
     ext2: 3
-    slashDuration: .8
+    slashDuration: .6
     weight: 2.5
-    slashiness: 5
+    slashiness: 3
 ---
 gameName: spear
 displayName: Spear

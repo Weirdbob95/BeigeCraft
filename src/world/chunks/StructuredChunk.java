@@ -9,6 +9,7 @@ import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
 import world.biomes.Biome;
+import world.structures.Castle;
 import world.structures.Structure;
 import world.structures.Structure.Cactus;
 import world.structures.Structure.SingleTerrainObject;
@@ -25,7 +26,8 @@ public class StructuredChunk extends AbstractChunk {
     @Override
     protected void generate() {
         HeightmappedChunk hc = world.heightmappedChunks.get(pos);
-        for (int i = 0; i < CHUNK_SIZE * CHUNK_SIZE / 10.; i++) {
+        int numToGenerate = poissonSample(random, CHUNK_SIZE * CHUNK_SIZE / 10.);
+        for (int i = 0; i < numToGenerate; i++) {
             int x = random.nextInt(CHUNK_SIZE);
             int y = random.nextInt(CHUNK_SIZE);
             if (hc.biomemap[x][y].plurality().treeDensity > 0 && random.nextDouble() < hc.biomemap[x][y].averageTreeDensity() * .1) {
@@ -33,6 +35,9 @@ public class StructuredChunk extends AbstractChunk {
                         (2 + random.nextInt(8) + random.nextInt(8)) * hc.biomemap[x][y].averageTreeHeight()));
             } else if (hc.biomemap[x][y].plurality() == Biome.COLD_DESERT && random.nextDouble() < hc.biomemap[x][y].get(Biome.COLD_DESERT) * .01) {
                 structures.add(new Cactus(this, x, y, hc.elevationAt(x, y) + 1, 2 + random.nextInt(6)));
+            }
+            if (random.nextDouble() < .0001) {
+                structures.add(new Castle(this, x, y, hc.elevationAt(x, y) + 1));
             }
         }
         generateFlora(getTerrainObject("fern"), .25);

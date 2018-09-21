@@ -28,3 +28,7 @@ modelName: flower3.vox
 gameName: extraPlant4
 displayName: Fern
 modelName: fern.vox
+---
+gameName: door
+displayName: Door
+modelName: door.vox

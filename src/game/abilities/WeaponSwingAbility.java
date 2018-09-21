@@ -16,7 +16,7 @@ import world.World;
 
 public class WeaponSwingAbility extends Ability {
 
-    private static final double MAX_SLASH_ANGLE = 2.5;
+    private static final double MAX_SLASH_ANGLE = 1.5;
 
     public final CreatureBehavior creature = user.get(CreatureBehavior.class);
     public final HeldItemController heldItemController = user.get(HeldItemController.class);
@@ -40,7 +40,7 @@ public class WeaponSwingAbility extends Ability {
         if (!weaponAttack.haveParriedThis.isEmpty()) {
             return new Stun(user, .5 + slashDuration / 2);
         }
-        return timer < 0 ? new Wait(user, slashDuration / 2) : this;
+        return timer < 0 ? new Wait(user, .1) : this;
     }
 
     @Override

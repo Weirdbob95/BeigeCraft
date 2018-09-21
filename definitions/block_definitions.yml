@@ -68,7 +68,7 @@ tool: shovel
 gameName: planks
 displayName: Wooden Planks
 uniformTexture:
-    pos: {x: 4, y: 1}
+    pos: {x: 4, y: 0}
 tool: axe
 ---
 gameName: cactus

@@ -11,13 +11,19 @@ public class TerrainObjectInstance {
     public final TerrainObjectType type;
     public final ChunkPos chunkPos;
     public final int x, y, z;
+    public final int rotation;
 
     public TerrainObjectInstance(TerrainObjectType type, ChunkPos chunkPos, int x, int y, int z) {
+        this(type, chunkPos, x, y, z, 0);
+    }
+
+    public TerrainObjectInstance(TerrainObjectType type, ChunkPos chunkPos, int x, int y, int z, int rotation) {
         this.type = type;
         this.chunkPos = chunkPos;
         this.x = x;
         this.y = y;
         this.z = z;
+        this.rotation = rotation;
     }
 
     public Vec3d center() {
@@ -29,7 +35,20 @@ public class TerrainObjectInstance {
         for (int i = 0; i < type.getSize().x; i++) {
             for (int j = 0; j < type.getSize().y; j++) {
                 for (int k = 0; k < type.getSize().z; k++) {
-                    r.add(new Vec3d(x + i, y + j, z + k));
+                    switch (rotation) {
+                        case 0:
+                            r.add(new Vec3d(x + i, y + j, z + k));
+                            break;
+                        case 1:
+                            r.add(new Vec3d(x - j, y + i, z + k));
+                            break;
+                        case 2:
+                            r.add(new Vec3d(x - i, y - j, z + k));
+                            break;
+                        case 3:
+                            r.add(new Vec3d(x + j, y - i, z + k));
+                            break;
+                    }
                 }
             }
         }
@@ -37,6 +56,7 @@ public class TerrainObjectInstance {
     }
 
     public void render(Vec3d pos) {
-        type.getModel().render(pos.add(center()), 0, 0, 1 / 16., type.getModel().originalSize().div(2), new Vec4d(1, 1, 1, 1));
+        //type.getModel().render(pos.add(center()), rotation * Math.PI / 2, 0, 1 / 16., type.getModel().originalSize().div(2), new Vec4d(1, 1, 1, 1));
+        type.getModel().render(pos.add(new Vec3d(x + .5, y + .5, z + .5)), rotation * Math.PI / 2, 0, 1 / 16., new Vec3d(8, 8, 8), new Vec4d(1, 1, 1, 1));
     }
 }

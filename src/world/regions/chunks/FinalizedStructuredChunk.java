@@ -3,10 +3,10 @@ package world.regions.chunks;
 import java.util.HashSet;
 import java.util.Set;
 import util.math.Vec3d;
-import world.regions.RegionPos;
 import world.TerrainObjectInstance;
 import world.World;
 import static world.World.CHUNK_SIZE;
+import world.regions.RegionPos;
 import world.structures.Structure;
 
 public class FinalizedStructuredChunk extends AbstractChunk {
@@ -38,17 +38,13 @@ public class FinalizedStructuredChunk extends AbstractChunk {
 
     @Override
     protected void generate() {
-        structures.addAll(world.structuredChunks.get(pos).structures);
+        structures.addAll(world.getChunk(StructuredChunk.class, pos).structures);
         structures.removeIf(s -> {
-            int rangeToCheck = 1;
-            for (int i = -rangeToCheck; i <= rangeToCheck; i++) {
-                for (int j = -rangeToCheck; j <= rangeToCheck; j++) {
-                    StructuredChunk structuredChunk = world.structuredChunks.get(new RegionPos(pos.x + i, pos.y + j));
-                    for (Structure s2 : structuredChunk.structures) {
-                        if (s2.priority > s.priority && s.intersects(s2)) {
-                            //System.out.println("rejected type " + s.getClass());
-                            return true;
-                        }
+            for (RegionPos rp : pos.nearby(1)) {
+                StructuredChunk structuredChunk = world.getChunk(StructuredChunk.class, rp);
+                for (Structure s2 : structuredChunk.structures) {
+                    if (s2.priority > s.priority && s.intersects(s2)) {
+                        return true;
                     }
                 }
             }

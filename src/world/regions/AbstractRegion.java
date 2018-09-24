@@ -16,8 +16,13 @@ public abstract class AbstractRegion {
     public AbstractRegion(World world, RegionPos pos) {
         this.world = world;
         this.pos = pos;
-        this.random = new Random(pos.hashCode() + getClass().hashCode() + Double.hashCode(world.seed));
-        this.noise = new Noise(random);
+        if (world != null && pos != null) {
+            this.random = new Random(pos.hashCode() + getClass().hashCode() + Double.hashCode(world.seed));
+            this.noise = new Noise(random);
+        } else {
+            this.random = null;
+            this.noise = null;
+        }
     }
 
     public Vec3d center() {

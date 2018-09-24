@@ -5,14 +5,13 @@ import graphics.Graphics;
 import static graphics.VoxelRenderer.DIRS;
 import java.util.*;
 import java.util.Map.Entry;
+import util.Multithreader;
 import static util.math.MathUtils.clamp;
 import static util.math.MathUtils.round;
 import static util.math.MathUtils.vecMap;
-import util.Multithreader;
 import util.math.Vec2d;
 import util.math.Vec3d;
 import util.math.Vec4d;
-import world.World;
 
 public class WaterManager extends Behavior {
 

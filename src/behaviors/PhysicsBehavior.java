@@ -147,7 +147,7 @@ public class PhysicsBehavior extends Behavior {
         Vec3d hitboxSize2 = crouch ? hitboxSize2Crouch : this.hitboxSize2;
         for (int x = floor(pos.x - hitboxSize1.x); x < pos.x + hitboxSize2.x; x++) {
             for (int y = floor(pos.y - hitboxSize1.y); y < pos.y + hitboxSize2.y; y++) {
-                ConstructedChunk cc = world.getChunk(ConstructedChunk.class, new Vec3d(x, y, 0));
+                ConstructedChunk cc = world.constructedChunks.get(new Vec3d(x, y, 0));
                 if (!cc.blockStorage.rangeEquals(mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE), floor(pos.z - hitboxSize1.z), ceil(pos.z + hitboxSize2.z) - 1, null)) {
                     return true;
                 }

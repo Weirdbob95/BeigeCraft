@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import util.Multithreader;
+import static util.math.MathUtils.floor;
 import util.math.Vec3d;
 import world.World;
 
@@ -20,9 +21,9 @@ public class RegionMap<T extends AbstractRegion> {
     private final int size;
     private final BiFunction<World, RegionPos, T> constructor;
 
-    public RegionMap(World world, int size, BiFunction<World, RegionPos, T> constructor) {
+    public RegionMap(World world, BiFunction<World, RegionPos, T> constructor) {
         this.world = world;
-        this.size = size;
+        this.size = constructor.apply(null, null).size();
         this.constructor = constructor;
     }
 
@@ -36,7 +37,7 @@ public class RegionMap<T extends AbstractRegion> {
     }
 
     public T get(Vec3d pos) {
-        return get(world.getChunkPos(pos));
+        return get(new RegionPos(floor(pos.x / size), floor(pos.y / size)));
     }
 
     public T get(RegionPos pos) {
@@ -90,11 +91,9 @@ public class RegionMap<T extends AbstractRegion> {
         if (has(pos)) {
             return false;
         }
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                if (has(new RegionPos(pos.x + i, pos.y + j))) {
-                    return true;
-                }
+        for (RegionPos rp : pos.nearby(1)) {
+            if (has(rp)) {
+                return true;
             }
         }
         return false;
@@ -102,13 +101,11 @@ public class RegionMap<T extends AbstractRegion> {
 
     private void updateBorder(RegionPos pos) {
         synchronized (border) {
-            for (int i = -1; i <= 1; i++) {
-                for (int j = -1; j <= 1; j++) {
-                    if (shouldBeBorder(new RegionPos(pos.x + i, pos.y + j))) {
-                        border.add(new RegionPos(pos.x + i, pos.y + j));
-                    } else {
-                        border.remove(new RegionPos(pos.x + i, pos.y + j));
-                    }
+            for (RegionPos rp : pos.nearby(1)) {
+                if (shouldBeBorder(rp)) {
+                    border.add(rp);
+                } else {
+                    border.remove(rp);
                 }
             }
         }

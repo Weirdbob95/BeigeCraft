@@ -52,7 +52,7 @@ public class HUD extends GUIItem {
             Vec3d pos = player.position.position;
             position.setText(String.format("%.2f, %.2f, %.2f", pos.x, pos.y, pos.z));
             Biome b = player.physics.world.heightmappedChunks
-                    .get(player.physics.world.getChunkPos(player.position.position)).biomemap[(int) mod(player.position.position.x,
+                    .get(player.position.position).biomemap[(int) mod(player.position.position.x,
                     CHUNK_SIZE)][(int) mod(player.position.position.y, CHUNK_SIZE)].plurality();
             biome.setText(b.toString());
         } else {

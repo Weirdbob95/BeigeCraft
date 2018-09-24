@@ -34,7 +34,7 @@ public class ConstructedChunk extends AbstractChunk {
 //        iron.setTransform(worldPos(), new Vec3d(1, 1, 2).mul(CHUNK_SIZE / 8.));
 //        iron.generate(1, .05 * ironDensity);
 
-        HeightmappedChunk hc = world.getChunk(HeightmappedChunk.class, pos);
+        HeightmappedChunk hc = world.heightmappedChunks.get(pos);
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 Biome b = hc.biomemap[x][y].plurality();
@@ -62,7 +62,7 @@ public class ConstructedChunk extends AbstractChunk {
             }
         }
 
-        for (RegionPos cp : world.getChunksNearby(pos)) {
+        for (RegionPos cp : pos.nearby(1)) {
             FinalizedStructuredChunk fsc = world.getChunk(FinalizedStructuredChunk.class, cp);
             fsc.constructIn(this);
         }

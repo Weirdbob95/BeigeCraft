@@ -1,5 +1,8 @@
 package world.regions;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class RegionPos {
 
     public final int x, y;
@@ -40,6 +43,16 @@ public class RegionPos {
         hash = 17 * hash + this.x;
         hash = 17 * hash + this.y;
         return hash;
+    }
+
+    public List<RegionPos> nearby(int dist) {
+        List<RegionPos> r = new LinkedList();
+        for (int i = -dist; i <= dist; i++) {
+            for (int j = -dist; j <= dist; j++) {
+                r.add(new RegionPos(x + i, y + j));
+            }
+        }
+        return r;
     }
 
     @Override

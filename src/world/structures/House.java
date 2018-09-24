@@ -8,19 +8,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import static util.math.MathUtils.min;
+import static util.math.MathUtils.mod;
 import world.TerrainObjectInstance;
+import static world.World.CHUNK_SIZE;
 import world.regions.chunks.StructuredChunk;
 
 public class House extends Structure {
 
     private final Random random;
 
-    public House(StructuredChunk sc, int x, int y, int z) {
+    public House(StructuredChunk sc, int x, int y, int z, int width, int height) {
         super(sc, x, y, z);
         priority += 10;
         random = sc.random;
-        int width = 10 + random.nextInt(10);
-        int height = 10 + random.nextInt(10);
         Rectangle base = new Rectangle(-width / 2, -height / 2, width, height);
         int floorHeight = 6 + random.nextInt(3);
         int numFloors = 1 + random.nextInt(3);
@@ -47,7 +47,7 @@ public class House extends Structure {
                             x + rb.x + (rb.horizontal ? doorPos : 0), y + rb.y + (rb.horizontal ? 0 : doorPos), z + wallBottom + 1, rb.horizontal ? 0 : 1));
                 }
             }
-            int numWindows = 4 + random.nextInt(30);
+            int numWindows = 4 + random.nextInt(10);
             for (int i = 0; i < numWindows; i++) {
                 RoomBorder rb = outsideBorders.get(random.nextInt(outsideBorders.size()));
                 rb.buildOpening(wallBottom + 3, wallBottom + 4, 2, null);
@@ -78,6 +78,14 @@ public class House extends Structure {
                     if ((i == 0 || i == base.w || j == 0 || j == base.h) && roofHeight > minRoofHeight + 2) {
                         blocks.setRange(i + base.x, j + base.y, minRoofHeight + 1, roofHeight - 2, getBlock("plaster"));
                     }
+                }
+            }
+        }
+        for (int i = base.x; i <= base.maxX(); i++) {
+            for (int j = base.y; j <= base.maxY(); j++) {
+                int worldElev = sc.world.heightmappedChunks.get(sc.worldPos(x + i, y + j, 0)).elevationAt(mod(x + i, CHUNK_SIZE), mod(y + j, CHUNK_SIZE)) - z;
+                if (worldElev < 0) {
+                    blocks.setRange(i, j, worldElev, -1, getBlock("dirt"));
                 }
             }
         }

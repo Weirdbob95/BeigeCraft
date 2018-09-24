@@ -38,10 +38,10 @@ public class FinalizedStructuredChunk extends AbstractChunk {
 
     @Override
     protected void generate() {
-        structures.addAll(world.getChunk(StructuredChunk.class, pos).structures);
+        structures.addAll(get(StructuredChunk.class, pos).structures);
         structures.removeIf(s -> {
             for (RegionPos rp : pos.nearby(1)) {
-                StructuredChunk structuredChunk = world.getChunk(StructuredChunk.class, rp);
+                StructuredChunk structuredChunk = get(StructuredChunk.class, rp);
                 for (Structure s2 : structuredChunk.structures) {
                     if (s2.priority > s.priority && s.intersects(s2)) {
                         return true;

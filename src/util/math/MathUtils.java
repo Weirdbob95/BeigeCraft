@@ -1,5 +1,6 @@
 package util.math;
 
+import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -76,6 +77,18 @@ public abstract class MathUtils {
         double deltaLength = delta.length();
         double moveLength = linearSpeed * dt + deltaLength * (1 - Math.pow(expSpeed, dt));
         return pos.add(delta.mul(Math.min(moveLength / deltaLength, 1)));
+    }
+
+    public static int poissonSample(Random random, double expected) {
+        double t = 0;
+        int k = 0;
+        while (true) {
+            t += -Math.log(random.nextDouble()) / expected;
+            if (t > 1) {
+                return k;
+            }
+            k++;
+        }
     }
 
     public static Vec3d randomInSphere() {

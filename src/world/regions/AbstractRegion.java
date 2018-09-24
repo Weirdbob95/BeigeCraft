@@ -40,6 +40,10 @@ public abstract class AbstractRegion {
         isGenerated = true;
     }
 
+    protected <T extends AbstractRegion> T get(Class<T> c, RegionPos rp) {
+        return world.getRegionMap(c).get(rp);
+    }
+
     public boolean isGenerated() {
         return isGenerated;
     }

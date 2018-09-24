@@ -28,7 +28,6 @@ import util.noise.Noise;
 import world.regions.AbstractRegion;
 import world.regions.RegionMap;
 import world.regions.RegionPos;
-import world.regions.chunks.AbstractChunk;
 import world.regions.chunks.ConstructedChunk;
 import world.regions.chunks.HeightmappedChunk;
 import world.regions.chunks.RenderedChunk;
@@ -62,10 +61,6 @@ public class World extends Behavior {
     public void createInner() {
         waterManager.world = this;
         waterManager.create();
-    }
-
-    public <T extends AbstractChunk> T getChunk(Class<T> c, RegionPos pos) {
-        return getRegionMap(c).get(pos);
     }
 
     private RegionPos getChunkPos(Vec3d pos) {

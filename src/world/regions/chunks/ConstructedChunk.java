@@ -63,7 +63,7 @@ public class ConstructedChunk extends AbstractChunk {
         }
 
         for (RegionPos cp : pos.nearby(1)) {
-            FinalizedStructuredChunk fsc = world.getChunk(FinalizedStructuredChunk.class, cp);
+            FinalizedStructuredChunk fsc = get(FinalizedStructuredChunk.class, cp);
             fsc.constructIn(this);
         }
 

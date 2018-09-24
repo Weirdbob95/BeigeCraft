@@ -55,7 +55,7 @@ weapon:
     modelTip: {x: 8, y: 8, z: 32}
     ext1: 1.5
     ext2: 3
-    slashDuration: .6
+    slashDuration: .4
     weight: 2.5
     slashiness: 3
 ---

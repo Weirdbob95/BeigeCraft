@@ -1,4 +1,4 @@
-package world.chunks;
+package world.regions.chunks;
 
 import definitions.BlockType;
 import static definitions.Loader.getBlock;
@@ -10,11 +10,11 @@ import util.math.Vec3d;
 import util.noise.ZeroCrossing;
 import util.rlestorage.IntConverter.BlockTypeConverter;
 import util.rlestorage.RLEArrayStorage;
-import world.ChunkPos;
 import world.TerrainObjectInstance;
 import world.World;
 import static world.World.CHUNK_SIZE;
 import world.biomes.Biome;
+import world.regions.RegionPos;
 
 public class ConstructedChunk extends AbstractChunk {
 
@@ -22,7 +22,7 @@ public class ConstructedChunk extends AbstractChunk {
     public final List<TerrainObjectInstance> terrainObjects = new LinkedList();
     public final Map<Vec3d, TerrainObjectInstance> terrainObjectOccupancyMap = new HashMap();
 
-    public ConstructedChunk(World world, ChunkPos pos) {
+    public ConstructedChunk(World world, RegionPos pos) {
         super(world, pos);
     }
 
@@ -34,7 +34,7 @@ public class ConstructedChunk extends AbstractChunk {
 //        iron.setTransform(worldPos(), new Vec3d(1, 1, 2).mul(CHUNK_SIZE / 8.));
 //        iron.generate(1, .05 * ironDensity);
 
-        HeightmappedChunk hc = world.heightmappedChunks.get(pos);
+        HeightmappedChunk hc = world.getChunk(HeightmappedChunk.class, pos);
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 Biome b = hc.biomemap[x][y].plurality();
@@ -62,8 +62,8 @@ public class ConstructedChunk extends AbstractChunk {
             }
         }
 
-        for (ChunkPos cp : world.getChunksNearby(pos)) {
-            FinalizedStructuredChunk fsc = world.finalizedStructuredChunks.get(cp);
+        for (RegionPos cp : world.getChunksNearby(pos)) {
+            FinalizedStructuredChunk fsc = world.getChunk(FinalizedStructuredChunk.class, cp);
             fsc.constructIn(this);
         }
 

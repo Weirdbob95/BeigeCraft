@@ -24,9 +24,11 @@ import util.Resources;
 import static util.math.MathUtils.max;
 import util.math.Vec3d;
 import util.math.Vec4d;
-import world.ChunkPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
+import world.regions.RegionPos;
+import world.regions.chunks.HeightmappedChunk;
+import world.regions.chunks.RenderedChunk;
 
 public abstract class Main {
 
@@ -78,10 +80,10 @@ public abstract class Main {
         gui.create();
 
         Player p = new Player();
-        int maxHeight = max(world.heightmappedChunks.get(new ChunkPos(0, 0)).elevationAt(0, 0),
-                world.heightmappedChunks.get(new ChunkPos(-1, 0)).elevationAt(CHUNK_SIZE - 1, 0),
-                world.heightmappedChunks.get(new ChunkPos(0, -1)).elevationAt(0, CHUNK_SIZE - 1),
-                world.heightmappedChunks.get(new ChunkPos(-1, -1)).elevationAt(CHUNK_SIZE - 1, CHUNK_SIZE - 1));
+        int maxHeight = max(world.getChunk(HeightmappedChunk.class, new RegionPos(0, 0)).elevationAt(0, 0),
+                world.getChunk(HeightmappedChunk.class, new RegionPos(-1, 0)).elevationAt(CHUNK_SIZE - 1, 0),
+                world.getChunk(HeightmappedChunk.class, new RegionPos(0, -1)).elevationAt(0, CHUNK_SIZE - 1),
+                world.getChunk(HeightmappedChunk.class, new RegionPos(-1, -1)).elevationAt(CHUNK_SIZE - 1, CHUNK_SIZE - 1));
         p.position.position = new Vec3d(.4 * Math.random() - .2, .4 * Math.random() - .2, maxHeight + 4);
         Camera.camera3d.position = p.position.position;
         p.physics.world = world;
@@ -91,17 +93,17 @@ public abstract class Main {
         int initialWorldSize = 1;
         for (int x = -initialWorldSize; x < initialWorldSize; x++) {
             for (int y = -initialWorldSize; y < initialWorldSize; y++) {
-                world.renderedChunks.get(new ChunkPos(x, y));
+                world.getChunk(RenderedChunk.class, new RegionPos(x, y));
             }
         }
 
         onUpdate(0, dt -> {
             if (Multithreader.isFree()) {
-                ChunkPos camera = world.getChunkPos(Camera.camera3d.position);
-                Optional<ChunkPos> toRender = world.renderedChunks.border().stream()
+                RegionPos camera = world.getChunkPos(Camera.camera3d.position);
+                Optional<RegionPos> toRender = world.getRegionMap(RenderedChunk.class).border().stream()
                         .min(Comparator.comparingDouble(camera::distance));
                 if (toRender.isPresent() && camera.distance(toRender.get()) <= RENDER_DISTANCE) {
-                    world.renderedChunks.lazyGenerate(toRender.get());
+                    world.getRegionMap(RenderedChunk.class).lazyGenerate(toRender.get());
                 }
             }
         });

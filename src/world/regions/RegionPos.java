@@ -1,15 +1,15 @@
-package world;
+package world.regions;
 
-public class ChunkPos {
+public class RegionPos {
 
     public final int x, y;
 
-    public ChunkPos(int x, int y) {
+    public RegionPos(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public double distance(ChunkPos other) {
+    public double distance(RegionPos other) {
         return Math.sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
     }
 
@@ -24,7 +24,7 @@ public class ChunkPos {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final ChunkPos other = (ChunkPos) obj;
+        final RegionPos other = (RegionPos) obj;
         if (this.x != other.x) {
             return false;
         }

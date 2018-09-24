@@ -4,17 +4,11 @@ import definitions.BlockType;
 import definitions.TerrainObjectType;
 import engine.Behavior;
 import static game.Settings.RENDER_DISTANCE;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import opengl.Camera;
 import static opengl.GLObject.bindAll;
 import opengl.ShaderProgram;
@@ -22,24 +16,23 @@ import opengl.Texture;
 import static org.lwjgl.opengl.GL20.glDrawBuffers;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT1;
-import util.Multithreader;
 import util.Resources;
 import static util.math.MathUtils.floor;
 import static util.math.MathUtils.mod;
 import util.math.Vec3d;
 import util.math.Vec4d;
 import util.noise.Noise;
-import world.chunks.AbstractChunk;
-import world.chunks.ConstructedChunk;
-import world.chunks.FinalizedStructuredChunk;
-import world.chunks.HeightmappedChunk;
-import world.chunks.PlannedChunk;
-import world.chunks.RenderedChunk;
-import world.chunks.StructuredChunk;
+import world.regions.AbstractRegion;
+import world.regions.RegionMap;
+import world.regions.RegionPos;
+import world.regions.chunks.AbstractChunk;
+import world.regions.chunks.ConstructedChunk;
+import world.regions.chunks.RenderedChunk;
 
 public class World extends Behavior {
 
     public static final int CHUNK_SIZE = 32;
+    public static final int PROVINCE_SIZE = 32;
     public static final int UNLOAD_DISTANCE = 8;
 
     public static final ShaderProgram TERRAIN_SHADER = Resources.loadShaderProgramGeom("terrain");
@@ -51,12 +44,7 @@ public class World extends Behavior {
         TERRAIN_SHADER.setUniform("bloom_sampler", 1);
     }
 
-    public final ChunkMap<ConstructedChunk> constructedChunks = new ChunkMap<>(this, ConstructedChunk::new);
-    public final ChunkMap<FinalizedStructuredChunk> finalizedStructuredChunks = new ChunkMap<>(this, FinalizedStructuredChunk::new);
-    public final ChunkMap<HeightmappedChunk> heightmappedChunks = new ChunkMap<>(this, HeightmappedChunk::new);
-    public final ChunkMap<PlannedChunk> plannedChunks = new ChunkMap<>(this, PlannedChunk::new);
-    public final ChunkMap<RenderedChunk> renderedChunks = new ChunkMap<>(this, RenderedChunk::new);
-    public final ChunkMap<StructuredChunk> structuredChunks = new ChunkMap<>(this, StructuredChunk::new);
+    private final Map<Class<? extends AbstractRegion>, RegionMap> regions = new HashMap();
 
     public final long seed = new Random().nextLong();
     public WaterManager waterManager;
@@ -73,9 +61,9 @@ public class World extends Behavior {
         }
         for (Vec3d v : toi.getOccupancy()) {
             v = v.add(new Vec3d(toi.chunkPos.x, toi.chunkPos.y, 0).mul(CHUNK_SIZE));
-            constructedChunks.get(getChunkPos(v)).terrainObjectOccupancyMap.put(new Vec3d((int) mod(v.x, CHUNK_SIZE), (int) mod(v.y, CHUNK_SIZE), floor(v.z)), toi);
+            getChunk(ConstructedChunk.class, v).terrainObjectOccupancyMap.put(new Vec3d((int) mod(v.x, CHUNK_SIZE), (int) mod(v.y, CHUNK_SIZE), floor(v.z)), toi);
         }
-        constructedChunks.get(toi.chunkPos).terrainObjects.add(toi);
+        getChunk(ConstructedChunk.class, toi.chunkPos).terrainObjects.add(toi);
         return true;
     }
 
@@ -87,15 +75,23 @@ public class World extends Behavior {
     }
 
     public BlockType getBlock(Vec3d pos) {
-        return constructedChunks.get(getChunkPos(pos)).blockStorage.get((int) mod(pos.x, CHUNK_SIZE), (int) mod(pos.y, CHUNK_SIZE), floor(pos.z));
+        return getChunk(ConstructedChunk.class, pos).blockStorage.get((int) mod(pos.x, CHUNK_SIZE), (int) mod(pos.y, CHUNK_SIZE), floor(pos.z));
     }
 
-    public ChunkPos getChunkPos(Vec3d pos) {
-        return new ChunkPos(floor(pos.x / CHUNK_SIZE), floor(pos.y / CHUNK_SIZE));
+    public <T extends AbstractChunk> T getChunk(Class<T> c, Vec3d pos) {
+        return getChunk(c, getChunkPos(pos));
     }
 
-    public Set<ChunkPos> getChunksNearby(Vec3d pos) {
-        Set<ChunkPos> r = new HashSet();
+    public <T extends AbstractChunk> T getChunk(Class<T> c, RegionPos pos) {
+        return getRegionMap(c).get(pos);
+    }
+
+    public RegionPos getChunkPos(Vec3d pos) {
+        return new RegionPos(floor(pos.x / CHUNK_SIZE), floor(pos.y / CHUNK_SIZE));
+    }
+
+    public Set<RegionPos> getChunksNearby(Vec3d pos) {
+        Set<RegionPos> r = new HashSet();
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 r.add(getChunkPos(pos.add(new Vec3d(i, j, 0))));
@@ -104,18 +100,29 @@ public class World extends Behavior {
         return r;
     }
 
-    public Set<ChunkPos> getChunksNearby(ChunkPos pos) {
-        Set<ChunkPos> r = new HashSet();
+    public Set<RegionPos> getChunksNearby(RegionPos pos) {
+        Set<RegionPos> r = new HashSet();
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                r.add(new ChunkPos(pos.x + i, pos.y + j));
+                r.add(new RegionPos(pos.x + i, pos.y + j));
             }
         }
         return r;
     }
 
+    public <T extends AbstractRegion> RegionMap<T> getRegionMap(Class<T> c) {
+        regions.putIfAbsent(c, new RegionMap(this, CHUNK_SIZE, (w, rp) -> {
+            try {
+                return c.getConstructor(World.class, RegionPos.class).newInstance(w, rp);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }));
+        return regions.get(c);
+    }
+
     public TerrainObjectInstance getTerrainObject(Vec3d pos) {
-        return constructedChunks.get(getChunkPos(pos)).terrainObjectOccupancyMap.get(new Vec3d((int) mod(pos.x, CHUNK_SIZE), (int) mod(pos.y, CHUNK_SIZE), floor(pos.z)));
+        return getChunk(ConstructedChunk.class, pos).terrainObjectOccupancyMap.get(new Vec3d((int) mod(pos.x, CHUNK_SIZE), (int) mod(pos.y, CHUNK_SIZE), floor(pos.z)));
     }
 
     public Noise noise(String id) {
@@ -130,29 +137,26 @@ public class World extends Behavior {
         if (toi != null) {
             for (Vec3d v : toi.getOccupancy()) {
                 v = v.add(new Vec3d(toi.chunkPos.x, toi.chunkPos.y, 0).mul(CHUNK_SIZE));
-                constructedChunks.get(getChunkPos(v)).terrainObjectOccupancyMap.remove(new Vec3d((int) mod(v.x, CHUNK_SIZE), (int) mod(v.y, CHUNK_SIZE), floor(v.z)));
+                getChunk(ConstructedChunk.class, v).terrainObjectOccupancyMap.remove(new Vec3d((int) mod(v.x, CHUNK_SIZE), (int) mod(v.y, CHUNK_SIZE), floor(v.z)));
             }
-            constructedChunks.get(toi.chunkPos).terrainObjects.remove(toi);
+            getChunk(ConstructedChunk.class, toi.chunkPos).terrainObjects.remove(toi);
         }
     }
 
     @Override
     public void render() {
-        renderedChunks.get(getChunkPos(Camera.camera3d.position));
+        getChunk(RenderedChunk.class, Camera.camera3d.position);
         bindAll(TERRAIN_TEXTURE, TERRAIN_BLOOM_TEXTURE, TERRAIN_SHADER);
         TERRAIN_SHADER.setUniform("projectionMatrix", Camera.camera3d.getProjectionMatrix());
         TERRAIN_SHADER.setUniform("color", new Vec4d(1, 1, 1, 1));
         glDrawBuffers(new int[]{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
-        for (ChunkPos pos : renderedChunks.allGenerated()) {
-            renderedChunks.get(pos).render();
+        for (RegionPos pos : getRegionMap(RenderedChunk.class).allGenerated()) {
+            getChunk(RenderedChunk.class, pos).render();
         }
         glDrawBuffers(new int[]{GL_COLOR_ATTACHMENT0});
-        ChunkPos camera = getChunkPos(Camera.camera3d.position);
-        constructedChunks.removeDistant(camera);
-        heightmappedChunks.removeDistant(camera);
-        plannedChunks.removeDistant(camera);
-        renderedChunks.removeDistant(camera);
-        structuredChunks.removeDistant(camera);
+        for (RegionMap rm : regions.values()) {
+            rm.removeDistant(getChunkPos(Camera.camera3d.position), RENDER_DISTANCE + UNLOAD_DISTANCE);
+        }
     }
 
     public void setBlock(Vec3d pos, BlockType bt) {
@@ -160,110 +164,11 @@ public class World extends Behavior {
             removeTerrainObject(pos);
         }
         if (bt != getBlock(pos)) {
-            constructedChunks.get(getChunkPos(pos)).blockStorage.set((int) mod(pos.x, CHUNK_SIZE), (int) mod(pos.y, CHUNK_SIZE), (int) Math.floor(pos.z), bt);
+            getChunk(ConstructedChunk.class, pos).blockStorage.set((int) mod(pos.x, CHUNK_SIZE), (int) mod(pos.y, CHUNK_SIZE), (int) Math.floor(pos.z), bt);
 
-            for (ChunkPos c : getChunksNearby(pos)) {
-                if (renderedChunks.has(c)) {
-                    renderedChunks.get(c).shouldRegenerate = true;
-                    //renderedChunks.get(c).generateOuter();
-                }
-            }
-        }
-    }
-
-    public static class ChunkMap<T extends AbstractChunk> {
-
-        private final Map<ChunkPos, T> chunks = new ConcurrentHashMap();
-        private final Map<ChunkPos, Object> locks = new ConcurrentHashMap();
-        private final Set<ChunkPos> border = Collections.newSetFromMap(new ConcurrentHashMap());
-        private final World world;
-        private final BiFunction<World, ChunkPos, T> constructor;
-
-        public ChunkMap(World world, BiFunction<World, ChunkPos, T> constructor) {
-            this.world = world;
-            this.constructor = constructor;
-        }
-
-        public List<ChunkPos> allGenerated() {
-            return chunks.entrySet().stream().filter(e -> e.getValue().isGenerated())
-                    .map(Entry::getKey).collect(Collectors.toList());
-        }
-
-        public Set<ChunkPos> border() {
-            return border;
-        }
-
-        public T get(ChunkPos pos) {
-            locks.putIfAbsent(pos, new Object());
-            synchronized (locks.get(pos)) {
-                if (!chunks.containsKey(pos)) {
-                    chunks.put(pos, constructor.apply(world, pos));
-                    updateBorder(pos);
-                    chunks.get(pos).generateOuter();
-                }
-                return chunks.get(pos);
-            }
-        }
-
-        public boolean has(ChunkPos pos) {
-            return chunks.containsKey(pos);
-        }
-
-        public void lazyGenerate(ChunkPos pos) {
-            if (has(pos)) {
-                return;
-            }
-            locks.putIfAbsent(pos, new Object());
-            synchronized (locks.get(pos)) {
-                chunks.put(pos, constructor.apply(world, pos));
-                updateBorder(pos);
-                Multithreader.run(() -> chunks.get(pos).generateOuter());
-            }
-        }
-
-        public void remove(ChunkPos pos) {
-            locks.putIfAbsent(pos, new Object());
-            synchronized (locks.get(pos)) {
-                if (chunks.containsKey(pos)) {
-                    T t = chunks.remove(pos);
-                    updateBorder(pos);
-                    t.cleanup();
-                }
-            }
-        }
-
-        public void removeDistant(ChunkPos camera) {
-            for (ChunkPos pos : chunks.keySet()) {
-                if (camera.distance(pos) > RENDER_DISTANCE + UNLOAD_DISTANCE) {
-                    remove(pos);
-                }
-            }
-        }
-
-        private boolean shouldBeBorder(ChunkPos pos) {
-            if (has(pos)) {
-                return false;
-            }
-            for (int i = -1; i <= 1; i++) {
-                for (int j = -1; j <= 1; j++) {
-                    if (has(new ChunkPos(pos.x + i, pos.y + j))) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        private void updateBorder(ChunkPos pos) {
-            synchronized (border) {
-                for (int i = -1; i <= 1; i++) {
-                    for (int j = -1; j <= 1; j++) {
-                        if (shouldBeBorder(new ChunkPos(pos.x + i, pos.y + j))) {
-                            border.add(new ChunkPos(pos.x + i, pos.y + j));
-                        } else {
-                            border.remove(new ChunkPos(pos.x + i, pos.y + j));
-                        }
-                    }
+            for (RegionPos c : getChunksNearby(pos)) {
+                if (getRegionMap(RenderedChunk.class).has(c)) {
+                    getChunk(RenderedChunk.class, c).shouldRegenerate = true;
                 }
             }
         }

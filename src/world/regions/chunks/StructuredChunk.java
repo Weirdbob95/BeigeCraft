@@ -1,15 +1,15 @@
-package world.chunks;
+package world.regions.chunks;
 
 import static definitions.Loader.getTerrainObject;
 import definitions.TerrainObjectType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import world.ChunkPos;
+import world.regions.RegionPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
 import world.biomes.Biome;
-import world.structures.Castle;
+import world.structures.House;
 import world.structures.Structure;
 import world.structures.Structure.Cactus;
 import world.structures.Structure.SingleTerrainObject;
@@ -19,7 +19,7 @@ public class StructuredChunk extends AbstractChunk {
 
     public final List<Structure> structures = new ArrayList();
 
-    public StructuredChunk(World world, ChunkPos pos) {
+    public StructuredChunk(World world, RegionPos pos) {
         super(world, pos);
     }
 
@@ -36,8 +36,8 @@ public class StructuredChunk extends AbstractChunk {
             } else if (hc.biomemap[x][y].plurality() == Biome.COLD_DESERT && random.nextDouble() < hc.biomemap[x][y].get(Biome.COLD_DESERT) * .01) {
                 structures.add(new Cactus(this, x, y, hc.elevationAt(x, y) + 1, 2 + random.nextInt(6)));
             }
-            if (random.nextDouble() < .0001) {
-                structures.add(new Castle(this, x, y, hc.elevationAt(x, y) + 1));
+            if (random.nextDouble() < .0001 * 10) {
+                structures.add(new House(this, x, y, hc.elevationAt(x, y) + 1));
             }
         }
         generateFlora(getTerrainObject("fern"), .25);

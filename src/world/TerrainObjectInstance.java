@@ -1,5 +1,6 @@
 package world;
 
+import world.regions.RegionPos;
 import definitions.TerrainObjectType;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,15 +10,15 @@ import util.math.Vec4d;
 public class TerrainObjectInstance {
 
     public final TerrainObjectType type;
-    public final ChunkPos chunkPos;
+    public final RegionPos chunkPos;
     public final int x, y, z;
     public final int rotation;
 
-    public TerrainObjectInstance(TerrainObjectType type, ChunkPos chunkPos, int x, int y, int z) {
+    public TerrainObjectInstance(TerrainObjectType type, RegionPos chunkPos, int x, int y, int z) {
         this(type, chunkPos, x, y, z, 0);
     }
 
-    public TerrainObjectInstance(TerrainObjectType type, ChunkPos chunkPos, int x, int y, int z, int rotation) {
+    public TerrainObjectInstance(TerrainObjectType type, RegionPos chunkPos, int x, int y, int z, int rotation) {
         this.type = type;
         this.chunkPos = chunkPos;
         this.x = x;

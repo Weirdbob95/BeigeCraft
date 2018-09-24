@@ -1,9 +1,9 @@
-package world.chunks;
+package world.regions.chunks;
 
 import java.util.HashSet;
 import java.util.Set;
 import util.math.Vec3d;
-import world.ChunkPos;
+import world.regions.RegionPos;
 import world.TerrainObjectInstance;
 import world.World;
 import static world.World.CHUNK_SIZE;
@@ -13,7 +13,7 @@ public class FinalizedStructuredChunk extends AbstractChunk {
 
     private final Set<Structure> structures = new HashSet();
 
-    public FinalizedStructuredChunk(World world, ChunkPos pos) {
+    public FinalizedStructuredChunk(World world, RegionPos pos) {
         super(world, pos);
     }
 
@@ -38,17 +38,16 @@ public class FinalizedStructuredChunk extends AbstractChunk {
 
     @Override
     protected void generate() {
-        StructuredChunk sc = world.structuredChunks.get(pos);
-        structures.addAll(sc.structures);
+        structures.addAll(world.structuredChunks.get(pos).structures);
         structures.removeIf(s -> {
-            if (s.canBeOverwritten) {
-                for (int i = -1; i <= 1; i++) {
-                    for (int j = -1; j <= 1; j++) {
-                        StructuredChunk sc2 = world.structuredChunks.get(new ChunkPos(pos.x + i, pos.y + j));
-                        for (Structure s2 : sc2.structures) {
-                            if (s != s2 && s.intersects(s2)) {
-                                return true;
-                            }
+            int rangeToCheck = 1;
+            for (int i = -rangeToCheck; i <= rangeToCheck; i++) {
+                for (int j = -rangeToCheck; j <= rangeToCheck; j++) {
+                    StructuredChunk structuredChunk = world.structuredChunks.get(new RegionPos(pos.x + i, pos.y + j));
+                    for (Structure s2 : structuredChunk.structures) {
+                        if (s2.priority > s.priority && s.intersects(s2)) {
+                            //System.out.println("rejected type " + s.getClass());
+                            return true;
                         }
                     }
                 }

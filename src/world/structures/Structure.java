@@ -16,7 +16,7 @@ import util.math.Vec3d;
 import util.rlestorage.IntConverter.BlockTypeConverter;
 import util.rlestorage.RLEMapStorage;
 import world.TerrainObjectInstance;
-import world.chunks.StructuredChunk;
+import world.regions.chunks.StructuredChunk;
 
 public abstract class Structure {
 
@@ -25,7 +25,8 @@ public abstract class Structure {
     public final RLEMapStorage<BlockType> blocks = new RLEMapStorage(new BlockTypeConverter());
     public final List<TerrainObjectInstance> terrainObjects = new LinkedList();
 
-    public boolean canBeOverwritten = false;
+    //public boolean canBeOverwritten = false;
+    public double priority;
 
     private Vec3d maxPos, minPos;
 
@@ -34,6 +35,7 @@ public abstract class Structure {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.priority = sc.random.nextDouble();
     }
 
     private synchronized void computeMaxMin() {
@@ -52,7 +54,7 @@ public abstract class Structure {
         blocks.allColumns().forEach(c -> {
             if (!c.isEmpty()) {
                 for (int z = c.minPos() + 1; z <= c.maxPos(); z++) {
-                    r.add(sc.worldPos(c.x, c.y, z));
+                    r.add(new Vec3d(x, y, this.z).add(sc.worldPos(c.x, c.y, z)));
                 }
             }
         });
@@ -129,7 +131,8 @@ public abstract class Structure {
         public SingleTerrainObject(StructuredChunk sc, int x, int y, int z, TerrainObjectType tot) {
             super(sc, x, y, z);
             terrainObjects.add(new TerrainObjectInstance(tot, sc.pos, x, y, z));
-            canBeOverwritten = true;
+            //canBeOverwritten = true;
+            priority -= 5;
         }
     }
 }

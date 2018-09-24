@@ -1,8 +1,8 @@
-package world.chunks;
+package world.regions.chunks;
 
 import graphics.ChunkRenderer;
 import opengl.Camera;
-import world.ChunkPos;
+import world.regions.RegionPos;
 import world.TerrainObjectInstance;
 import world.World;
 import static world.World.CHUNK_SIZE;
@@ -13,7 +13,7 @@ public class RenderedChunk extends AbstractChunk {
     public boolean shouldRegenerate;
     public ConstructedChunk cc;
 
-    public RenderedChunk(World world, ChunkPos pos) {
+    public RenderedChunk(World world, RegionPos pos) {
         super(world, pos);
     }
 

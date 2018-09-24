@@ -9,25 +9,26 @@ import java.util.List;
 import java.util.Random;
 import static util.math.MathUtils.min;
 import world.TerrainObjectInstance;
-import world.chunks.StructuredChunk;
+import world.regions.chunks.StructuredChunk;
 
-public class Castle extends Structure {
+public class House extends Structure {
 
     private final Random random;
 
-    public Castle(StructuredChunk sc, int x, int y, int z) {
+    public House(StructuredChunk sc, int x, int y, int z) {
         super(sc, x, y, z);
+        priority += 10;
         random = sc.random;
         int width = 10 + random.nextInt(10);
         int height = 10 + random.nextInt(10);
         Rectangle base = new Rectangle(-width / 2, -height / 2, width, height);
-        int floorHeight = 5 + random.nextInt(5);
+        int floorHeight = 6 + random.nextInt(3);
         int numFloors = 1 + random.nextInt(3);
         for (int floor = 0; floor < numFloors; floor++) {
             int wallBottom = floor * floorHeight;
             List<Rectangle> rooms = base.recursivelySubdivide();
             for (Rectangle room : rooms) {
-                room.buildWalls(wallBottom, wallBottom + floorHeight - 1, getBlock("stone"));
+                room.buildWalls(wallBottom, wallBottom + floorHeight - 1, getBlock("plaster"));
             }
             for (RoomBorder rb : findRoomBorders(rooms)) {
                 if (random.nextDouble() < .2) {
@@ -51,15 +52,33 @@ public class Castle extends Structure {
                 RoomBorder rb = outsideBorders.get(random.nextInt(outsideBorders.size()));
                 rb.buildOpening(wallBottom + 3, wallBottom + 4, 2, null);
             }
+            base.buildCorners(wallBottom, wallBottom + floorHeight - 1, getBlock("log"));
             base.buildFloor(floor * floorHeight, getBlock("planks"));
+            if (floor > 0) {
+                base.buildWalls(floor * floorHeight, floor * floorHeight, getBlock("log"));
+            }
         }
         int minRoofHeight = numFloors * floorHeight;
         int maxRoofHeight = random.nextInt(20);
         base.buildFloor(minRoofHeight, getBlock("planks"));
-        for (int i = -1; i < base.w + 2; i++) {
-            for (int j = -1; j < base.h + 2; j++) {
-                int roofHeight = minRoofHeight + min(i + 1, base.w + 1 - i, j + 1, base.h + 1 - j, maxRoofHeight);
-                blocks.setRange(i + base.x, j + base.y, Math.max(minRoofHeight, roofHeight - 1), roofHeight, getBlock("planks"));
+        base.buildWalls(minRoofHeight, minRoofHeight, getBlock("log"));
+        if (random.nextDouble() < .5) {
+            for (int i = -1; i < base.w + 2; i++) {
+                for (int j = -1; j < base.h + 2; j++) {
+                    int roofHeight = minRoofHeight + min(i + 1, base.w + 1 - i, j + 1, base.h + 1 - j, maxRoofHeight);
+                    blocks.setRange(i + base.x, j + base.y, Math.max(minRoofHeight, roofHeight - 1), roofHeight, getBlock("slate"));
+                }
+            }
+        } else {
+            boolean roofDir = random.nextDouble() < .5;
+            for (int i = -1; i < base.w + 2; i++) {
+                for (int j = -1; j < base.h + 2; j++) {
+                    int roofHeight = minRoofHeight + (roofDir ? min(i + 1, base.w + 1 - i, maxRoofHeight) : min(j + 1, base.h + 1 - j, maxRoofHeight));
+                    blocks.setRange(i + base.x, j + base.y, Math.max(minRoofHeight, roofHeight - 1), roofHeight, getBlock("slate"));
+                    if ((i == 0 || i == base.w || j == 0 || j == base.h) && roofHeight > minRoofHeight + 2) {
+                        blocks.setRange(i + base.x, j + base.y, minRoofHeight + 1, roofHeight - 2, getBlock("plaster"));
+                    }
+                }
             }
         }
     }
@@ -129,6 +148,13 @@ public class Castle extends Structure {
             this.h = h;
         }
 
+        public void buildCorners(int zMin, int zMax, BlockType bt) {
+            blocks.setRange(x, y, zMin, zMax, bt);
+            blocks.setRange(maxX(), y, zMin, zMax, bt);
+            blocks.setRange(x, maxY(), zMin, zMax, bt);
+            blocks.setRange(maxX(), maxY(), zMin, zMax, bt);
+        }
+
         public void buildFloor(int z, BlockType bt) {
             for (int i = x + 1; i < maxX(); i++) {
                 for (int j = y + 1; j < maxY(); j++) {
@@ -139,12 +165,12 @@ public class Castle extends Structure {
 
         public void buildWalls(int zMin, int zMax, BlockType bt) {
             for (int i = x; i <= maxX(); i++) {
-                blocks.setRange(i, y, zMin, zMax, getBlock("stone"));
-                blocks.setRange(i, maxY(), zMin, zMax, getBlock("stone"));
+                blocks.setRange(i, y, zMin, zMax, bt);
+                blocks.setRange(i, maxY(), zMin, zMax, bt);
             }
             for (int i = y; i <= maxY(); i++) {
-                blocks.setRange(x, i, zMin, zMax, getBlock("stone"));
-                blocks.setRange(maxX(), i, zMin, zMax, getBlock("stone"));
+                blocks.setRange(x, i, zMin, zMax, bt);
+                blocks.setRange(maxX(), i, zMin, zMax, bt);
             }
         }
 

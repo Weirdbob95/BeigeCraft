@@ -4,13 +4,13 @@ import static definitions.Loader.getBlock;
 import static util.math.MathUtils.ceil;
 import util.math.Vec3d;
 import util.noise.NoiseInterpolator;
-import world.chunks.StructuredChunk;
+import world.regions.chunks.StructuredChunk;
 
 public class Tree extends Structure {
 
     public Tree(StructuredChunk sc, int x1, int y1, int z1, double height) {
         super(sc, x1, y1, z1);
-
+        priority = 5;
         double size = (2 + height) * .7;
         int intSize = ceil(size);
         NoiseInterpolator leaves = new NoiseInterpolator(sc.noise, intSize, intSize, intSize);

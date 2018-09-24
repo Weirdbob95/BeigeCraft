@@ -1,4 +1,4 @@
-package world.chunks;
+package world.regions.chunks;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +8,7 @@ import util.math.Vec3d;
 import util.noise.NoiseInterpolator;
 import util.noise.ZeroCrossing;
 import static util.noise.ZeroCrossing.findZeroCrossings;
-import world.ChunkPos;
+import world.regions.RegionPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
 import world.biomes.BiomeData;
@@ -25,7 +25,7 @@ public class HeightmappedChunk extends AbstractChunk {
     public int zMin = -100, zMax = height + 100;
     public double caveDensity = 1;
 
-    public HeightmappedChunk(World world, ChunkPos pos) {
+    public HeightmappedChunk(World world, RegionPos pos) {
         super(world, pos);
     }
 

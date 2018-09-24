@@ -11,22 +11,22 @@ import static util.math.MathUtils.mod;
 import util.math.Vec3d;
 import util.math.Vec4d;
 import definitions.BlockType;
-import world.ChunkPos;
+import world.regions.RegionPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
 import static world.World.TERRAIN_SHADER;
-import world.chunks.ConstructedChunk;
+import world.regions.chunks.ConstructedChunk;
 
 public class ChunkRenderer extends VoxelRenderer<BlockType> {
 
     private ConstructedChunk[][] ccs;
     private double maxZ, minZ;
 
-    public ChunkRenderer(World world, ChunkPos pos) {
+    public ChunkRenderer(World world, RegionPos pos) {
         ccs = new ConstructedChunk[3][3];
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
-                ccs[x + 1][y + 1] = world.constructedChunks.get(new ChunkPos(pos.x + x, pos.y + y));
+                ccs[x + 1][y + 1] = world.constructedChunks.get(new RegionPos(pos.x + x, pos.y + y));
                 maxZ = Math.max(maxZ, ccs[x + 1][y + 1].blockStorage.maxZ());
                 minZ = Math.min(minZ, ccs[x + 1][y + 1].blockStorage.minZ());
             }

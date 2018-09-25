@@ -1,11 +1,12 @@
 package world.regions.chunks;
 
+import game.Settings;
 import graphics.ChunkRenderer;
 import opengl.Camera;
-import world.regions.RegionPos;
 import world.TerrainObjectInstance;
 import world.World;
 import static world.World.CHUNK_SIZE;
+import world.regions.RegionPos;
 
 public class RenderedChunk extends AbstractChunk {
 
@@ -53,5 +54,10 @@ public class RenderedChunk extends AbstractChunk {
                 toi.render(worldPos());
             }
         }
+    }
+
+    @Override
+    public int unloadDist() {
+        return Settings.RENDER_DISTANCE;
     }
 }

@@ -1,9 +1,9 @@
 package world.regions.chunks;
 
-import world.regions.AbstractRegion;
-import world.regions.RegionPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
+import world.regions.AbstractRegion;
+import world.regions.RegionPos;
 
 public abstract class AbstractChunk extends AbstractRegion {
 

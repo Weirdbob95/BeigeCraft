@@ -8,14 +8,16 @@ import util.math.Vec3d;
 import util.noise.NoiseInterpolator;
 import util.noise.ZeroCrossing;
 import static util.noise.ZeroCrossing.findZeroCrossings;
-import world.regions.RegionPos;
 import world.World;
 import static world.World.CHUNK_SIZE;
 import world.biomes.BiomeData;
+import world.regions.RegionPos;
 
 public class HeightmappedChunk extends AbstractChunk {
 
     public BiomeData[][] biomemap = new BiomeData[CHUNK_SIZE][CHUNK_SIZE];
+    public int[][] elevationmap = new int[CHUNK_SIZE][CHUNK_SIZE];
+
     public List<ZeroCrossing>[][] heightmap = new List[CHUNK_SIZE][CHUNK_SIZE];
     public List<ZeroCrossing>[][] cavemap = new List[CHUNK_SIZE][CHUNK_SIZE];
 
@@ -34,7 +36,8 @@ public class HeightmappedChunk extends AbstractChunk {
     }
 
     public int elevationAt(int x, int y) {
-        return heightmap[x][y].get(heightmap[x][y].size() - 2).end;
+        //return heightmap[x][y].get(heightmap[x][y].size() - 2).end;
+        return elevationmap[x][y];
     }
 
     @Override
@@ -53,7 +56,9 @@ public class HeightmappedChunk extends AbstractChunk {
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 int wx = x + pos.x * CHUNK_SIZE;
                 int wy = y + pos.y * CHUNK_SIZE;
+
                 biomemap[x][y] = BiomeData.generate(world, wx, wy);
+
                 double wHeight = altitudeAt(wx, wy) * height * biomemap[x][y].averageElevation();
                 IntToDoubleFunction density = z -> terrain.get(wx, wy, (z - zMin) * craziness) - z / wHeight + .1;
                 heightmap[x][y] = findZeroCrossings(density, 0, zMax, .02 + 1 / wHeight);
@@ -65,6 +70,8 @@ public class HeightmappedChunk extends AbstractChunk {
 //                        - 5 * Math.min(density.applyAsDouble(z), 0);
 //                cavemap[x][y] = findZeroCrossings(caves, zMin, zMax, .1);
                 cavemap[x][y] = new LinkedList();
+
+                elevationmap[x][y] = heightmap[x][y].get(heightmap[x][y].size() - 2).end;
             }
         }
     }

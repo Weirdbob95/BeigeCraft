@@ -1,5 +1,6 @@
 package world.regions;
 
+import game.Settings;
 import java.util.Random;
 import util.math.Vec3d;
 import util.noise.Noise;
@@ -49,6 +50,10 @@ public abstract class AbstractRegion {
     }
 
     public abstract int size();
+
+    public int unloadDist() {
+        return Settings.RENDER_DISTANCE + 8;
+    }
 
     public Vec3d worldPos() {
         return new Vec3d(pos.x, pos.y, 0).mul(size());

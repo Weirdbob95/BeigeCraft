@@ -37,8 +37,6 @@ public class World extends Behavior {
     public static final int CHUNK_SIZE = 32;
     public static final int PROVINCE_SIZE = 32;
 
-    public static final int UNLOAD_DISTANCE = 8;
-
     public static final ShaderProgram TERRAIN_SHADER = Resources.loadShaderProgramGeom("terrain");
     public static final Texture TERRAIN_TEXTURE = Texture.load("blockSpritesheet.png");
     public static final Texture TERRAIN_BLOOM_TEXTURE = Texture.load("blockSpritesheet_bloom.png");
@@ -61,6 +59,13 @@ public class World extends Behavior {
     public void createInner() {
         waterManager.world = this;
         waterManager.create();
+
+        int initialWorldSize = 1;
+        for (int x = -initialWorldSize; x < initialWorldSize; x++) {
+            for (int y = -initialWorldSize; y < initialWorldSize; y++) {
+                renderedChunks.get(new RegionPos(x, y));
+            }
+        }
     }
 
     private RegionPos getChunkPos(Vec3d pos) {
@@ -97,7 +102,7 @@ public class World extends Behavior {
         }
         glDrawBuffers(new int[]{GL_COLOR_ATTACHMENT0});
         for (RegionMap cm : regions.values()) {
-            cm.removeDistant(getChunkPos(Camera.camera3d.position), RENDER_DISTANCE + UNLOAD_DISTANCE);
+            cm.removeDistant(getChunkPos(Camera.camera3d.position));
         }
     }
 

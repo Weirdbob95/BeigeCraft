@@ -191,6 +191,9 @@ public class House extends Structure {
         }
 
         public List<Rectangle> recursivelySubdivide() {
+            if (w * h < MIN_SIZE * MIN_SIZE * 4) {
+                return Arrays.asList(this);
+            }
             int wChanges = Math.max(w - MIN_SIZE * 2, 0);
             int hChanges = Math.max(h - MIN_SIZE * 2, 0);
             if (wChanges + hChanges == 0) {

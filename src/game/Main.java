@@ -85,13 +85,6 @@ public abstract class Main {
         p.gui = gui;
         p.create();
 
-        int initialWorldSize = 1;
-        for (int x = -initialWorldSize; x < initialWorldSize; x++) {
-            for (int y = -initialWorldSize; y < initialWorldSize; y++) {
-                world.renderedChunks.get(new RegionPos(x, y));
-            }
-        }
-
         onUpdate(0, dt -> {
             if (Input.keyJustPressed(GLFW_KEY_G)) {
                 Skeletor doot = new Skeletor();

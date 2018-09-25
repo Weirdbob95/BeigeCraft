@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import static util.math.MathUtils.poissonSample;
 import static util.math.MathUtils.round;
+import util.math.Vec3d;
 import world.World;
 import world.regions.RegionPos;
 import world.regions.chunks.StructuredChunk;
@@ -13,6 +14,7 @@ import world.structures.StructurePlan;
 
 public class StructuredProvince extends AbstractProvince {
 
+    public List<Vec3d> villagePositions = new ArrayList();
     public List<StructurePlan> structurePlans = new ArrayList();
 
     public StructuredProvince(World world, RegionPos pos) {
@@ -30,6 +32,7 @@ public class StructuredProvince extends AbstractProvince {
             for (int j = 0; j < numHouses; j++) {
                 placeHouse(villageX, villageY, houses);
             }
+            villagePositions.add(worldPos(villageX, villageY, 0));
             structurePlans.addAll(houses);
         }
     }

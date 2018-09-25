@@ -18,12 +18,12 @@ public class RegionMap<T extends AbstractRegion> {
     private final Map<RegionPos, Object> locks = new ConcurrentHashMap();
     private final Set<RegionPos> border = Collections.newSetFromMap(new ConcurrentHashMap());
     private final World world;
-    private final int size;
+    private final T sample;
     private final BiFunction<World, RegionPos, T> constructor;
 
     public RegionMap(World world, BiFunction<World, RegionPos, T> constructor) {
         this.world = world;
-        this.size = constructor.apply(null, null).size();
+        this.sample = constructor.apply(null, null);
         this.constructor = constructor;
     }
 
@@ -37,7 +37,7 @@ public class RegionMap<T extends AbstractRegion> {
     }
 
     public T get(Vec3d pos) {
-        return get(new RegionPos(floor(pos.x / size), floor(pos.y / size)));
+        return get(new RegionPos(floor(pos.x / sample.size()), floor(pos.y / sample.size())));
     }
 
     public T get(RegionPos pos) {
@@ -79,9 +79,9 @@ public class RegionMap<T extends AbstractRegion> {
         }
     }
 
-    public void removeDistant(RegionPos camera, int maxDist) {
+    public void removeDistant(RegionPos camera) {
         for (RegionPos pos : chunks.keySet()) {
-            if (camera.distance(pos) > maxDist) {
+            if (camera.distance(pos) > sample.unloadDist()) {
                 remove(pos);
             }
         }

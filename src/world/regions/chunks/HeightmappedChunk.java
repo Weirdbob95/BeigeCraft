@@ -32,7 +32,7 @@ public class HeightmappedChunk extends AbstractChunk {
     }
 
     public double altitudeAt(int x, int y) {
-        return Math.pow(world.noise("heightmappedchunk1").noise2d(x, y, .001), 3) + .1;
+        return Math.pow(world.noise("heightmappedchunk1").noise2d(x, y, .001), 3) + .05;
     }
 
     public int elevationAt(int x, int y) {
@@ -44,7 +44,8 @@ public class HeightmappedChunk extends AbstractChunk {
     protected void generate() {
         NoiseInterpolator terrain = new NoiseInterpolator(world.noise("heightmappedchunk0"), 8, 8, ceil((zMax - zMin) * craziness / 4));
         terrain.setTransform(worldPos(), new Vec3d(1, 1, 1).mul(CHUNK_SIZE / 8.));
-        terrain.generate(12, 1 / xyLength);
+        //terrain.generate(12, 1 / xyLength);
+        terrain.generate(4, 1 / xyLength);
 
 //        NoiseInterpolator caves1 = new NoiseInterpolator(world.noise("constructedchunk1"), 8, 8, ceil((zMax - zMin) * craziness / 4));
 //        NoiseInterpolator caves2 = new NoiseInterpolator(world.noise("constructedchunk2"), 8, 8, ceil((zMax - zMin) * craziness / 4));

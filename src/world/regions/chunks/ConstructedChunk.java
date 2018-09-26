@@ -28,12 +28,13 @@ public class ConstructedChunk extends AbstractChunk {
 
     @Override
     protected void generate() {
+        int dirtHeight = 5;
+
 //        double ironDensity = 1;
 //
 //        NoiseInterpolator iron = new NoiseInterpolator(world.noise("constructedchunk3"), 8, 8, 128);
 //        iron.setTransform(worldPos(), new Vec3d(1, 1, 2).mul(CHUNK_SIZE / 8.));
 //        iron.generate(1, .05 * ironDensity);
-
         HeightmappedChunk hc = world.heightmappedChunks.get(pos);
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -42,11 +43,14 @@ public class ConstructedChunk extends AbstractChunk {
                 blockStorage.setRangeInfinite(x, y, 0, getBlock("stone"));
                 for (ZeroCrossing zc : hc.heightmap[x][y]) {
                     if (zc.positive) {
-                        if (zc.start <= zc.end - 3) {
-                            blockStorage.setRange(x, y, zc.start, zc.end - 3, getBlock("stone"));
+                        if (zc.start <= zc.end - 2 * dirtHeight) {
+                            blockStorage.setRange(x, y, zc.start, zc.end - 2 * dirtHeight, getBlock("stone"));
+                        }
+                        if (zc.start <= zc.end - dirtHeight) {
+                            blockStorage.setRange(x, y, Math.max(zc.end - 2 * dirtHeight + 1, zc.start), zc.end - dirtHeight, getBlock("stoneLight"));
                         }
                         if (zc.start <= zc.end - 1) {
-                            blockStorage.setRange(x, y, Math.max(zc.end - 2, zc.start), zc.end - 1, nearSurface);
+                            blockStorage.setRange(x, y, Math.max(zc.end - dirtHeight + 1, zc.start), zc.end - 1, nearSurface);
                         }
                         blockStorage.set(x, y, zc.end, surface);
                     }
@@ -82,7 +86,8 @@ public class ConstructedChunk extends AbstractChunk {
                 return getBlock("dirt");
             case DESERT:
             case COLD_DESERT:
-                return getBlock("sand");
+                return getBlock("sandStone");
+            //return getBlock("sand");
             case ROCK:
                 return getBlock("stone");
             default:

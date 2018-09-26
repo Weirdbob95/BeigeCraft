@@ -117,7 +117,7 @@ public class HUD extends GUIItem {
                 color = new Vec4d(0, .4, 0, 1);
                 break;
             case PLAINS:
-                color = new Vec4d(.3, .7, .3, 1);
+                color = new Vec4d(.5, .7, .4, 1);
                 break;
             case DESERT:
                 color = new Vec4d(1, 1, .3, 1);

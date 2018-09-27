@@ -1,5 +1,6 @@
 package graphics;
 
+import definitions.BlockType;
 import static graphics.Sprite.SPRITE_SHADER;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,12 +19,13 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import util.math.Vec2d;
 import util.math.Vec3d;
 import util.math.Vec4d;
-import definitions.BlockType;
 import static world.World.TERRAIN_TEXTURE;
 
 public class BlockGUI {
 
     private static final Map<BlockType, BlockGUI> BLOCKGUI_CACHE = new HashMap();
+
+    private static final float TEX_WIDTH = 7, TEX_HEIGHT = 5;
 
     public static BlockGUI load(BlockType bt) {
         if (!BLOCKGUI_CACHE.containsKey(bt)) {
@@ -43,18 +45,18 @@ public class BlockGUI {
             float h = (float) Math.sqrt(3) / 2;
             float ep = .01f;
             BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{
-                -h, -.5f, 0, (texID1 % 256 + ep) / 5f, (texID1 / 256 + ep) / 4f, .8f, .8f, .8f, 1,
-                -h, .5f, 0, (texID1 % 256 + ep) / 5f, (texID1 / 256 + 1 - ep) / 4f, .8f, .8f, .8f, 1,
-                0, 0, 0, (texID1 % 256 + 1 - ep) / 5f, (texID1 / 256 + 1 - ep) / 4f, .8f, .8f, .8f, 1,
-                0, -1, 0, (texID1 % 256 + 1 - ep) / 5f, (texID1 / 256 + ep) / 4f, .8f, .8f, .8f, 1,
-                h, -.5f, 0, (texID2 % 256 + ep) / 5f, (texID2 / 256 + ep) / 4f, .6f, .6f, .6f, 1,
-                h, .5f, 0, (texID2 % 256 + ep) / 5f, (texID2 / 256 + 1 - ep) / 4f, .6f, .6f, .6f, 1,
-                0, 0, 0, (texID2 % 256 + 1 - ep) / 5f, (texID2 / 256 + 1 - ep) / 4f, .6f, .6f, .6f, 1,
-                0, -1, 0, (texID2 % 256 + 1 - ep) / 5f, (texID2 / 256 + ep) / 4f, .6f, .6f, .6f, 1,
-                -h, .5f, 0, (texID3 % 256 + ep) / 5f, (texID3 / 256 + ep) / 4f, 1, 1, 1, 1,
-                0, 1, 0, (texID3 % 256 + ep) / 5f, (texID3 / 256 + 1 - ep) / 4f, 1, 1, 1, 1,
-                h, .5f, 0, (texID3 % 256 + 1 - ep) / 5f, (texID3 / 256 + 1 - ep) / 4f, 1, 1, 1, 1,
-                0, 0, 0, (texID3 % 256 + 1 - ep) / 5f, (texID3 / 256 + ep) / 4f, 1, 1, 1, 1
+                -h, -.5f, 0, (texID1 % 256 + ep) / TEX_WIDTH, (texID1 / 256 + ep) / TEX_HEIGHT, .8f, .8f, .8f, 1,
+                -h, .5f, 0, (texID1 % 256 + ep) / TEX_WIDTH, (texID1 / 256 + 1 - ep) / TEX_HEIGHT, .8f, .8f, .8f, 1,
+                0, 0, 0, (texID1 % 256 + 1 - ep) / TEX_WIDTH, (texID1 / 256 + 1 - ep) / TEX_HEIGHT, .8f, .8f, .8f, 1,
+                0, -1, 0, (texID1 % 256 + 1 - ep) / TEX_WIDTH, (texID1 / 256 + ep) / TEX_HEIGHT, .8f, .8f, .8f, 1,
+                h, -.5f, 0, (texID2 % 256 + ep) / TEX_WIDTH, (texID2 / 256 + ep) / TEX_HEIGHT, .6f, .6f, .6f, 1,
+                h, .5f, 0, (texID2 % 256 + ep) / TEX_WIDTH, (texID2 / 256 + 1 - ep) / TEX_HEIGHT, .6f, .6f, .6f, 1,
+                0, 0, 0, (texID2 % 256 + 1 - ep) / TEX_WIDTH, (texID2 / 256 + 1 - ep) / TEX_HEIGHT, .6f, .6f, .6f, 1,
+                0, -1, 0, (texID2 % 256 + 1 - ep) / TEX_WIDTH, (texID2 / 256 + ep) / TEX_HEIGHT, .6f, .6f, .6f, 1,
+                -h, .5f, 0, (texID3 % 256 + ep) / TEX_WIDTH, (texID3 / 256 + ep) / TEX_HEIGHT, 1, 1, 1, 1,
+                0, 1, 0, (texID3 % 256 + ep) / TEX_WIDTH, (texID3 / 256 + 1 - ep) / TEX_HEIGHT, 1, 1, 1, 1,
+                h, .5f, 0, (texID3 % 256 + 1 - ep) / TEX_WIDTH, (texID3 / 256 + 1 - ep) / TEX_HEIGHT, 1, 1, 1, 1,
+                0, 0, 0, (texID3 % 256 + 1 - ep) / TEX_WIDTH, (texID3 / 256 + ep) / TEX_HEIGHT, 1, 1, 1, 1
             });
             BufferObject ebo = new BufferObject(GL_ELEMENT_ARRAY_BUFFER, new int[]{
                 0, 1, 2, 0, 2, 3,

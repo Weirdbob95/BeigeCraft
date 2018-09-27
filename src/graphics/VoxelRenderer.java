@@ -3,6 +3,7 @@ package graphics;
 import engine.Core;
 import static game.Settings.ENABLE_LOD;
 import static game.Settings.MULTITHREADED_OPENGL;
+import static graphics.Quad.OCCLUSION_DIST;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -184,23 +185,23 @@ public abstract class VoxelRenderer<T> {
     }
 
     protected boolean[][] getOccludingVoxels(int x, int y, int z, Vec3d dir) {
-        boolean[][] r = new boolean[3][3];
+        boolean[][] r = new boolean[1 + 2 * OCCLUSION_DIST][1 + 2 * OCCLUSION_DIST];
         if (dir.x != 0) {
-            for (int i = -1; i <= 1; i++) {
-                for (int j = -1; j <= 1; j++) {
-                    r[i + 1][j + 1] = voxelAt(x + (int) dir.x, y + i, z + j) != null;
+            for (int i = -OCCLUSION_DIST; i <= OCCLUSION_DIST; i++) {
+                for (int j = -OCCLUSION_DIST; j <= OCCLUSION_DIST; j++) {
+                    r[i + OCCLUSION_DIST][j + OCCLUSION_DIST] = voxelAt(x + (int) dir.x, y + i, z + j) != null;
                 }
             }
         } else if (dir.y != 0) {
-            for (int i = -1; i <= 1; i++) {
-                for (int j = -1; j <= 1; j++) {
-                    r[i + 1][j + 1] = voxelAt(x + i, y + (int) dir.y, z + j) != null;
+            for (int i = -OCCLUSION_DIST; i <= OCCLUSION_DIST; i++) {
+                for (int j = -OCCLUSION_DIST; j <= OCCLUSION_DIST; j++) {
+                    r[i + OCCLUSION_DIST][j + OCCLUSION_DIST] = voxelAt(x + i, y + (int) dir.y, z + j) != null;
                 }
             }
         } else {
-            for (int i = -1; i <= 1; i++) {
-                for (int j = -1; j <= 1; j++) {
-                    r[i + 1][j + 1] = voxelAt(x + i, y + j, z + (int) dir.z) != null;
+            for (int i = -OCCLUSION_DIST; i <= OCCLUSION_DIST; i++) {
+                for (int j = -OCCLUSION_DIST; j <= OCCLUSION_DIST; j++) {
+                    r[i + OCCLUSION_DIST][j + OCCLUSION_DIST] = voxelAt(x + i, y + j, z + (int) dir.z) != null;
                 }
             }
         }

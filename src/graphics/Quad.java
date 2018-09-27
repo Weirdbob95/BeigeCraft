@@ -1,11 +1,13 @@
 package graphics;
 
+import definitions.BlockType;
 import static graphics.VoxelRenderer.DIRS;
 import static util.math.MathUtils.round;
 import util.math.Vec3d;
-import definitions.BlockType;
 
 public abstract class Quad {
+
+    static final int OCCLUSION_DIST = 5;
 
     public float x, y, z;
     public int normal;
@@ -20,28 +22,16 @@ public abstract class Quad {
     }
 
     private static double getAmbientOcclusion(boolean[][] a, int i, int j) {
-//        if (a[0][0] || a[1][0] || a[0][1] || a[1][1]) {
-//            return .75f;
-//        }
-        if ((a[i][j] && a[i + 1][j + 1]) || (a[i][j + 1] && a[i + 1][j])) {
-            return .55f;
-        }
-        int numSolid = 0;
-        for (int i2 = i; i2 < i + 2; i2++) {
-            for (int j2 = j; j2 < j + 2; j2++) {
-                if (a[i2][j2]) {
-                    numSolid++;
+        double solidity = 0;
+        for (int i2 = 0; i2 < 2 * OCCLUSION_DIST; i2++) {
+            for (int j2 = 0; j2 < 2 * OCCLUSION_DIST; j2++) {
+                if (a[i + i2][j + j2]) {
+                    double distToCenter2 = (OCCLUSION_DIST - .5 - i2) * (OCCLUSION_DIST - .5 - i2) + (OCCLUSION_DIST - .5 - j2) * (OCCLUSION_DIST - .5 - j2);
+                    solidity += 1 / distToCenter2;
                 }
             }
         }
-        switch (numSolid) {
-            case 2:
-                return .7f;
-            case 1:
-                return .85f;
-            default:
-                return 1;
-        }
+        return Math.exp(-solidity * .05);
     }
 
     public int getLOD() {

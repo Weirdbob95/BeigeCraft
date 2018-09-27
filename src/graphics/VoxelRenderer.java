@@ -4,6 +4,7 @@ import engine.Core;
 import static game.Settings.ENABLE_LOD;
 import static game.Settings.MULTITHREADED_OPENGL;
 import static graphics.Quad.OCCLUSION_DIST;
+import static graphics.Quad.OCCLUSION_HEIGHT;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -184,24 +185,30 @@ public abstract class VoxelRenderer<T> {
         }
     }
 
-    protected boolean[][] getOccludingVoxels(int x, int y, int z, Vec3d dir) {
-        boolean[][] r = new boolean[1 + 2 * OCCLUSION_DIST][1 + 2 * OCCLUSION_DIST];
+    protected boolean[][][] getOccludingVoxels(int x, int y, int z, Vec3d dir) {
+        boolean[][][] r = new boolean[1 + 2 * OCCLUSION_DIST][1 + 2 * OCCLUSION_DIST][OCCLUSION_HEIGHT];
         if (dir.x != 0) {
             for (int i = -OCCLUSION_DIST; i <= OCCLUSION_DIST; i++) {
                 for (int j = -OCCLUSION_DIST; j <= OCCLUSION_DIST; j++) {
-                    r[i + OCCLUSION_DIST][j + OCCLUSION_DIST] = voxelAt(x + (int) dir.x, y + i, z + j) != null;
+                    for (int k = 0; k < OCCLUSION_HEIGHT; k++) {
+                        r[i + OCCLUSION_DIST][j + OCCLUSION_DIST][k] = voxelAt(x + (int) dir.x * (k + 1), y + i, z + j) != null;
+                    }
                 }
             }
         } else if (dir.y != 0) {
             for (int i = -OCCLUSION_DIST; i <= OCCLUSION_DIST; i++) {
                 for (int j = -OCCLUSION_DIST; j <= OCCLUSION_DIST; j++) {
-                    r[i + OCCLUSION_DIST][j + OCCLUSION_DIST] = voxelAt(x + i, y + (int) dir.y, z + j) != null;
+                    for (int k = 0; k < OCCLUSION_HEIGHT; k++) {
+                        r[i + OCCLUSION_DIST][j + OCCLUSION_DIST][k] = voxelAt(x + i, y + (int) dir.y * (k + 1), z + j) != null;
+                    }
                 }
             }
         } else {
             for (int i = -OCCLUSION_DIST; i <= OCCLUSION_DIST; i++) {
                 for (int j = -OCCLUSION_DIST; j <= OCCLUSION_DIST; j++) {
-                    r[i + OCCLUSION_DIST][j + OCCLUSION_DIST] = voxelAt(x + i, y + j, z + (int) dir.z) != null;
+                    for (int k = 0; k < OCCLUSION_HEIGHT; k++) {
+                        r[i + OCCLUSION_DIST][j + OCCLUSION_DIST][k] = voxelAt(x + i, y + j, z + (int) dir.z * (k + 1)) != null;
+                    }
                 }
             }
         }

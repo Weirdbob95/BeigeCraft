@@ -18,7 +18,7 @@ public class RLEMapStorage<T> extends RLEStorage<T> {
     }
 
     @Override
-    protected RLEColumn<T> columnAt(int x, int y) {
+    public RLEColumn<T> columnAt(int x, int y) {
         columnMap.putIfAbsent(new IntPos(x, y), new RLEColumn(x, y, ic));
         return columnMap.get(new IntPos(x, y));
     }

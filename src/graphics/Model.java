@@ -1,13 +1,10 @@
 package graphics;
 
 import graphics.Quad.ColoredQuad;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import opengl.Camera;
 import opengl.ShaderProgram;
 import util.Resources;
@@ -17,6 +14,7 @@ import util.math.Vec3d;
 import util.math.Vec4d;
 import util.rlestorage.IntConverter.IntegerConverter;
 import util.rlestorage.RLEArrayStorage;
+import util.rlestorage.RLEColumn;
 
 public class Model extends VoxelRenderer<Integer> {
 
@@ -107,11 +105,11 @@ public class Model extends VoxelRenderer<Integer> {
     }
 
     @Override
-    protected Iterator<Entry<Integer, Integer>> columnAt(int x, int y) {
+    protected RLEColumn<Integer> columnAt(int x, int y) {
         if (x < 0 || x >= originalSize.x || y < 0 || y >= originalSize.y) {
-            return new ArrayList().iterator();
+            return null;
         }
-        return colors.columnIterator(x, y);
+        return colors.columnAt(x, y);
     }
 
     @Override

@@ -28,6 +28,7 @@ import static util.math.MathUtils.clamp;
 import static util.math.MathUtils.floor;
 import util.math.Vec3d;
 import util.math.Vec4d;
+import util.rlestorage.RLEColumn;
 
 public abstract class VoxelRenderer<T> {
 
@@ -49,7 +50,15 @@ public abstract class VoxelRenderer<T> {
         }
     }
 
-    protected abstract Iterator<Entry<Integer, T>> columnAt(int x, int y);
+    protected abstract RLEColumn<T> columnAt(int x, int y);
+
+    private Iterator<Entry<Integer, T>> columnIterator(int x, int y) {
+        RLEColumn<T> r = columnAt(x, y);
+        if (r == null) {
+            return new ArrayList().iterator();
+        }
+        return r.iterator();
+    }
 
     protected abstract Quad createQuad(int x, int y, int z, T voxel, Vec3d dir);
 
@@ -131,7 +140,7 @@ public abstract class VoxelRenderer<T> {
     }
 
     private void generateExposedFaces(int x, int y, List<Quad> quads1, List<Quad> quads2) {
-        Iterator<Entry<Integer, T>> i = columnAt(x, y);
+        Iterator<Entry<Integer, T>> i = columnIterator(x, y);
         if (!i.hasNext()) {
             return;
         }
@@ -149,8 +158,8 @@ public abstract class VoxelRenderer<T> {
     }
 
     private void generateExposedSideFaces(int x, int y, Vec3d dir, List<Quad> quads) {
-        Iterator<Entry<Integer, T>> i1 = columnAt(x, y);
-        Iterator<Entry<Integer, T>> i2 = columnAt(x + (int) dir.x, y + (int) dir.y);
+        Iterator<Entry<Integer, T>> i1 = columnIterator(x, y);
+        Iterator<Entry<Integer, T>> i2 = columnIterator(x + (int) dir.x, y + (int) dir.y);
         Entry<Integer, T> e1 = i1.hasNext() ? i1.next() : null;
         Entry<Integer, T> e2 = i2.hasNext() ? i2.next() : null;
         if (e1 == null) {

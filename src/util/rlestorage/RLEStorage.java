@@ -11,7 +11,7 @@ public abstract class RLEStorage<T> {
 
     public abstract Stream<RLEColumn<T>> allColumns();
 
-    protected abstract RLEColumn<T> columnAt(int x, int y);
+    public abstract RLEColumn<T> columnAt(int x, int y);
 
     public Iterator<Entry<Integer, T>> columnIterator(int x, int y) {
         return columnAt(x, y).iterator();

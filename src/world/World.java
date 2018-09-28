@@ -166,7 +166,7 @@ public class World extends Behavior {
             Set<RegionPos> toRedraw = new HashSet();
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
-                    toRedraw.add(getChunkPos(pos.add(new Vec3d(i, j, 0))));
+                    toRedraw.add(getChunkPos(pos.add(new Vec3d(i * 5, j * 5, 0))));
                 }
             }
             for (RegionPos c : toRedraw) {

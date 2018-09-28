@@ -23,6 +23,12 @@ public abstract class Quad {
         occlusion = new float[]{(float) ao00, (float) ao10, (float) ao11, (float) ao01};
     }
 
+    public void colorShadow(double shadow) {
+        for (int i = 0; i < 4; i++) {
+            occlusion[i] *= shadow;
+        }
+    }
+
     private static double getAmbientOcclusion(boolean[][][] a, int i, int j) {
         double solidity = 0;
         for (int i2 = 0; i2 < 2 * OCCLUSION_DIST; i2++) {

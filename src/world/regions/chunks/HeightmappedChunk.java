@@ -68,7 +68,7 @@ public class HeightmappedChunk extends AbstractChunk {
                 double wHeight = altitudeAt(wx, wy) * height * biomemap[x][y].averageElevation();
                 //IntToDoubleFunction density = z -> terrain.get(wx, wy, (z - zMin) * craziness) - z / wHeight + .1;
                 IntToDoubleFunction density = z -> {
-                    return Math.min(terrain.get(wx, wy, (z - zMin) * craziness), terrain2.get(wx, wy, (z - zMin) * craziness)) - z / wHeight + .1;
+                    return Math.min(terrain.get(wx, wy, (z - zMin) * craziness), .2 + terrain2.get(wx, wy, (z - zMin) * craziness)) - z / wHeight + .1;
                 };
                 heightmap[x][y] = findZeroCrossings(density, 0, zMax, .02 + 1 / wHeight);
 

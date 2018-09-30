@@ -46,7 +46,7 @@ public abstract class Quad {
                 }
             }
         }
-        return Math.exp(-solidity * .05);
+        return Math.exp(-solidity * .1);
 //        int reachableBlocks = getAmbientOcclusionOctant(a, OCCLUSION_DIST + i, OCCLUSION_DIST + j, 0, 1, 1, 1)
 //                + getAmbientOcclusionOctant(a, OCCLUSION_DIST + i - 1, OCCLUSION_DIST + j, 0, -1, 1, 1)
 //                + getAmbientOcclusionOctant(a, OCCLUSION_DIST + i, OCCLUSION_DIST + j - 1, 0, 1, -1, 1)

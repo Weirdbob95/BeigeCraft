@@ -52,7 +52,7 @@ public class ChunkRenderer extends VoxelRenderer<BlockType> {
                 }
             }
         }
-        return lerp(.8, 1, light);
+        return lerp(.6, 1, light);
     }
 
     @Override
@@ -65,14 +65,14 @@ public class ChunkRenderer extends VoxelRenderer<BlockType> {
         //q.colorShadow(computeShadow(x + (int) dir.x, y + (int) dir.y, z));
         if (dir.x == -1) {
             q.occlusion[0] *= MathUtils.max(computeShadow(x, y, z));
-            q.occlusion[1] *= MathUtils.max(computeShadow(x, y, z));
+            q.occlusion[1] *= MathUtils.max(computeShadow(x, y + 1, z));
             q.occlusion[2] *= MathUtils.max(computeShadow(x, y + 1, z));
-            q.occlusion[3] *= MathUtils.max(computeShadow(x, y + 1, z));
+            q.occlusion[3] *= MathUtils.max(computeShadow(x, y, z));
         } else if (dir.x == 1) {
             q.occlusion[0] *= MathUtils.max(computeShadow(x + 1, y, z));
-            q.occlusion[1] *= MathUtils.max(computeShadow(x + 1, y, z));
+            q.occlusion[1] *= MathUtils.max(computeShadow(x + 1, y + 1, z));
             q.occlusion[2] *= MathUtils.max(computeShadow(x + 1, y + 1, z));
-            q.occlusion[3] *= MathUtils.max(computeShadow(x + 1, y + 1, z));
+            q.occlusion[3] *= MathUtils.max(computeShadow(x + 1, y, z));
         } else if (dir.y == -1) {
             q.occlusion[0] *= MathUtils.max(computeShadow(x, y, z));
             q.occlusion[1] *= MathUtils.max(computeShadow(x + 1, y, z));

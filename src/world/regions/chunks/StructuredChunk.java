@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import static util.math.MathUtils.mod;
 import static util.math.MathUtils.poissonSample;
+import util.math.Vec2d;
 import util.math.Vec3d;
 import world.World;
 import static world.World.CHUNK_SIZE;
@@ -29,20 +30,27 @@ public class StructuredChunk extends AbstractChunk {
     @Override
     protected void generate() {
         HeightmappedChunk hc = world.heightmappedChunks.get(pos);
-        int numToGenerate = poissonSample(random, CHUNK_SIZE * CHUNK_SIZE / 10.);
-        for (int i = 0; i < numToGenerate; i++) {
-            int x = random.nextInt(CHUNK_SIZE);
-            int y = random.nextInt(CHUNK_SIZE);
-            if (hc.biomemap[x][y].plurality().treeDensity > 0 && random.nextDouble() < hc.biomemap[x][y].averageTreeDensity() * .1) {
+        PoissonDiskChunk pdc = world.getRegionMap(PoissonDiskChunk.class).get(pos);
+        for (Vec2d v : pdc.getPoints(10)) {
+            int x = (int) v.x, y = (int) v.y;
+            if (hc.biomemap[x][y].plurality().treeDensity > 0) {
                 structures.add(new Tree(this, x, y, hc.elevationAt(x, y) + 1,
-                        (2 + random.nextInt(8) + random.nextInt(8)) * hc.biomemap[x][y].averageTreeHeight()));
-            } else if (hc.biomemap[x][y].plurality() == Biome.COLD_DESERT && random.nextDouble() < hc.biomemap[x][y].get(Biome.COLD_DESERT) * .01) {
+                        (6 + random.nextInt(6) + random.nextInt(6)) * hc.biomemap[x][y].averageTreeHeight()));
+            } else if (hc.biomemap[x][y].plurality() == Biome.COLD_DESERT) {
                 structures.add(new Cactus(this, x, y, hc.elevationAt(x, y) + 1, 2 + random.nextInt(6)));
             }
-//            if (random.nextDouble() < .0001 * 10) {
-//                structures.add(new House(this, x, y, hc.elevationAt(x, y) + 1));
-//            }
         }
+//        int numToGenerate = poissonSample(random, CHUNK_SIZE * CHUNK_SIZE / 10.);
+//        for (int i = 0; i < numToGenerate; i++) {
+//            int x = random.nextInt(CHUNK_SIZE);
+//            int y = random.nextInt(CHUNK_SIZE);
+//            if (hc.biomemap[x][y].plurality().treeDensity > 0 && random.nextDouble() < hc.biomemap[x][y].averageTreeDensity() * .05) {
+//                structures.add(new Tree(this, x, y, hc.elevationAt(x, y) + 1,
+//                        (6 + random.nextInt(6) + random.nextInt(6)) * hc.biomemap[x][y].averageTreeHeight()));
+//            } else if (hc.biomemap[x][y].plurality() == Biome.COLD_DESERT && random.nextDouble() < hc.biomemap[x][y].get(Biome.COLD_DESERT) * .01) {
+//                structures.add(new Cactus(this, x, y, hc.elevationAt(x, y) + 1, 2 + random.nextInt(6)));
+//            }
+//        }
         generateFlora(getTerrainObject("fern"), .25);
         generateFlora(getTerrainObject("flower1"), .25);
         generateFlora(getTerrainObject("extraPlant1"), .1);

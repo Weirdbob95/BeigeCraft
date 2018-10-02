@@ -26,8 +26,8 @@ public class HUD extends GUIItem {
     private final GUIInventorySquare mainHand, offHand;
     private GUIHealthbar healthbar;
 
-    private static final int MAP_SIZE = 100;
-    private static final int MAP_SQUARE_SIZE = 2;
+    private static final int MAP_SIZE = 50;
+    private static final int MAP_SQUARE_SIZE = 4;
     private final Vec4d[][] map = new Vec4d[MAP_SIZE][MAP_SIZE];
     private final Set<Vec2d> villagePositions = new HashSet();
 

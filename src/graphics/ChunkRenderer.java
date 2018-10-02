@@ -44,7 +44,7 @@ public class ChunkRenderer extends VoxelRenderer<BlockType> {
 
     private double computeShadow(int x, int y, int z) {
         double light = 0;
-        int shadowSize = 3;
+        int shadowSize = 5;
         for (int i = -shadowSize; i < shadowSize; i++) {
             for (int j = -shadowSize; j < shadowSize; j++) {
                 if (columnAt(x + i, y + j).maxPos() <= z) {
@@ -52,7 +52,7 @@ public class ChunkRenderer extends VoxelRenderer<BlockType> {
                 }
             }
         }
-        return lerp(.6, 1, light);
+        return Math.exp(1 * (light - 1));
     }
 
     @Override
@@ -61,8 +61,8 @@ public class ChunkRenderer extends VoxelRenderer<BlockType> {
         q.positionDir(x, y, z, dir);
         q.texCoordFromBlockType(voxel, dir);
         q.colorAmbientOcclusion(getOccludingVoxels(x, y, z, dir));
+//        q.colorAmbientOcclusionGlobal(ccs[1][1].world, ccs[1][1].worldPos(x, y, z));
 
-        //q.colorShadow(computeShadow(x + (int) dir.x, y + (int) dir.y, z));
         if (dir.x == -1) {
             q.occlusion[0] *= MathUtils.max(computeShadow(x, y, z));
             q.occlusion[1] *= MathUtils.max(computeShadow(x, y + 1, z));

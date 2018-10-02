@@ -47,11 +47,10 @@ public class HeightmappedChunk extends AbstractChunk {
         //terrain.generate(12, 1 / xyLength);
         terrain.generate(4, 1 / xyLength);
 
-        NoiseInterpolator terrain2 = new NoiseInterpolator(world.noise("heightmappedchunk5"), 8, 8, ceil((zMax - zMin) * craziness / 4));
-        terrain2.setTransform(worldPos(), new Vec3d(1, 1, 1).mul(CHUNK_SIZE / 8.));
-        //terrain.generate(12, 1 / xyLength);
-        terrain2.generate(4, 1 / xyLength);
-
+//        NoiseInterpolator terrain2 = new NoiseInterpolator(world.noise("heightmappedchunk5"), 8, 8, ceil((zMax - zMin) * craziness / 4));
+//        terrain2.setTransform(worldPos(), new Vec3d(1, 1, 1).mul(CHUNK_SIZE / 8.));
+//        terrain2.generate(4, 1 / xyLength);
+//
 //        NoiseInterpolator caves1 = new NoiseInterpolator(world.noise("constructedchunk1"), 8, 8, ceil((zMax - zMin) * craziness / 4));
 //        NoiseInterpolator caves2 = new NoiseInterpolator(world.noise("constructedchunk2"), 8, 8, ceil((zMax - zMin) * craziness / 4));
 //        caves1.setTransform(worldPos(), new Vec3d(1, 1, 2).mul(CHUNK_SIZE / 8.));
@@ -66,10 +65,10 @@ public class HeightmappedChunk extends AbstractChunk {
                 biomemap[x][y] = BiomeData.generate(world, wx, wy);
 
                 double wHeight = altitudeAt(wx, wy) * height * biomemap[x][y].averageElevation();
-                //IntToDoubleFunction density = z -> terrain.get(wx, wy, (z - zMin) * craziness) - z / wHeight + .1;
-                IntToDoubleFunction density = z -> {
-                    return Math.min(terrain.get(wx, wy, (z - zMin) * craziness), .2 + terrain2.get(wx, wy, (z - zMin) * craziness)) - z / wHeight + .1;
-                };
+                IntToDoubleFunction density = z -> terrain.get(wx, wy, (z - zMin) * craziness) - z / wHeight + .1;
+//                IntToDoubleFunction density = z -> {
+//                    return Math.min(terrain.get(wx, wy, (z - zMin) * craziness), .2 + terrain2.get(wx, wy, (z - zMin) * craziness)) - z / wHeight + .1;
+//                };
                 heightmap[x][y] = findZeroCrossings(density, 0, zMax, .02 + 1 / wHeight);
 
 //                IntToDoubleFunction caves = z

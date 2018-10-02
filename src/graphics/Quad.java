@@ -3,13 +3,36 @@ package graphics;
 import definitions.BlockType;
 import static graphics.VoxelRenderer.DIRS;
 import java.util.HashSet;
+import java.util.Iterator;
+import static util.math.MathUtils.lerp;
 import static util.math.MathUtils.round;
+import static util.math.MathUtils.vecMap;
 import util.math.Vec3d;
+import world.Raycast;
+import world.Raycast.RaycastHit;
+import world.World;
 
 public abstract class Quad {
 
-    static final int OCCLUSION_DIST = 4;
+    static final int OCCLUSION_DIST = 6;
     static final int OCCLUSION_HEIGHT = 1;
+
+    private static final Vec3d[] NORMAL_TO_DIR1 = {
+        new Vec3d(0., 1., 0.),
+        new Vec3d(0., 1., 0.),
+        new Vec3d(1., 0., 0.),
+        new Vec3d(1., 0., 0.),
+        new Vec3d(1., 0., 0.),
+        new Vec3d(1., 0., 0.)
+    };
+    private static final Vec3d[] NORMAL_TO_DIR2 = {
+        new Vec3d(0., 0., 1.),
+        new Vec3d(0., 0., 1.),
+        new Vec3d(0., 0., 1.),
+        new Vec3d(0., 0., 1.),
+        new Vec3d(0., 1., 0.),
+        new Vec3d(0., 1., 0.)
+    };
 
     public float x, y, z;
     public int normal;
@@ -23,10 +46,58 @@ public abstract class Quad {
         occlusion = new float[]{(float) ao00, (float) ao10, (float) ao11, (float) ao01};
     }
 
+    public void colorAmbientOcclusionGlobal(World world, Vec3d pos) {
+//        double ao00 = getAmbientOcclusionGlobal(world, pos.add(new Vec3d(0, 0, 1)));
+//        double ao10 = getAmbientOcclusionGlobal(world, pos.add(new Vec3d(1, 0, 1)));
+//        double ao11 = getAmbientOcclusionGlobal(world, pos.add(new Vec3d(1, 1, 1)));
+//        double ao01 = getAmbientOcclusionGlobal(world, pos.add(new Vec3d(0, 1, 1)));
+        Vec3d n = DIRS.get(normal);
+        Vec3d d1 = NORMAL_TO_DIR1[normal];
+        Vec3d d2 = NORMAL_TO_DIR2[normal];
+        Vec3d p = pos.add(vecMap(n, x -> x > 0 ? 1. : 0));
+        double ao00 = getAmbientOcclusionGlobal(world, p);
+        double ao10 = getAmbientOcclusionGlobal(world, p.add(d1));
+        double ao11 = getAmbientOcclusionGlobal(world, p.add(d1).add(d2));
+        double ao01 = getAmbientOcclusionGlobal(world, p.add(d2));
+        occlusion = new float[]{(float) ao00, (float) ao10, (float) ao11, (float) ao01};
+    }
+
     public void colorShadow(double shadow) {
         for (int i = 0; i < 4; i++) {
             occlusion[i] *= shadow;
         }
+    }
+
+    private double getAmbientOcclusionGlobal(World world, Vec3d pos) {
+        double cosSum = 0, escapedSum = 0;
+        double inc = Math.PI * (3 - Math.sqrt(5));
+        double off = 2 / 200.;
+        for (int k = 0; k < 200; k++) {
+            double y = k * off - 1 + off / 2;
+            double r = Math.sqrt(1 - y * y);
+            double phi = k * inc;
+            Vec3d dir2 = new Vec3d(Math.cos(phi) * r, y, Math.sin(phi) * r);
+            if (dir2.dot(DIRS.get(normal)) < 0) {
+                continue;
+                //dir2 = dir2.add(DIRS.get(normal).mul(dir2.dot(DIRS.get(normal)) * -2));
+            }
+            Raycast ra = new Raycast(world, pos.sub(dir2.mul(.1)), dir2, 30);
+            double cos = Math.abs(dir2.dot(DIRS.get(normal)));
+            cosSum += cos;
+            Iterator<RaycastHit> i = ra.iterator();
+            boolean hitSolid = false;
+            for (RaycastHit rh = i.next(); i.hasNext(); rh = i.next()) {
+                if (rh.getBlock() != null) {
+                    hitSolid = true;
+                    break;
+                }
+            }
+            //if (!ra.stream().anyMatch(rh -> rh.getBlock() != null)) {
+            if (!hitSolid) {
+                escapedSum += cos;
+            }
+        }
+        return lerp(.05, 1, escapedSum / cosSum);
     }
 
     private static double getAmbientOcclusion(boolean[][][] a, int i, int j) {

@@ -16,8 +16,16 @@ public class WindLift extends SpellEffect {
 
     @Override
     public void cast(SpellInfo info) {
-        if (info.target.targetsCreature) {
+        if (info.target.targetsCreature()) {
             new LiftStatus(info.target.creature, 3).start();
+        }
+        if (info.target.targetsTerrain()) {
+            //TODO
+            //info.target.terrain
+        }
+        if (info.target.targetsItem()) {
+            //TODO
+            //info.target.item
         }
     }
 

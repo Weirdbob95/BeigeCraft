@@ -13,11 +13,16 @@ public class LifeHeal extends SpellEffect {
 
     @Override
     public void cast(SpellInfo info) {
-        if (info.target.targetsCreature) {
-            if (info.target.creature.currentHealth.get() < info.target.creature.maxHealth.get()) {
-                info.target.creature.currentHealth.setBaseValue(Math.min(info.target.creature.maxHealth.get(),
-                        info.target.creature.currentHealth.getBaseValue() + 3 * info.powerMultiplier));
-            }
+        if (info.target.targetsCreature()) {
+            info.target.creature.heal(info.powerMultiplier);
+        }
+        if (info.target.targetsTerrain()) {
+            //TODO implement terrain corruption
+            //info.target.terrain.corruption = 0;
+        }
+        if (info.target.targetsItem()) {
+            //TODO implement item/shard corruption
+            //info.target.item.corruption = 0;
         }
     }
 

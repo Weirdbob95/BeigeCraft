@@ -23,6 +23,11 @@ public class SpellInfo {
      * The creature or block that this spell targets.
      */
     public final SpellTarget target;
+    
+    /**
+     * The creature casting the spell
+     */
+    public final CreatureBehavior caster;
 
     /**
      * The direction this spell is heading. This is not necessarily a unit
@@ -45,12 +50,14 @@ public class SpellInfo {
      * Constructs a new SpellInfo with the given parameters.
      *
      * @param target The target of the spell
+     * @param caster The caster of the spell
      * @param direction The direction of the spell
      * @param powerMultiplier The power of the spell
      * @param world The world the spell lives in
      */
-    public SpellInfo(SpellTarget target, Vec3d direction, double powerMultiplier, World world) {
+    public SpellInfo(SpellTarget target, CreatureBehavior caster, Vec3d direction, double powerMultiplier, World world) {
         this.target = target;
+        this.caster = caster;
         this.direction = direction;
         this.powerMultiplier = powerMultiplier;
         this.world = world;
@@ -71,18 +78,21 @@ public class SpellInfo {
      * @return The new SpellInfo
      */
     public SpellInfo multiplyPower(double mult) {
-        return new SpellInfo(target, direction, powerMultiplier * mult, world);
+        return new SpellInfo(target, caster, direction, powerMultiplier * mult, world);
     }
 
     /**
-     * @return The position of the spell's target
+     * @return The position of the spell's target, null if no target.
      */
     public Vec3d position() {
-        if (target.targetsCreature) {
+        if (target.targetsCreature()) {
             return target.creature.position.position;
-        } else {
+        } else if (target.targetsTerrain()) {
             return target.terrain;
+        } else if (target.targetsItem()) {
+            
         }
+        return null;
     }
 
     /**
@@ -92,7 +102,7 @@ public class SpellInfo {
      * @return The new SpellInfo
      */
     public SpellInfo setTarget(CreatureBehavior creature) {
-        return new SpellInfo(new SpellTarget(creature), direction, powerMultiplier, world);
+        return new SpellInfo(new SpellTarget(creature), caster, direction, powerMultiplier, world);
     }
 
     /**
@@ -102,7 +112,7 @@ public class SpellInfo {
      * @return The new SpellInfo
      */
     public SpellInfo setTarget(Vec3d terrain) {
-        return new SpellInfo(new SpellTarget(terrain), direction, powerMultiplier, world);
+        return new SpellInfo(new SpellTarget(terrain), caster, direction, powerMultiplier, world);
     }
 
     /**
@@ -112,11 +122,6 @@ public class SpellInfo {
      * The SpellTarget class is immutable.
      */
     public static class SpellTarget {
-
-        /**
-         * Whether the spell targets a creature
-         */
-        public final boolean targetsCreature;
 
         /**
          * The creature that the spell targets (or null if the spell targets a
@@ -136,7 +141,6 @@ public class SpellInfo {
          * @param creature The target of the spell
          */
         public SpellTarget(CreatureBehavior creature) {
-            this.targetsCreature = true;
             this.creature = creature;
             this.terrain = null;
         }
@@ -147,9 +151,32 @@ public class SpellInfo {
          * @param terrain The target of the spell
          */
         public SpellTarget(Vec3d terrain) {
-            this.targetsCreature = false;
             this.creature = null;
             this.terrain = terrain;
+        }
+        
+        /**
+         * Determines trueness of creature targeting. 
+         * @return whether or not this targets a creature
+         */
+        public boolean targetsCreature() {
+            return this.creature != null;
+        }
+        
+        /**
+         * Determines trueness of terrain targeting. 
+         * @return whether or not this targets terrain
+         */
+        public boolean targetsTerrain() {
+            return this.terrain != null;
+        }
+        
+        /**
+         * Determines trueness of item targeting. 
+         * @return whether or not this targets an item
+         */
+        public boolean targetsItem() {
+            return false; //TODO implement item targeting.
         }
     }
 }

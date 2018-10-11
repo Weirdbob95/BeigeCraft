@@ -26,7 +26,7 @@ public class SpellcastAbility extends InstantAbility {
         SpellShapeMissile missile = new S_Projectile();
         missile.isMultishot = true;
         SpellShapeInitial shape = constructSpell(missile, new S_Burst(), new WindLift());
-        SpellInfo info = new SpellInfo(new SpellTarget(player.creature), Camera.camera3d.facing(), 1, player.physics.world);
+        SpellInfo info = new SpellInfo(new SpellTarget(player.creature), player.creature, Camera.camera3d.facing(), 1, player.physics.world);
         shape.cast(info);
     }
 }

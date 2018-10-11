@@ -13,8 +13,17 @@ public class CorruptionDrain extends SpellEffect {
 
     @Override
     public void cast(SpellInfo info) {
-        if (info.target.targetsCreature) {
-            info.target.creature.damage(3 * info.powerMultiplier, info.direction);
+        if (info.target.targetsCreature()) {
+            double healthStolen = info.target.creature.damage(3 * info.powerMultiplier);
+            info.caster.heal(healthStolen);
+        }
+        if (info.target.targetsTerrain()) {
+            //TODO
+            //info.target.terrain add health and destroy vegetation if vegetation
+        }
+        if (info.target.targetsItem()) {
+            //TODO
+            //info.target.item consumes food / item
         }
     }
 

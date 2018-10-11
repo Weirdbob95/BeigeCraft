@@ -45,6 +45,41 @@ public class CreatureBehavior extends Behavior {
             getRoot().destroy();
         }
     }
+    
+    /**
+     * @requires damage >= 0
+     * @param damage the amount of damage the creature should take
+     * @return how much the creature was damaged
+     */
+    public double damage(double damage) {
+        if (damage < 0) return 0.0;
+        
+        double initialHealth = currentHealth.get();
+        
+        currentHealth.setBaseValue(currentHealth.getBaseValue() - damage);
+        if (currentHealth.get() <= 0) {
+            getRoot().destroy();
+        }
+        
+        return initialHealth - currentHealth.get();
+    }
+    
+    /**
+     * @requires health >= 0
+     * @param health the amount of health the creature should gain
+     * @return how much the creature was healed
+     */
+    public double heal(double health) {
+        if (health < 0) return 0.0;
+        
+        double initialHealth = currentHealth.get();
+        
+        if (currentHealth.get() < maxHealth.get()) {
+            currentHealth.setBaseValue(Math.min(maxHealth.get(),
+                    currentHealth.getBaseValue() + health));
+        }
+        return currentHealth.get() - initialHealth;
+    }
 
     @Override
     public void update(double dt) {

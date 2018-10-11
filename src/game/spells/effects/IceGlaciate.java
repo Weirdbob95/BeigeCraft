@@ -19,8 +19,16 @@ public class IceGlaciate extends SpellEffect {
 
     @Override
     public void cast(SpellInfo info) {
-        if (info.target.targetsCreature) {
+        if (info.target.targetsCreature()) {
             new FreezeStatus(info.target.creature, 5).start();
+        }
+        if (info.target.targetsTerrain()) {
+            //TODO
+            //info.target.terrain
+        }
+        if (info.target.targetsItem()) {
+            //TODO
+            //info.target.item
         }
     }
 

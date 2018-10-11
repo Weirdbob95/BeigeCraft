@@ -13,8 +13,16 @@ public class FireIgnite extends SpellEffect {
 
     @Override
     public void cast(SpellInfo info) {
-        if (info.target.targetsCreature) {
+        if (info.target.targetsCreature()) {
             info.target.creature.damage(5 * info.powerMultiplier, info.direction);
+        }
+        if (info.target.targetsTerrain()) {
+            //TODO
+            //info.target.terrain
+        }
+        if (info.target.targetsItem()) {
+            //TODO
+            //info.target.item
         }
     }
 

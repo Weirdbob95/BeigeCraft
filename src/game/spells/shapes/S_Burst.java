@@ -19,7 +19,7 @@ public class S_Burst extends SpellShapeModifier {
 
     @Override
     public void cast(SpellInfo info) {
-        if (info.target.targetsCreature) {
+        if (info.target.targetsCreature()) {
             for (CreatureBehavior c : new LinkedList<>(ALL_CREATURES)) {
                 if (c.position.position.sub(info.position()).length() < 6) {
                     hit(info.setTarget(c).multiplyPower(.5));

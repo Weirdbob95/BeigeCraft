@@ -58,6 +58,11 @@ public abstract class Status {
      * @param dt The amount of time in seconds since the last frame
      */
     protected abstract void onUpdate(double dt);
+    
+    /**
+     * This function is called when the effect timer ends.
+     */
+    protected abstract void onFinish();
 
     /**
      * This function specifies how this status interacts with existing statuses
@@ -97,6 +102,7 @@ public abstract class Status {
     public void update(double dt) {
         timer -= dt;
         if (timer <= 0) {
+            onFinish();
             creature.statuses.remove(this);
             modifiers.forEach(m -> m.remove());
         } else {

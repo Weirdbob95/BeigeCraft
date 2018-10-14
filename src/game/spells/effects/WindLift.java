@@ -50,6 +50,11 @@ public class WindLift extends SpellEffect {
                 creature.velocity.velocity = creature.velocity.velocity.setZ(Math.min(creature.velocity.velocity.z + 100 * dt, 8));
             }
         }
+        
+        @Override
+        protected void onFinish() {
+            
+        }
 
         @Override
         protected StackMode stackMode() {

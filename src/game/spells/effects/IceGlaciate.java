@@ -59,6 +59,11 @@ public class IceGlaciate extends SpellEffect {
         public void onUpdate(double dt) {
             creature.velocity.velocity = creature.velocity.velocity.mul(Math.pow(.1, dt)).setZ(creature.velocity.velocity.z);
         }
+        
+        @Override
+        protected void onFinish() {
+            
+        }
 
         @Override
         protected StackMode stackMode() {

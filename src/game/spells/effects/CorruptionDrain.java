@@ -1,5 +1,6 @@
 package game.spells.effects;
 
+import definitions.BlockType;
 import game.spells.SpellInfo;
 import game.spells.SpellPart.SpellEffect;
 import game.spells.TypeDefinitions.SpellElement;
@@ -19,7 +20,9 @@ public class CorruptionDrain extends SpellEffect {
         }
         if (info.target.targetsTerrain()) {
             //TODO
-            //info.target.terrain add health and destroy vegetation if vegetation
+            BlockType block = info.world.getBlock(info.target.terrain);
+            
+            //add health and destroy vegetation if vegetation
         }
         if (info.target.targetsItem()) {
             //TODO

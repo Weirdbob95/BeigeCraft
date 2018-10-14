@@ -1,5 +1,6 @@
 package game.spells.effects;
 
+import definitions.BlockType;
 import game.spells.SpellInfo;
 import game.spells.SpellPart.SpellEffect;
 import game.spells.TypeDefinitions.SpellElement;
@@ -18,7 +19,8 @@ public class LifeHeal extends SpellEffect {
         }
         if (info.target.targetsTerrain()) {
             //TODO implement terrain corruption
-            //info.target.terrain.corruption = 0;
+            BlockType block = info.world.getBlock(info.target.terrain);
+            //block.corruption = 0;
         }
         if (info.target.targetsItem()) {
             //TODO implement item/shard corruption

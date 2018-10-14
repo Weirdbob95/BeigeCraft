@@ -30,6 +30,11 @@ public class Healing extends Status {
     protected void onUpdate(double dt) {
         creature.heal(power);
     }
+    
+    @Override
+    protected void onFinish() {
+        
+    }
 
     @Override
     protected StackMode stackMode() {

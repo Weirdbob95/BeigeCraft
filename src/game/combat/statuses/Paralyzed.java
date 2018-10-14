@@ -13,13 +13,10 @@ import game.creatures.CreatureBehavior;
  *
  * @author nikolas
  */
-public class Hurting extends Status {
+public class Paralyzed extends Status {
     
-    private double power;
-    
-    public Hurting(CreatureBehavior creature, double maxTimer, double power) {
+    public Paralyzed(CreatureBehavior creature, double maxTimer) {
         super(creature, maxTimer);
-        this.power = power;
     }
 
     @Override
@@ -28,10 +25,7 @@ public class Hurting extends Status {
 
     @Override
     protected void onUpdate(double dt) {
-        if (creature.currentHealth.get() < creature.maxHealth.get()) {
-            creature.currentHealth.setBaseValue(Math.max(0,
-                    creature.currentHealth.getBaseValue() - 3 * power));
-        }
+        
     }
     
     @Override
@@ -40,7 +34,7 @@ public class Hurting extends Status {
     }
 
     @Override
-    protected StackMode stackMode() {
+    protected Status.StackMode stackMode() {
         return MAX_DURATION;
     }
     

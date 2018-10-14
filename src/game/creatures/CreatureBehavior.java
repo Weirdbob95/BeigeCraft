@@ -80,6 +80,23 @@ public class CreatureBehavior extends Behavior {
         }
         return currentHealth.get() - initialHealth;
     }
+    
+    /**
+     * Determines if this currently has the given status
+     * 
+     * @param statusName name of the status to check for
+     * @return true if status is contained in statuses
+     */
+    public boolean status(String statusName) {
+        statusName = statusName.toLowerCase();
+        for (Status state : statuses) {
+            String stateString = state.toString().toLowerCase();
+            if (stateString.equals(statusName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public void update(double dt) {

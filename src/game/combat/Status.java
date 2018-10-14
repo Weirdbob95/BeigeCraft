@@ -109,6 +109,11 @@ public abstract class Status {
             onUpdate(dt);
         }
     }
+    
+    @Override
+    public String toString() {
+        return "Unknown Effect";
+    }
 
     /**
      * This enum defines how a status should interact with existing status of

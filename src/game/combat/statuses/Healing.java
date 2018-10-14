@@ -35,6 +35,11 @@ public class Healing extends Status {
     protected void onFinish() {
         
     }
+    
+    @Override
+    public String toString() {
+        return "Healing";
+    }
 
     @Override
     protected StackMode stackMode() {

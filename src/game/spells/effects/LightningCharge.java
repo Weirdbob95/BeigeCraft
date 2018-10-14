@@ -6,6 +6,7 @@
 package game.spells.effects;
 
 import definitions.BlockType;
+import game.combat.statuses.SpeedChanged;
 import game.spells.SpellInfo;
 import game.spells.SpellPart.SpellEffect;
 import game.spells.TypeDefinitions;
@@ -16,12 +17,13 @@ import static game.spells.TypeDefinitions.SpellElement.LIGHTNING;
  * @author nikolas
  */
 public class LightningCharge extends SpellEffect {
+    
+    private final double TIME = 10.0;
 
     @Override
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature()) {
-            //TODO
-            
+            new SpeedChanged(info.target.creature, TIME, 0.0).start();
         }
         if (info.target.targetsTerrain()) {
             //TODO

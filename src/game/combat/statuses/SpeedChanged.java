@@ -5,22 +5,29 @@
  */
 package game.combat.statuses;
 
+import engine.Property.Modifier;
 import game.combat.Status;
 import static game.combat.Status.StackMode.MAX_DURATION;
 import game.creatures.CreatureBehavior;
 
-/** Damages over time
+/** changes creature speed for the given time.
  *
  * @author nikolas
  */
-public class Paralyzed extends Status {
+public class SpeedChanged extends Status {
     
-    public Paralyzed(CreatureBehavior creature, double maxTimer) {
+    private Modifier speedModifier;
+    
+    private double modifier;
+    
+    public SpeedChanged(CreatureBehavior creature, double maxTimer, double change) {
         super(creature, maxTimer);
+        modifier = change;
     }
 
     @Override
     protected void onStart() {
+        speedModifier = creature.speed.addModifier(x -> x * modifier);
     }
 
     @Override
@@ -30,7 +37,12 @@ public class Paralyzed extends Status {
     
     @Override
     protected void onFinish() {
-        
+        speedModifier.remove();
+    }
+    
+    @Override
+    public String toString() {
+        return "Speed Changed";
     }
 
     @Override

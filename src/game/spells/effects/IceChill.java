@@ -6,6 +6,7 @@
 package game.spells.effects;
 
 import definitions.BlockType;
+import game.combat.statuses.SpeedChanged;
 import game.spells.SpellInfo;
 import game.spells.SpellPart.SpellEffect;
 import game.spells.TypeDefinitions;
@@ -16,12 +17,14 @@ import static game.spells.TypeDefinitions.SpellElement.ICE;
  * @author nikolas
  */
 public class IceChill extends SpellEffect {
+    
+    private static final double TIME = 10.0;
 
     @Override
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature()) {
-            //TODO
-            
+            info.target.creature.damage(5 * info.powerMultiplier, info.direction);
+            new SpeedChanged(info.target.creature, TIME, 0.5).start();
         }
         if (info.target.targetsTerrain()) {
             //TODO

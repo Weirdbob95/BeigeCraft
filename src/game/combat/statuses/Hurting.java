@@ -38,6 +38,11 @@ public class Hurting extends Status {
     protected void onFinish() {
         
     }
+    
+    @Override
+    public String toString() {
+        return "Hurting";
+    }
 
     @Override
     protected StackMode stackMode() {

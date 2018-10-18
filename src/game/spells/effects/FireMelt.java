@@ -26,13 +26,16 @@ public class FireMelt extends SpellEffect {
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature()) {
             new Melting(info.target.creature, TIME, 4 * info.powerMultiplier).start();
+            hit(info);
         }
         if (info.target.targetsTerrain()) {
             //TODO
             BlockType block = info.world.getBlock(info.target.terrain);
+            hit(info);
         }
         if (info.target.targetsItem()) {
             //TODO
+            hit(info);
         }
     }
     

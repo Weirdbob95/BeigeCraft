@@ -23,14 +23,18 @@ public class LightningCharge extends SpellEffect {
     @Override
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature()) {
+            info.target.creature.damage(info.powerMultiplier, info.direction);
             new SpeedChanged(info.target.creature, TIME, 0.0).start();
+            hit(info);
         }
         if (info.target.targetsTerrain()) {
             //TODO
             BlockType block = info.world.getBlock(info.target.terrain);
+            hit(info);
         }
         if (info.target.targetsItem()) {
             //TODO
+            hit(info);
         }
     }
     

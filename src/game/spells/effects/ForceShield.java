@@ -20,14 +20,17 @@ public class ForceShield extends SpellPart.SpellEffect {
         if (info.target.targetsCreature()) {
             //TODO
             //info.target.creature
+            hit(info);
         }
         if (info.target.targetsTerrain()) {
             //TODO
             //info.target.terrain
+            hit(info);
         }
         if (info.target.targetsItem()) {
             //TODO
             //info.target.item
+            hit(info);
         }
     }
 

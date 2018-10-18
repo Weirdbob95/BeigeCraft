@@ -11,18 +11,23 @@ import static game.spells.TypeDefinitions.SpellElement.WIND;
  */
 public class WindGust extends SpellEffect {
 
+    private static final double DAMAGE_MODIFIER = 1.0;
+    
     @Override
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature()) {
-            info.target.creature.damage(2 * info.powerMultiplier, info.direction.mul(3));
+            info.target.creature.damage(DAMAGE_MODIFIER * info.powerMultiplier, info.direction.mul(3));
+            hit(info);
         }
         if (info.target.targetsTerrain()) {
             //TODO
             //info.target.terrain
+            hit(info);
         }
         if (info.target.targetsItem()) {
             //TODO
             //info.target.item
+            hit(info);
         }
     }
 

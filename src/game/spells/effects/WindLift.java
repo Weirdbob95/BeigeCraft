@@ -18,14 +18,17 @@ public class WindLift extends SpellEffect {
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature()) {
             new LiftStatus(info.target.creature, 3).start();
+            hit(info);
         }
         if (info.target.targetsTerrain()) {
             //TODO
             //info.target.terrain
+            hit(info);
         }
         if (info.target.targetsItem()) {
             //TODO
             //info.target.item
+            hit(info);
         }
     }
 

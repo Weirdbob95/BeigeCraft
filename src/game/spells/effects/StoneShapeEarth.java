@@ -21,14 +21,16 @@ public class StoneShapeEarth extends SpellEffect {
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature()) {
             //TODO
-            
+            hit(info);
         }
         if (info.target.targetsTerrain()) {
             //TODO
             BlockType block = info.world.getBlock(info.target.terrain);
+            hit(info);
         }
         if (info.target.targetsItem()) {
             //TODO
+            hit(info);
         }
     }
     

@@ -16,15 +16,18 @@ public class LifeHeal extends SpellEffect {
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature()) {
             info.target.creature.heal(info.powerMultiplier);
+            hit(info);
         }
         if (info.target.targetsTerrain()) {
             //TODO implement terrain corruption
             BlockType block = info.world.getBlock(info.target.terrain);
             //block.corruption = 0;
+            hit(info);
         }
         if (info.target.targetsItem()) {
             //TODO implement item/shard corruption
             //info.target.item.corruption = 0;
+            hit(info);
         }
     }
 

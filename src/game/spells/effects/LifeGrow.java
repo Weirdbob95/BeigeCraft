@@ -5,10 +5,7 @@
  */
 package game.spells.effects;
 
-import game.combat.Status;
-import static game.combat.Status.StackMode.MAX_DURATION;
 import game.combat.statuses.Healing;
-import game.creatures.CreatureBehavior;
 import game.spells.SpellInfo;
 import game.spells.SpellPart;
 import game.spells.TypeDefinitions;
@@ -26,14 +23,17 @@ public class LifeGrow extends SpellPart.SpellEffect {
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature()) {
             new Healing(info.target.creature, TIME, info.powerMultiplier).start();
+            hit(info);
         }
         if (info.target.targetsTerrain()) {
             //TODO
             //info.target.terrain spawn vegetation
+            hit(info);
         }
         if (info.target.targetsItem()) {
             //TODO
             //info.target.item spawn vegetation
+            hit(info);
         }
     }
 

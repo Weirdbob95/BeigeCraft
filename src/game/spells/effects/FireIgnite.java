@@ -14,21 +14,25 @@ import static game.spells.TypeDefinitions.SpellElement.FIRE;
  */
 public class FireIgnite extends SpellEffect {
     
+    private static final double DAMAGE_MODIFIER = 5.0;
+    
     private static final double TIME = 10.0;
 
     @Override
     public void cast(SpellInfo info) {
         if (info.target.targetsCreature()) {
-            info.target.creature.damage(5 * info.powerMultiplier, info.direction);
-            new Burning(info.target.creature, TIME, 5 * info.powerMultiplier).start();
+            new Burning(info.target.creature, TIME, DAMAGE_MODIFIER * info.powerMultiplier).start();
+            hit(info);
         }
         if (info.target.targetsTerrain()) {
             //TODO
             //info.target.terrain
+            hit(info);
         }
         if (info.target.targetsItem()) {
             //TODO
             //info.target.item
+            hit(info);
         }
     }
 

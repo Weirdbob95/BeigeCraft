@@ -22,13 +22,16 @@ public class StoneCrush extends SpellEffect {
         if (info.target.targetsCreature()) {
             //TODO
             
+            hit(info);
         }
         if (info.target.targetsTerrain()) {
             //TODO
             BlockType block = info.world.getBlock(info.target.terrain);
+            hit(info);
         }
         if (info.target.targetsItem()) {
             //TODO
+            hit(info);
         }
     }
     

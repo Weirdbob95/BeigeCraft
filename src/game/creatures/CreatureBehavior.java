@@ -82,20 +82,23 @@ public class CreatureBehavior extends Behavior {
     }
     
     /**
-     * Determines if this currently has the given status
+     * Finds the status that matches the given string
+     * 
+     * Relies on the toString method of the statuses, should probably change
+     * to be more reliable in the future.
      * 
      * @param statusName name of the status to check for
-     * @return true if status is contained in statuses
+     * @return a status if any match the input, null if non existent
      */
-    public boolean status(String statusName) {
+    public Status status(String statusName) {
         statusName = statusName.toLowerCase();
         for (Status state : statuses) {
             String stateString = state.toString().toLowerCase();
             if (stateString.equals(statusName)) {
-                return true;
+                return state;
             }
         }
-        return false;
+        return null;
     }
 
     @Override

@@ -25,13 +25,16 @@ public class IceChill extends SpellEffect {
         if (info.target.targetsCreature()) {
             info.target.creature.damage(5 * info.powerMultiplier, info.direction);
             new SpeedChanged(info.target.creature, TIME, 0.5).start();
+            hit(info);
         }
         if (info.target.targetsTerrain()) {
             //TODO
             BlockType block = info.world.getBlock(info.target.terrain);
+            hit(info);
         }
         if (info.target.targetsItem()) {
             //TODO
+            hit(info);
         }
     }
     

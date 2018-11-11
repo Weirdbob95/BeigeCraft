@@ -4,7 +4,7 @@ import behaviors.ModelBehavior;
 import behaviors.PhysicsBehavior;
 import behaviors.PositionBehavior;
 import engine.Behavior;
-import engine.Property;
+import engine.Queryable.Property;
 import opengl.Camera;
 import util.math.Vec3d;
 import util.math.Vec4d;

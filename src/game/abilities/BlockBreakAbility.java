@@ -5,7 +5,6 @@ import static definitions.Loader.getItemByBlock;
 import static definitions.Loader.getItemByTerrainObject;
 import engine.Behavior;
 import game.Player;
-import game.abilities.Ability.ContinuousAbility;
 import game.items.ItemSlot;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,7 @@ import util.math.Vec3d;
 import world.Raycast.RaycastHit;
 import world.TerrainObjectInstance;
 
-public class BlockBreakAbility extends ContinuousAbility {
+public class BlockBreakAbility extends Ability {
 
     public final Player player = user.get(Player.class);
 
@@ -24,7 +23,8 @@ public class BlockBreakAbility extends ContinuousAbility {
     }
 
     @Override
-    public void use(double dt) {
+    public void update(double dt) {
+        super.update(dt);
         player.breakingBlocks = true;
         RaycastHit block = player.firstSolid();
         if (block != null) {

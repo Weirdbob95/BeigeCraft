@@ -1,6 +1,6 @@
 package game.spells.effects;
 
-import engine.Property.Modifier;
+import engine.Queryable.Modifier;
 import game.combat.Status;
 import static game.combat.Status.StackMode.MAX_DURATION;
 import game.creatures.CreatureBehavior;

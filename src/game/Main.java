@@ -6,8 +6,8 @@ import static behaviors.MiscBehaviors.onUpdate;
 import engine.Core;
 import engine.Input;
 import static game.Settings.*;
+import game.archetypes.Knight;
 import game.creatures.Doggo;
-import game.creatures.Goblin;
 import game.creatures.Kitteh;
 import game.creatures.Skeletor;
 import gui.GUIManager;
@@ -108,13 +108,13 @@ public abstract class Main {
                 ziggy.monster.physics.world = world;
                 ziggy.create();
             }
-            if (Input.keyJustPressed(GLFW_KEY_M)) {
-                Goblin squee = new Goblin();
-                squee.enemy.monster.position.position = p.position.position;
-                squee.enemy.monster.model.rotation = Camera.camera3d.horAngle;
-                squee.enemy.monster.physics.world = world;
-                squee.create();
-            }
+//            if (Input.keyJustPressed(GLFW_KEY_M)) {
+//                Goblin squee = new Goblin();
+//                squee.enemy.monster.position.position = p.position.position;
+//                squee.enemy.monster.model.rotation = Camera.camera3d.horAngle;
+//                squee.enemy.monster.physics.world = world;
+//                squee.create();
+//            }
 
             if (Input.keyJustPressed(GLFW_KEY_L)) {
                 ENABLE_LOD = !ENABLE_LOD;

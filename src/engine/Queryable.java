@@ -3,14 +3,9 @@ package engine;
 import java.util.TreeSet;
 import java.util.function.Function;
 
-public class Property<T> {
+public class Queryable<T> {
 
-    private T value;
-    private Property<TreeSet<Modifier>> modifiers;
-
-    public Property(T value) {
-        this.value = value;
-    }
+    Property<TreeSet<Modifier>> modifiers;
 
     public Modifier addModifier(Function<T, T> modFunction) {
         return addModifier(0, modFunction);
@@ -22,20 +17,6 @@ public class Property<T> {
         return m;
     }
 
-    public T get() {
-        T returnVal = value;
-        if (modifiers != null) {
-            for (Modifier m : modifiers.get()) {
-                returnVal = m.modFunction.apply(returnVal);
-            }
-        }
-        return returnVal;
-    }
-
-    public T getBaseValue() {
-        return value;
-    }
-
     public Property<TreeSet<Modifier>> modifiers() {
         if (modifiers == null) {
             modifiers = new Property(new TreeSet());
@@ -43,12 +24,14 @@ public class Property<T> {
         return modifiers;
     }
 
-    public void setBaseValue(T value) {
-        this.value = value;
-    }
-
-    private boolean shouldRemove() {
-        return (modifiers == null || modifiers.shouldRemove()) && ((TreeSet) value).isEmpty();
+    public T query(T value) {
+        T returnVal = value;
+        if (modifiers != null) {
+            for (Modifier m : modifiers.get()) {
+                returnVal = m.modFunction.apply(returnVal);
+            }
+        }
+        return returnVal;
     }
 
     private static int maxModifierID;
@@ -77,6 +60,31 @@ public class Property<T> {
             if (modifiers.shouldRemove()) {
                 modifiers = null;
             }
+        }
+    }
+
+    public static class Property<T> extends Queryable<T> {
+
+        private T value;
+
+        public Property(T value) {
+            this.value = value;
+        }
+
+        public T get() {
+            return query(value);
+        }
+
+        public T getBaseValue() {
+            return value;
+        }
+
+        public void setBaseValue(T value) {
+            this.value = value;
+        }
+
+        private boolean shouldRemove() {
+            return (modifiers == null || modifiers.shouldRemove()) && ((TreeSet) value).isEmpty();
         }
     }
 }

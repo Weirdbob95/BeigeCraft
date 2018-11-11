@@ -6,10 +6,10 @@ import game.abilities.Ability;
 import game.abilities.BlockBreakAbility;
 import game.abilities.BlockPlaceAbility;
 import game.abilities.LiquidPlaceAbility;
-import game.abilities.ParryAbility;
 import game.abilities.SpellcastAbility;
 import game.abilities.TerrainObjectPlaceAbility;
-import game.abilities.WeaponChargeAbility;
+import game.archetypes.KnightBlock;
+import game.archetypes.KnightFastAttack;
 
 public class PlayerAbilityManager {
 
@@ -20,10 +20,10 @@ public class PlayerAbilityManager {
 
     private static Ability itemSlotToAbility(ItemSlot is) {
         if (is == null || is.item() == null) {
-            return new WeaponChargeAbility(player);
+            return new KnightFastAttack(player);
         }
         if (is.item().weapon != null) {
-            return new WeaponChargeAbility(player);
+            return new KnightFastAttack(player);
         }
         if (is.item().tool != null) {
             return new BlockBreakAbility(player);
@@ -47,15 +47,15 @@ public class PlayerAbilityManager {
         primary = itemSlotToAbility(ItemSlot.MAIN_HAND);
         secondary = itemSlotToAbility(ItemSlot.OFF_HAND);
         if (primary.getClass().equals(secondary.getClass())) {
-            secondary = new ParryAbility(player);
+            secondary = new KnightBlock(player);
         }
-        if (primary instanceof WeaponChargeAbility) {
+        if (primary instanceof KnightFastAttack) {
             if (ItemSlot.MAIN_HAND != null && ItemSlot.MAIN_HAND.item() != null) {
                 player.heldItemController.heldItemType = ItemSlot.MAIN_HAND.item().weapon;
             } else {
                 player.heldItemController.heldItemType = WeaponType.FIST;
             }
-        } else if (secondary instanceof WeaponChargeAbility) {
+        } else if (secondary instanceof KnightFastAttack) {
             if (ItemSlot.OFF_HAND != null && ItemSlot.OFF_HAND.item() != null) {
                 player.heldItemController.heldItemType = ItemSlot.OFF_HAND.item().weapon;
             } else {

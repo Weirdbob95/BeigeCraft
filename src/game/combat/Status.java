@@ -1,6 +1,6 @@
 package game.combat;
 
-import engine.Property.Modifier;
+import engine.Queryable.Modifier;
 import static game.combat.Status.StackMode.ADD_DURATION;
 import static game.combat.Status.StackMode.SEPARATE;
 import game.creatures.CreatureBehavior;

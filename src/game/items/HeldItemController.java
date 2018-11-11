@@ -6,13 +6,16 @@ import behaviors.PreviousPositionBehavior;
 import static definitions.Loader.getItem;
 import definitions.WeaponType;
 import engine.Behavior;
+import engine.Queryable.Property;
 import static game.GraphicsEffect.createGraphicsEffect;
 import game.creatures.CreatureBehavior;
 import game.creatures.EyeBehavior;
 import graphics.Model;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import org.joml.Matrix4d;
+import static util.math.MathUtils.clamp;
 import static util.math.MathUtils.lerp;
 import static util.math.MathUtils.randomInSphere;
 import util.math.Quaternion;
@@ -35,6 +38,7 @@ public class HeldItemController extends Behavior {
     public boolean makeTrail;
     public double reorientSpeed = .5;
 
+    public Property<Supplier<Double>> ext1 = new Property<>(() -> heldItemType.ext1);
     public Vec3d handlePos = new Vec3d(16. / 16, -2. / 16, -1);
     public Vec3d restingPos = new Vec3d(0, -.25, .5);
     public Vec3d shoulderPos = new Vec3d(0, .5, 14. / 16 - 1.4);
@@ -109,7 +113,10 @@ public class HeldItemController extends Behavior {
     private Consumer<Vec4d> renderTask() {
         Vec3d currentPos = eye.eyePos.get().add(heldItemPos);
         Vec3d handleDir = heldItemPos.sub(eye.quat().applyTo(handlePos));
-        Quaternion quat = Quaternion.fromXYAxes(handleDir, heldItemVel);
+        Quaternion quatVel = Quaternion.fromXYAxes(handleDir, heldItemVel);
+        Quaternion quatUp = Quaternion.fromXYAxes(handleDir, new Vec3d(0, 0, 1));
+        double lerpVal = clamp((heldItemVel.length() - .001) * 1, 0, 1);
+        Quaternion quat = lerpVal == 0 ? quatUp : quatUp.lerp(quatVel, lerpVal);
         return c -> {
             heldItemType.getModel().render(currentPos, quat, 1 / 16., heldItemType.getModelTip(), c);
         };
@@ -125,7 +132,7 @@ public class HeldItemController extends Behavior {
 
             SplineAnimation anim = new SplineAnimation();
             anim.addKeyframe(0, heldItemPos, heldItemVel);
-            Vec3d goal = heldItemPos.normalize().lerp(eye.quatScaled(1, .5).applyToForwards(), reorientSpeed).mul(heldItemType.ext1)
+            Vec3d goal = heldItemPos.normalize().lerp(eye.quatScaled(1, .5).applyToForwards(), reorientSpeed).mul(ext1.get().get())
                     .add(eye.quat().applyTo(restingPos));
 //                    .add(rotate(restingPos, direction1(eye.facing)));
             anim.addKeyframe(1, goal, new Vec3d(0, 0, 0));

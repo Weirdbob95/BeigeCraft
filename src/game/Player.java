@@ -5,7 +5,6 @@ import behaviors.PositionBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
 import engine.Input;
-import static game.abilities.Ability.DO_NOTHING;
 import game.abilities.AbilityController;
 import game.creatures.CreatureBehavior;
 import game.items.HeldItemController;
@@ -203,10 +202,12 @@ public class Player extends Behavior {
             // Use items
             PlayerAbilityManager.updateAbilities();
             if (Input.mouseJustPressed(0)) {
-                abilityController.attemptAbility(PlayerAbilityManager.primary);
+                abilityController.tryAbility(PlayerAbilityManager.primary);
             }
             if (Input.mouseJustReleased(0)) {
-                abilityController.attemptAbility(DO_NOTHING);
+                if (abilityController.currentAbility().getClass().equals(PlayerAbilityManager.primary.getClass())) {
+                    abilityController.finishAbility();
+                }
             }
 //            if (Input.keyJustPressed(GLFW_KEY_LEFT_SHIFT)) {
 //                abilityController.attemptAbility(PlayerAbilityManager.secondary);
@@ -215,10 +216,12 @@ public class Player extends Behavior {
 //                abilityController.attemptAbility(DO_NOTHING);
 //            }
             if (Input.mouseJustPressed(1)) {
-                abilityController.attemptAbility(PlayerAbilityManager.secondary);
+                abilityController.tryAbility(PlayerAbilityManager.secondary);
             }
             if (Input.mouseJustReleased(1)) {
-                abilityController.attemptAbility(DO_NOTHING);
+                if (abilityController.currentAbility().getClass().equals(PlayerAbilityManager.secondary.getClass())) {
+                    abilityController.finishAbility();
+                }
             }
         }
 

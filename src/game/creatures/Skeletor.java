@@ -1,10 +1,9 @@
 package game.creatures;
 
 import engine.Behavior;
-import game.Knight.FastAttack;
-import static game.abilities.Ability.DO_NOTHING;
 import game.abilities.AbilityController;
 import game.abilities.Stun;
+import game.archetypes.KnightFastAttack;
 import game.combat.WeaponAttack;
 import game.items.HeldItemController;
 import graphics.Model;
@@ -35,12 +34,12 @@ public class Skeletor extends Behavior {
 
     @Override
     public void render() {
-        WeaponAttack wa = WeaponAttack.getFromAbility(abilityController.currentAbility);
+        WeaponAttack wa = WeaponAttack.getFromAbility(abilityController.currentAbility());
         if (wa != null && wa.isParryable) {
 //            Vec4d color = !wa.wantToParryThis.isEmpty() ? new Vec4d(.5, 1, .5, 1) : new Vec4d(1, .5 + clamp(attackTimer * .5 / .4, 0, .5), .5, 1);
 //            Sprite.load("item_sword.png").drawBillboard(monster.position.position.add(new Vec3d(0, 0, 2.5)), new Vec2d(1, 1), color);
         }
-        if (abilityController.currentAbility instanceof Stun) {
+        if (abilityController.currentAbility() instanceof Stun) {
             Sprite.load("swirl.png").drawBillboard(monster.position.position.add(new Vec3d(0, 0, 2.5)), new Vec2d(1, 1), new Vec4d(.8, .8, .2, 1));
         }
     }
@@ -52,7 +51,7 @@ public class Skeletor extends Behavior {
             heldItemController.eye.lookAt(monster.goal);
             if (!timerOn) {
                 if (Math.random() < 2 * dt) {
-                    abilityController.attemptAbility(new FastAttack(this));
+                    abilityController.tryAbility(new KnightFastAttack(this));
                     timerOn = true;
                     attackTimer = .7;
                 }
@@ -68,7 +67,6 @@ public class Skeletor extends Behavior {
             }
             if (timerOn && attackTimer <= 0) {
                 timerOn = false;
-                abilityController.attemptAbility(DO_NOTHING);
             }
         }
     }

@@ -6,7 +6,9 @@ import behaviors.PositionBehavior;
 import behaviors.SpaceOccupierBehavior;
 import behaviors.VelocityBehavior;
 import engine.Behavior;
-import engine.Property;
+import engine.Queryable;
+import engine.Queryable.Property;
+import game.combat.ParryEvent;
 import game.combat.Status;
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,6 +32,8 @@ public class CreatureBehavior extends Behavior {
     public Property<Double> speed = new Property(6.);
     public Property<Double> jumpSpeed = new Property(10.);
     public Property<Boolean> canMove = new Property(true);
+
+    public Queryable<ParryEvent> parryQuery = new Queryable();
 
     public Set<Status> statuses = new HashSet();
 

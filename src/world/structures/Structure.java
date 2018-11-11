@@ -43,8 +43,14 @@ public abstract class Structure {
             Set<Vec3d> occupancy = computeOccupancy();
             maxPos = minPos = occupancy.iterator().next();
             for (Vec3d v : occupancy) {
-                maxPos = vecMap(maxPos, v, Math::max);
-                minPos = vecMap(minPos, v, Math::min);
+                if (v.x > maxPos.x || v.y > maxPos.y || v.z > maxPos.z) {
+                    maxPos = vecMap(maxPos, v, Math::max);
+                }
+                if (v.x < minPos.x || v.y < minPos.y || v.z < minPos.z) {
+                    minPos = vecMap(minPos, v, Math::min);
+                }
+//                maxPos = vecMap(maxPos, v, Math::max);
+//                minPos = vecMap(minPos, v, Math::min);
             }
         }
     }

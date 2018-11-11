@@ -1,8 +1,11 @@
 package gui;
 
+import behaviors.PhysicsBehavior;
+import behaviors.PositionBehavior;
+import engine.Behavior;
 import engine.Input;
-import game.Player;
 import static game.Settings.SHOW_DEBUG_HUD;
+import game.creatures.CreatureBehavior;
 import game.items.ItemSlot;
 import graphics.Graphics;
 import java.util.HashSet;
@@ -63,7 +66,9 @@ public class HUD extends GUIItem {
             for (int j = 0; j < MAP_SIZE; j++) {
                 double mapAngle = Math.PI / 2 - Camera.camera3d.horAngle;
                 Vec2d centerOffset = new Vec2d(i - MAP_SIZE / 2., j - MAP_SIZE / 2.).mul(MAP_SQUARE_SIZE);
-                Graphics.drawRectangle(new Vec2d(670, 320).add(MathUtils.rotate(centerOffset, mapAngle)), mapAngle, new Vec2d(MAP_SQUARE_SIZE, MAP_SQUARE_SIZE), map[i][j]);
+                if (map[i][j] != null) {
+                    Graphics.drawRectangle(new Vec2d(670, 320).add(MathUtils.rotate(centerOffset, mapAngle)), mapAngle, new Vec2d(MAP_SQUARE_SIZE, MAP_SQUARE_SIZE), map[i][j]);
+                }
             }
         }
         for (Vec2d v : villagePositions) {
@@ -73,20 +78,22 @@ public class HUD extends GUIItem {
         }
     }
 
-    public void update(Player player) {
+    public void update(Behavior player) {
+        PositionBehavior position = player.get(PositionBehavior.class);
+        PhysicsBehavior physics = player.get(PhysicsBehavior.class);
         if (SHOW_DEBUG_HUD) {
-            Vec3d pos = player.position.position;
-            position.setText(String.format("%.2f, %.2f, %.2f", pos.x, pos.y, pos.z));
-            Biome b = player.physics.world.heightmappedChunks
-                    .get(player.position.position).biomemap[(int) mod(player.position.position.x,
-                    CHUNK_SIZE)][(int) mod(player.position.position.y, CHUNK_SIZE)].plurality();
+            Vec3d pos = position.position;
+            this.position.setText(String.format("%.2f, %.2f, %.2f", pos.x, pos.y, pos.z));
+            Biome b = physics.world.heightmappedChunks
+                    .get(position.position).biomemap[(int) mod(position.position.x,
+                    CHUNK_SIZE)][(int) mod(position.position.y, CHUNK_SIZE)].plurality();
             biome.setText(b.toString());
         } else {
-            position.setText(null);
+            this.position.setText(null);
             biome.setText(null);
         }
         if (healthbar == null) {
-            healthbar = new GUIHealthbar(player.creature);
+            healthbar = new GUIHealthbar(player.get(CreatureBehavior.class));
             healthbar.offset = new Vec2d(-550, -400);
             healthbar.size = new Vec2d(400, 50);
             add(healthbar);
@@ -94,11 +101,11 @@ public class HUD extends GUIItem {
         villagePositions.clear();
         for (int i = 0; i < MAP_SIZE; i++) {
             for (int j = 0; j < MAP_SIZE; j++) {
-                Vec3d pos = player.position.position.add(new Vec3d(i - MAP_SIZE / 2., j - MAP_SIZE / 2., 0).mul(CHUNK_SIZE));
-                Biome b = player.physics.world.getRegionMap(PlannedChunk.class).get(pos).bd.plurality();
+                Vec3d pos = position.position.add(new Vec3d(i - MAP_SIZE / 2., j - MAP_SIZE / 2., 0).mul(CHUNK_SIZE));
+                Biome b = physics.world.getRegionMap(PlannedChunk.class).get(pos).bd.plurality();
                 map[i][j] = biomeToColor(b);
-                for (Vec3d v : player.physics.world.getRegionMap(StructuredProvince.class).get(pos).villagePositions) {
-                    v = v.div(PROVINCE_SIZE).floor().sub(player.position.position.div(PROVINCE_SIZE).floor()).setZ(0);
+                for (Vec3d v : physics.world.getRegionMap(StructuredProvince.class).get(pos).villagePositions) {
+                    v = v.div(PROVINCE_SIZE).floor().sub(position.position.div(PROVINCE_SIZE).floor()).setZ(0);
                     if (Math.abs(v.x) < MAP_SIZE / 2. && Math.abs(v.y) < MAP_SIZE / 2.) {
                         villagePositions.add(new Vec2d(v.x, v.y));
                     }

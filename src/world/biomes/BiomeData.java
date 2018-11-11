@@ -1,8 +1,5 @@
 package world.biomes;
 
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Map.Entry;
 import static util.math.MathUtils.ceil;
 import static util.math.MathUtils.clamp;
 import static util.math.MathUtils.floor;
@@ -21,7 +18,8 @@ public class BiomeData {
         {DESERT, DESERT, COLD_DESERT, TUNDRA, ROCK}
     };
 
-    private final Map<Biome, Double> biomeStrengths = new EnumMap(Biome.class);
+    //private final Map<Biome, Double> biomeStrengths = new EnumMap(Biome.class);
+    private final double[] biomeStrengths = new double[Biome.values().length];
     private Biome plurality;
     private double totalStrength;
 
@@ -57,36 +55,47 @@ public class BiomeData {
 
     private void addStrength(Biome b, double strength) {
         if (strength > 0) {
-            biomeStrengths.put(b, strength + biomeStrengths.getOrDefault(b, 0.));
+            //biomeStrengths.put(b, strength + biomeStrengths.getOrDefault(b, 0.));
+            biomeStrengths[b.ordinal()] += strength;
         }
     }
 
     public double averageElevation() {
         double r = 0;
-        for (Entry<Biome, Double> e : biomeStrengths.entrySet()) {
-            r += e.getKey().elevation * e.getValue();
+//        for (Entry<Biome, Double> e : biomeStrengths.entrySet()) {
+//            r += e.getKey().elevation * e.getValue();
+//        }
+        for (int i = 0; i < biomeStrengths.length; i++) {
+            r += Biome.values()[i].elevation * biomeStrengths[i];
         }
         return r / totalStrength;
     }
 
     public double averageTreeDensity() {
         double r = 0;
-        for (Entry<Biome, Double> e : biomeStrengths.entrySet()) {
-            r += e.getKey().treeDensity * e.getValue();
+//        for (Entry<Biome, Double> e : biomeStrengths.entrySet()) {
+//            r += e.getKey().treeDensity * e.getValue();
+//        }
+        for (int i = 0; i < biomeStrengths.length; i++) {
+            r += Biome.values()[i].treeDensity * biomeStrengths[i];
         }
         return r / totalStrength;
     }
 
     public double averageTreeHeight() {
         double r = 0;
-        for (Entry<Biome, Double> e : biomeStrengths.entrySet()) {
-            r += e.getKey().treeHeight * e.getValue();
+//        for (Entry<Biome, Double> e : biomeStrengths.entrySet()) {
+//            r += e.getKey().treeHeight * e.getValue();
+//        }
+        for (int i = 0; i < biomeStrengths.length; i++) {
+            r += Biome.values()[i].treeHeight * biomeStrengths[i];
         }
         return r / totalStrength;
     }
 
     public double get(Biome b) {
-        return biomeStrengths.getOrDefault(b, 0.) / totalStrength;
+        //return biomeStrengths.getOrDefault(b, 0.) / totalStrength;
+        return biomeStrengths[b.ordinal()] / totalStrength;
     }
 
     public Biome plurality() {
@@ -94,12 +103,17 @@ public class BiomeData {
     }
 
     public void set(Biome b, double strength) {
-        biomeStrengths.put(b, Math.max(strength, 0));
+        //biomeStrengths.put(b, Math.max(strength, 0));
+        biomeStrengths[b.ordinal()] = Math.max(strength, 0);
         update();
     }
 
     private void update() {
         //plurality = biomeStrengths.entrySet().stream().max(Comparator.comparingDouble(Entry::getValue)).map(Entry::getKey).orElse(null);
-        totalStrength = biomeStrengths.values().stream().mapToDouble(d -> d).sum();
+        //totalStrength = biomeStrengths.values().stream().mapToDouble(d -> d).sum();
+        totalStrength = 0;
+        for (int i = 0; i < biomeStrengths.length; i++) {
+            totalStrength += biomeStrengths[i];
+        }
     }
 }

@@ -15,6 +15,18 @@ public class SplineAnimation {
         keyframeVelocities.add(velocity);
     }
 
+    public void clearKeyframesAfter(double t) {
+        for (int i = 0; i < keyframeTimes.size();) {
+            if (keyframeTimes.get(i) <= t) {
+                i++;
+            } else {
+                keyframeTimes.remove(i);
+                keyframePositions.remove(i);
+                keyframeVelocities.remove(i);
+            }
+        }
+    }
+
     private static Vec3d cubicInterp(double t, Vec3d p1, Vec3d v1, Vec3d p2, Vec3d v2) {
         Vec3d a = v1.sub(p2.sub(p1));
         Vec3d b = v2.mul(-1).add(p2.sub(p1));

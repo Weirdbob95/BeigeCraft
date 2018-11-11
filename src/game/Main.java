@@ -74,7 +74,8 @@ public abstract class Main {
         GUIManager gui = new GUIManager();
         gui.create();
 
-        Player p = new Player();
+        //Player p = new Player();
+        Knight p = new Knight();
         int maxHeight = max(world.heightmappedChunks.get(new RegionPos(0, 0)).elevationAt(0, 0),
                 world.heightmappedChunks.get(new RegionPos(-1, 0)).elevationAt(CHUNK_SIZE - 1, 0),
                 world.heightmappedChunks.get(new RegionPos(0, -1)).elevationAt(0, CHUNK_SIZE - 1),

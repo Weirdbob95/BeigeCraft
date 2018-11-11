@@ -30,7 +30,8 @@ public class ParryAbility extends Ability {
         if (nextAbility instanceof ParryAbility || failed) {
             return new Stun(user, .5);
         }
-        return attacksToParry.isEmpty() ? nextAbility : this;
+        return this;
+        //return attacksToParry.isEmpty() ? nextAbility : this;
     }
 
     private WeaponAttack getParryableAttack(Skeletor s) {

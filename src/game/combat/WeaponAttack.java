@@ -1,6 +1,7 @@
 package game.combat;
 
 import definitions.BlockType;
+import game.Knight.FastAttack;
 import game.ParticleBurst;
 import game.abilities.Ability;
 import game.abilities.WeaponChargeAbility;
@@ -17,7 +18,7 @@ public class WeaponAttack {
 
     public CreatureBehavior attacker = null;
     public boolean canHitAttacker = false;
-    public boolean isParryable = false;
+    public boolean isParryable = true;
     public double damage = 0;
     public Vec3d knockback = new Vec3d(0, 0, 0);
     public Set<BlockType> blocksToBreak = new HashSet();
@@ -33,6 +34,9 @@ public class WeaponAttack {
         }
         if (a instanceof WeaponSwingAbility) {
             return ((WeaponSwingAbility) a).weaponAttack;
+        }
+        if (a instanceof FastAttack) {
+            return ((FastAttack) a).weaponAttack;
         }
         return null;
     }

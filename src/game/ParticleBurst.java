@@ -9,6 +9,7 @@ import graphics.Model;
 import java.util.LinkedList;
 import java.util.List;
 import util.math.MathUtils;
+import util.math.Quaternion;
 import util.math.Vec3d;
 import util.math.Vec4d;
 
@@ -29,7 +30,7 @@ public class ParticleBurst extends Behavior {
     public void render() {
         for (Vec3d p : particles) {
             Vec3d pos = position.position.add(p.mul(maxLifetime - lifetime.lifetime));
-            SINGLE_VOXEL.render(pos, 0, 0, 1 / 16., SINGLE_VOXEL.center(), color);
+            SINGLE_VOXEL.render(pos, Quaternion.IDENTITY, 1 / 16., SINGLE_VOXEL.center(), color);
         }
     }
 

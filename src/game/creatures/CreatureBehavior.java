@@ -28,14 +28,15 @@ public class CreatureBehavior extends Behavior {
     public Property<Double> maxHealth = new Property(10.);
 
     public Property<Double> speed = new Property(6.);
-    public Property<Double> jumpSpeed = new Property(15.);
+    public Property<Double> jumpSpeed = new Property(10.);
     public Property<Boolean> canMove = new Property(true);
 
     public Set<Status> statuses = new HashSet();
 
     @Override
     public void createInner() {
-        acceleration.acceleration = new Vec3d(0, 0, -64);
+//        acceleration.acceleration = new Vec3d(0, 0, -64);
+        acceleration.acceleration = new Vec3d(0, 0, -20);
     }
 
     public void damage(double damage, Vec3d dir) {

@@ -10,12 +10,13 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import util.Resources;
 import util.math.MathUtils;
 import static util.math.MathUtils.direction;
 import static util.math.MathUtils.direction1;
 import static util.math.MathUtils.direction2;
 import static util.math.MathUtils.rotate;
-import util.Resources;
+import util.math.Quaternion;
 import util.math.Vec2d;
 import util.math.Vec3d;
 import util.math.Vec4d;
@@ -70,7 +71,7 @@ public class Graphics {
     public static void drawLine(Vec3d p1, Vec3d p2, Vec4d color) {
         Vec3d delta = p2.sub(p1);
         COLOR_SHADER.setUniform("projectionMatrix", Camera.camera3d.getProjectionMatrix());
-        COLOR_SHADER.setUniform("modelViewMatrix", Camera.camera3d.getWorldMatrix(p1, direction1(delta), direction2(delta), delta.length()));
+        COLOR_SHADER.setUniform("modelViewMatrix", Camera.camera3d.getWorldMatrix(p1, Quaternion.fromEulerAngles(direction1(delta), direction2(delta), 0), delta.length()));
         COLOR_SHADER.setUniform("color", color);
         bindAll(COLOR_SHADER, LINE_VAO);
         glDrawArrays(GL_LINES, 0, 2);

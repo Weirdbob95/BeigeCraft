@@ -2,6 +2,7 @@ package behaviors;
 
 import engine.Behavior;
 import graphics.Model;
+import util.math.Quaternion;
 import util.math.Vec4d;
 
 public class ModelBehavior extends Behavior {
@@ -16,6 +17,6 @@ public class ModelBehavior extends Behavior {
 
     @Override
     public void render() {
-        model.render(position.position, rotation, 0, scale, useOriginalSize ? model.originalSize().div(2) : model.center(), color);
+        model.render(position.position, Quaternion.fromEulerAngles(rotation, 0, 0), scale, useOriginalSize ? model.originalSize().div(2) : model.center(), color);
     }
 }

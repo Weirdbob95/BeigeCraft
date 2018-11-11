@@ -1,5 +1,6 @@
 package game.items;
 
+import behaviors.ModelBehavior;
 import behaviors.PositionBehavior;
 import behaviors.PreviousPositionBehavior;
 import static definitions.Loader.getItem;
@@ -8,7 +9,13 @@ import engine.Behavior;
 import static game.GraphicsEffect.createGraphicsEffect;
 import game.creatures.CreatureBehavior;
 import game.creatures.EyeBehavior;
-import util.math.MathUtils;
+import graphics.Model;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import org.joml.Matrix4d;
+import static util.math.MathUtils.lerp;
+import static util.math.MathUtils.randomInSphere;
+import util.math.Quaternion;
 import util.math.SplineAnimation;
 import util.math.Vec3d;
 import util.math.Vec4d;
@@ -20,20 +27,49 @@ public class HeldItemController extends Behavior {
     public final CreatureBehavior creature = require(CreatureBehavior.class);
     public final EyeBehavior eye = require(EyeBehavior.class);
 
-    public Vec3d heldItemPos = MathUtils.randomInSphere();
+    public Vec3d heldItemPos = randomInSphere();
     public Vec3d heldItemVel = new Vec3d(0, 0, 0);
     public Vec3d realHeldItemVel = new Vec3d(0, 0, 0);
 
-    public WeaponType heldItemType = getItem("sword").weapon;
+    public WeaponType heldItemType = getItem("greataxe").weapon;
     public boolean makeTrail;
     public double reorientSpeed = .5;
-    public Vec4d color = new Vec4d(1, 1, 1, 1);
 
-    private SplineAnimation currentAnim;
-    private double animTime;
+    public Vec3d handlePos = new Vec3d(16. / 16, -2. / 16, -1);
+    public Vec3d restingPos = new Vec3d(0, -.25, .5);
+    public Vec3d shoulderPos = new Vec3d(0, .5, 14. / 16 - 1.4);
+    public boolean rotateShouldersWithFacing = false;
+
+    public SplineAnimation currentAnim;
+    public double animTime;
 
     public void clearAnim() {
         currentAnim = null;
+    }
+
+    public void drawArm(Vec3d shoulder, Vec3d hand, double segmentLength, double width, Vec4d color) {
+        Vec3d delta = hand.sub(shoulder);
+        double totalDist = delta.length();
+        double elbowLower = 1. / 16;
+        if (totalDist < segmentLength * 2) {
+            double realDist = Math.sqrt(segmentLength * segmentLength - totalDist * totalDist / 4);
+            elbowLower = lerp(realDist, Math.max(realDist, elbowLower), totalDist / (2 * segmentLength));
+        }
+        Vec3d viewUp = new Vec3d(0, 0, -1).cross(eye.facing).cross(eye.facing);
+        Vec3d elbow = shoulder.lerp(hand, .5).add(viewUp.cross(delta).cross(delta).setLength(elbowLower));
+        double segmentArcLength = Math.sqrt(totalDist * totalDist / 4 + elbowLower * elbowLower);
+        double offset = (1 - segmentLength / segmentArcLength) / 4;
+
+        Model.load("singlevoxel.vox").render(new Matrix4d()
+                .translate(shoulder.lerp(elbow, .5 + offset).toJOML())
+                .rotate(Quaternion.fromXYAxes(elbow.sub(shoulder), new Vec3d(0, 0, 1)).toJOML())
+                .scale(segmentLength, width, width),
+                new Vec3d(.5, .5, .5), color);
+        Model.load("singlevoxel.vox").render(new Matrix4d()
+                .translate(elbow.lerp(hand, .5 - offset).toJOML())
+                .rotate(Quaternion.fromXYAxes(hand.sub(elbow), new Vec3d(0, 0, 1)).toJOML())
+                .scale(segmentLength, width, width),
+                new Vec3d(.5, .5, .5), color);
     }
 
     public SplineAnimation newAnim() {
@@ -45,9 +81,38 @@ public class HeldItemController extends Behavior {
 
     @Override
     public void render() {
-        double direction1 = MathUtils.direction1(heldItemPos.add(eye.facing.cross(new Vec3d(0, 0, 1)).mul(-.5)));
-        double direction2 = Math.PI / 2 + MathUtils.direction2(heldItemPos.add(new Vec3d(0, 0, 1)));
-        heldItemType.getModel().render(eye.eyePos.get().add(heldItemPos), direction1, direction2, 1 / 16., heldItemType.getModelTip(), color);
+        renderTask().accept(new Vec4d(1, 1, 1, 1));
+
+        ModelBehavior model = getOrNull(ModelBehavior.class);
+        double modelRotation = eye.direction1();
+        Vec4d modelColor = new Vec4d(.8, .6, .3, 1);
+        if (model != null) {
+            modelRotation = model.rotation;
+            modelColor = model.color;
+        }
+
+        Vec3d currentPos = eye.eyePos.get().add(heldItemPos);
+        Vec3d handleDir = heldItemPos.sub(eye.quat().applyTo(handlePos));
+
+        Quaternion shoulderQuat = rotateShouldersWithFacing ? eye.quatScaled(1, .75) : Quaternion.fromEulerAngles(modelRotation, 0, 0);
+        Function<Vec3d, Vec3d> shoulderTransform = v -> shoulderQuat.applyTo(v).add(eye.eyePos.get());
+
+        Vec3d shoulder1 = shoulderTransform.apply(shoulderPos);
+        Vec3d hand1 = handleDir.setLength(-2.5).add(currentPos);
+        drawArm(shoulder1, hand1, 12. / 16, 2. / 16, new Vec4d(.9, .9, .9, 1).mul(modelColor));
+
+        Vec3d shoulder2 = shoulderTransform.apply(shoulderPos.mul(new Vec3d(1, -1, 1)));
+        Vec3d hand2 = handleDir.setLength(-2).add(currentPos);
+        drawArm(shoulder2, hand2, 12. / 16, 2. / 16, new Vec4d(.9, .9, .9, 1).mul(modelColor));
+    }
+
+    private Consumer<Vec4d> renderTask() {
+        Vec3d currentPos = eye.eyePos.get().add(heldItemPos);
+        Vec3d handleDir = heldItemPos.sub(eye.quat().applyTo(handlePos));
+        Quaternion quat = Quaternion.fromXYAxes(handleDir, heldItemVel);
+        return c -> {
+            heldItemType.getModel().render(currentPos, quat, 1 / 16., heldItemType.getModelTip(), c);
+        };
     }
 
     @Override
@@ -60,7 +125,10 @@ public class HeldItemController extends Behavior {
 
             SplineAnimation anim = new SplineAnimation();
             anim.addKeyframe(0, heldItemPos, heldItemVel);
-            anim.addKeyframe(1, heldItemPos.normalize().lerp(eye.facing, reorientSpeed).mul(heldItemType.ext1), new Vec3d(0, 0, 0));
+            Vec3d goal = heldItemPos.normalize().lerp(eye.quatScaled(1, .5).applyToForwards(), reorientSpeed).mul(heldItemType.ext1)
+                    .add(eye.quat().applyTo(restingPos));
+//                    .add(rotate(restingPos, direction1(eye.facing)));
+            anim.addKeyframe(1, goal, new Vec3d(0, 0, 0));
 
             double t = 1 - Math.exp(-dt * 20 / heldItemType.slashiness);
             heldItemPos = anim.getPosition(t);
@@ -72,12 +140,10 @@ public class HeldItemController extends Behavior {
         }
 
         if (makeTrail) {
-            Vec3d currentPos = eye.eyePos.get().add(heldItemPos);
-            double direction1 = MathUtils.direction1(heldItemPos.add(eye.facing.cross(new Vec3d(0, 0, 1)).mul(-.5)));
-            double direction2 = Math.PI / 2 + MathUtils.direction2(heldItemPos.add(new Vec3d(0, 0, 1)));
+            Consumer<Vec4d> renderTask = renderTask();
             double duration = .1;
             createGraphicsEffect(duration, t -> {
-                heldItemType.getModel().render(currentPos, direction1, direction2, 1 / 16., heldItemType.getModelTip(), new Vec4d(2, 2, 2, .05 * .2 / heldItemType.slashDuration * (1 - t / duration)));
+                renderTask.accept(new Vec4d(2, 2, 2, .25 * .2 / heldItemType.slashDuration * (1 - t / duration)));
             });
         }
         realHeldItemVel = heldItemPos.sub(prevSwordPos).div(dt);

@@ -73,13 +73,15 @@ public class World extends Behavior {
     }
 
     public <T extends AbstractRegion> RegionMap<T> getRegionMap(Class<T> c) {
-        regions.putIfAbsent(c, new RegionMap(this, (w, rp) -> {
-            try {
-                return c.getConstructor(World.class, RegionPos.class).newInstance(w, rp);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        }));
+        if (!regions.containsKey(c)) {
+            regions.put(c, new RegionMap(this, (w, rp) -> {
+                try {
+                    return c.getConstructor(World.class, RegionPos.class).newInstance(w, rp);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            }));
+        }
         return regions.get(c);
     }
 

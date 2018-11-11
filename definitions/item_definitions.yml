@@ -26,7 +26,7 @@ texture: item_sword.png
 maxStackSize: 1
 weapon:
     modelName: sword.vox
-    modelTip: {x: 16, y: 16, z: 32}
+    modelTip: {x: 32, y: 16, z: 16}
     ext1: 2.5
     ext2: 5
     slashDuration: .2
@@ -39,7 +39,7 @@ texture: item_dagger.png
 maxStackSize: 1
 weapon:
     modelName: dagger.vox
-    modelTip: {x: 4, y: 4, z: 16}
+    modelTip: {x: 16, y: 4, z: 4}
     ext1: 1.5
     ext2: 3
     slashDuration: .15
@@ -52,7 +52,7 @@ texture: item_hammer.png
 maxStackSize: 1
 weapon:
     modelName: hammer.vox
-    modelTip: {x: 8, y: 8, z: 32}
+    modelTip: {x: 32, y: 8, z: 8}
     ext1: 1.5
     ext2: 3
     slashDuration: .4
@@ -65,9 +65,22 @@ texture: item_spear.png
 maxStackSize: 1
 weapon:
     modelName: spear.vox
-    modelTip: {x: 4, y: 4, z: 64}
+    modelTip: {x: 64, y: 4, z: 4}
     ext1: 3.5
     ext2: 6
     slashDuration: .25
     weight: 1
     slashiness: .1
+---
+gameName: greataxe
+displayName: Greataxe
+texture: item_hammer.png
+maxStackSize: 1
+weapon:
+    modelName: greataxe.vox
+    modelTip: {x: 48, y: 16, z: 16}
+    ext1: 2
+    ext2: 4
+    slashDuration: .4
+    weight: 1
+    slashiness: 3

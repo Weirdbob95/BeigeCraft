@@ -1,5 +1,7 @@
 package util.math;
 
+import org.joml.Matrix3d;
+import org.joml.Quaterniond;
 import static util.math.MathUtils.mod;
 
 public class Quaternion {
@@ -73,6 +75,14 @@ public class Quaternion {
                 sinYaw * cosPitch * cosRoll - cosYaw * sinPitch * sinRoll);
     }
 
+    public static Quaternion fromXYAxes(Vec3d x, Vec3d y) {
+        Vec3d z = x.cross(y);
+        y = z.cross(x);
+        Matrix3d m = new Matrix3d(x.toJOML(), y.toJOML(), z.toJOML());
+        Quaterniond q = m.getUnnormalizedRotation(new Quaterniond());
+        return new Quaternion(q.w, q.x, q.y, q.z);
+    }
+
     public double getPitch() {
         return Math.asin(2 * (a * c - b * d));
     }
@@ -122,6 +132,10 @@ public class Quaternion {
 
     public Vec3d toAngleAxis() {
         return axis().mul(angle());
+    }
+
+    public Quaterniond toJOML() {
+        return new Quaterniond(b, c, d, a);
     }
 
     @Override

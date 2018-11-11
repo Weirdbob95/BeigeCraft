@@ -5,6 +5,7 @@ import org.joml.Matrix4d;
 import org.joml.Matrix4f;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
+import util.math.Quaternion;
 import util.math.Vec2d;
 import util.math.Vec3d;
 
@@ -68,7 +69,7 @@ public interface Camera {
 
         @Override
         public Matrix4d getProjectionMatrix() {
-            return getProjectionMatrix(80, Window.WIDTH, Window.HEIGHT, .2f, 2000);
+            return getProjectionMatrix(90, Window.WIDTH, Window.HEIGHT, .2f, 2000);
         }
 
         private Matrix4d getProjectionMatrix(double fov, double width, double height, double zNear, double zFar) {
@@ -100,8 +101,15 @@ public interface Camera {
             return getViewMatrix().translate(translate.toJOML()).rotate(rotation, up.toJOML()).scale(scale);
         }
 
-        public Matrix4d getWorldMatrix(Vec3d translate, double rotation1, double rotation2, double scale) {
-            return getViewMatrix().translate(translate.toJOML()).rotate(rotation1, up.toJOML()).rotate(rotation2, new Vector3d(0, 1, 0)).scale(scale);
+        public Matrix4d getWorldMatrix(Vec3d translate, Quaternion quat, double scale) {
+            return getViewMatrix()
+                    .translate(translate.toJOML())
+                    .rotate(quat.toJOML())
+                    .scale(scale);
+        }
+
+        public Matrix4d getWorldMatrix(Matrix4d modelMat) {
+            return getViewMatrix().mul(modelMat);
         }
     }
 }

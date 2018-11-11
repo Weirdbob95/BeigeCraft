@@ -1,11 +1,12 @@
 package world;
 
-import world.regions.RegionPos;
 import definitions.TerrainObjectType;
 import java.util.LinkedList;
 import java.util.List;
+import util.math.Quaternion;
 import util.math.Vec3d;
 import util.math.Vec4d;
+import world.regions.RegionPos;
 
 public class TerrainObjectInstance {
 
@@ -58,6 +59,7 @@ public class TerrainObjectInstance {
 
     public void render(Vec3d pos) {
         //type.getModel().render(pos.add(center()), rotation * Math.PI / 2, 0, 1 / 16., type.getModel().originalSize().div(2), new Vec4d(1, 1, 1, 1));
-        type.getModel().render(pos.add(new Vec3d(x + .5, y + .5, z + .5)), rotation * Math.PI / 2, 0, 1 / 16., new Vec3d(8, 8, 8), new Vec4d(1, 1, 1, 1));
+        Quaternion quat = Quaternion.fromEulerAngles(rotation * Math.PI / 2, 0, 0);
+        type.getModel().render(pos.add(new Vec3d(x + .5, y + .5, z + .5)), quat, 1 / 16., new Vec3d(8, 8, 8), new Vec4d(1, 1, 1, 1));
     }
 }

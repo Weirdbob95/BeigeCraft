@@ -6,7 +6,6 @@ import opengl.GLState;
 import opengl.Window;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import util.math.Vec2d;
 
@@ -76,16 +75,16 @@ public class GUIManager extends Behavior {
                 setRoot(null);
             }
         }
-        if (Input.keyJustPressed(GLFW_KEY_Q)) {
-            if (root == null) {
-                setRoot(qawRoot);
-            }
-        }
-        if (Input.keyJustReleased(GLFW_KEY_Q)) {
-            if (root == qawRoot) {
-                setRoot(null);
-            }
-        }
+//        if (Input.keyJustPressed(GLFW_KEY_Q)) {
+//            if (root == null) {
+//                setRoot(qawRoot);
+//            }
+//        }
+//        if (Input.keyJustReleased(GLFW_KEY_Q)) {
+//            if (root == qawRoot) {
+//                setRoot(null);
+//            }
+//        }
 
         if (root != null) {
             mouse = new Vec2d(Input.mouse().x - Window.WIDTH / 2, Window.HEIGHT / 2 - Input.mouse().y);

@@ -174,11 +174,18 @@ public class Player extends Behavior {
                 flying = !flying;
             }
 
-            creature.speed.setBaseValue(flying ? 200 : physics.crouch ? 4 : sprintTimer > 0 ? 40 : 8.);
-            creature.jumpSpeed.setBaseValue(flying ? 200 : 22.);
+            creature.speed.setBaseValue(flying ? 200 : physics.crouch ? 4 : sprintTimer > 0 ? 30 : 8.);
+            creature.jumpSpeed.setBaseValue(flying ? 200 : 12.);
 
             // Crouch
-            physics.shouldCrouch = Input.keyDown(GLFW_KEY_LEFT_SHIFT);
+            // physics.shouldCrouch = Input.keyDown(GLFW_KEY_LEFT_SHIFT);
+            if (Input.keyJustPressed(GLFW_KEY_LEFT_SHIFT)) {
+//            if (Input.mouseJustPressed(1)) {
+                sprintTimer = .2;
+            }
+            if (Input.keyJustPressed(GLFW_KEY_SPACE) && !physics.onGround) {
+                sprintTimer = .2;
+            }
         }
 
         velocity.velocity = computeIdealVel();
@@ -201,6 +208,12 @@ public class Player extends Behavior {
             if (Input.mouseJustReleased(0)) {
                 abilityController.attemptAbility(DO_NOTHING);
             }
+//            if (Input.keyJustPressed(GLFW_KEY_LEFT_SHIFT)) {
+//                abilityController.attemptAbility(PlayerAbilityManager.secondary);
+//            }
+//            if (Input.keyJustReleased(GLFW_KEY_LEFT_SHIFT)) {
+//                abilityController.attemptAbility(DO_NOTHING);
+//            }
             if (Input.mouseJustPressed(1)) {
                 abilityController.attemptAbility(PlayerAbilityManager.secondary);
             }

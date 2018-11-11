@@ -121,6 +121,11 @@ public abstract class MathUtils {
                 Math.sin(angle) * v.x + Math.cos(angle) * v.y);
     }
 
+    public static Vec3d rotate(Vec3d v, double angle) {
+        return new Vec3d(Math.cos(angle) * v.x - Math.sin(angle) * v.y,
+                Math.sin(angle) * v.x + Math.cos(angle) * v.y, v.z);
+    }
+
     public static int round(double x) {
         return (int) Math.round(x);
     }

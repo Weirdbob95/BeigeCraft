@@ -41,8 +41,9 @@ public class Knight extends Behavior {
         physics.hitboxSize1Crouch = new Vec3d(.6, .6, 1.8);
         physics.hitboxSize2Crouch = new Vec3d(.6, .6, 1.0);
         heldItemController.eye.eyePos = () -> Camera.camera3d.position;
-//        heldItemController.heldItemType = getItem("greataxe").weapon;
+//        heldItemController.heldItemType = getItem("sword").weapon;
         heldItemController.rotateShouldersWithFacing = true;
+        heldItemController.armWidth = 3. / 16;
     }
 
     @Override
@@ -66,16 +67,17 @@ public class Knight extends Behavior {
             camera3d.vertAngle += Input.mouseDelta().y / 300;
             camera3d.vertAngle = MathUtils.clamp(camera3d.vertAngle, -1.55, 1.55);
 
-            boolean lmb = Input.mouseDown(0);
-            boolean rmb = Input.mouseDown(1);
             // Weapon attack
-            if (lmb && !rmb) {
-                abilityController.tryAbilityType(new KnightFastAttack(this));
+            if (Input.mouseDown(0) && !Input.mouseDown(1)) {
+                abilityController.tryAbilityType(new KnightPrepareAttack(this));
+            } else if (abilityController.currentAbility() instanceof KnightPrepareAttack) {
+                abilityController.finishAbility();
             }
             // Parry
-            if (rmb && !lmb) {
+            if (Input.mouseDown(1)) {
                 abilityController.tryAbilityType(new KnightBlock(this));
-            } else if (abilityController.currentAbility() instanceof KnightBlock && abilityController.currentAbility().timer > .2) {
+            } else if (abilityController.currentAbility() instanceof KnightBlock
+                    && abilityController.currentAbility().timer > .2) {
                 abilityController.finishAbility();
             }
         }

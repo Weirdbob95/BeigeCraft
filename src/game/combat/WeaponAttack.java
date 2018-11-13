@@ -3,6 +3,8 @@ package game.combat;
 import definitions.BlockType;
 import game.ParticleBurst;
 import game.abilities.Ability;
+import game.abilities.AbilityController;
+import game.abilities.Stun;
 import game.archetypes.KnightFastAttack;
 import game.creatures.CreatureBehavior;
 import java.util.HashSet;
@@ -62,6 +64,12 @@ public class WeaponAttack {
             particleBurst(pos, new Vec4d(.7, .7, .7, 1));
         } else {
             c.damage(damage * pe.damageMultiplier, knockback.mul(pe.knockbackMultiplier));
+            if (Math.random() * 5 < damage * pe.damageMultiplier) {
+                AbilityController ac = c.getOrNull(AbilityController.class);
+                if (ac != null) {
+                    ac.tryAbility(new Stun(c, .05));
+                }
+            }
             particleBurst(pos, new Vec4d(.8, .1, .1, 1));
         }
     }

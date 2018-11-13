@@ -21,6 +21,6 @@ void main() {
     //float maxDist = 2000;
     //float fog = pow(.01, pow(length(gViewSpace) / maxDist, 2));
     vec4 preFogColor = pow(color * vec4(vec3(mix(1, fragOcclusion, fog)), 1) * textureColor, vec4(1/2.2));
-    finalColor = mix(vec4(.5, .7, 1., 1.), preFogColor, fog);
+    finalColor = mix(vec4(.4, .7, 1., 1.), preFogColor, fog);
     brightColor = texture(bloom_sampler, finalCoords);
 }

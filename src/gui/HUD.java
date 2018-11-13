@@ -3,15 +3,11 @@ package gui;
 import behaviors.PhysicsBehavior;
 import behaviors.PositionBehavior;
 import engine.Behavior;
-import engine.Input;
 import static game.Settings.SHOW_DEBUG_HUD;
 import game.creatures.CreatureBehavior;
 import game.items.ItemSlot;
-import graphics.Graphics;
 import java.util.HashSet;
 import java.util.Set;
-import opengl.Camera;
-import util.math.MathUtils;
 import static util.math.MathUtils.mod;
 import util.math.Vec2d;
 import util.math.Vec3d;
@@ -57,25 +53,25 @@ public class HUD extends GUIItem {
 
     @Override
     protected void render() {
-        mainHand.color = new Vec4d(.6, .6, .6, Input.mouseDown(0) ? .8 : .5);
-        mainHand.itemSlot = ItemSlot.MAIN_HAND;
-        offHand.color = new Vec4d(.6, .6, .6, Input.mouseDown(1) ? .8 : .5);
-        offHand.itemSlot = ItemSlot.OFF_HAND;
-
-        for (int i = 0; i < MAP_SIZE; i++) {
-            for (int j = 0; j < MAP_SIZE; j++) {
-                double mapAngle = Math.PI / 2 - Camera.camera3d.horAngle;
-                Vec2d centerOffset = new Vec2d(i - MAP_SIZE / 2., j - MAP_SIZE / 2.).mul(MAP_SQUARE_SIZE);
-                if (map[i][j] != null) {
-                    Graphics.drawRectangle(new Vec2d(670, 320).add(MathUtils.rotate(centerOffset, mapAngle)), mapAngle, new Vec2d(MAP_SQUARE_SIZE, MAP_SQUARE_SIZE), map[i][j]);
-                }
-            }
-        }
-        for (Vec2d v : villagePositions) {
-            double mapAngle = Math.PI / 2 - Camera.camera3d.horAngle;
-            Vec2d centerOffset = v.mul(MAP_SQUARE_SIZE);
-            Graphics.drawCircle(new Vec2d(670, 320).add(MathUtils.rotate(centerOffset, mapAngle)), MAP_SQUARE_SIZE, new Vec4d(0, 0, 0, 1));
-        }
+//        mainHand.color = new Vec4d(.6, .6, .6, Input.mouseDown(0) ? .8 : .5);
+//        mainHand.itemSlot = ItemSlot.MAIN_HAND;
+//        offHand.color = new Vec4d(.6, .6, .6, Input.mouseDown(1) ? .8 : .5);
+//        offHand.itemSlot = ItemSlot.OFF_HAND;
+//
+//        for (int i = 0; i < MAP_SIZE; i++) {
+//            for (int j = 0; j < MAP_SIZE; j++) {
+//                double mapAngle = Math.PI / 2 - Camera.camera3d.horAngle;
+//                Vec2d centerOffset = new Vec2d(i - MAP_SIZE / 2., j - MAP_SIZE / 2.).mul(MAP_SQUARE_SIZE);
+//                if (map[i][j] != null) {
+//                    Graphics.drawRectangle(new Vec2d(670, 320).add(MathUtils.rotate(centerOffset, mapAngle)), mapAngle, new Vec2d(MAP_SQUARE_SIZE, MAP_SQUARE_SIZE), map[i][j]);
+//                }
+//            }
+//        }
+//        for (Vec2d v : villagePositions) {
+//            double mapAngle = Math.PI / 2 - Camera.camera3d.horAngle;
+//            Vec2d centerOffset = v.mul(MAP_SQUARE_SIZE);
+//            Graphics.drawCircle(new Vec2d(670, 320).add(MathUtils.rotate(centerOffset, mapAngle)), MAP_SQUARE_SIZE, new Vec4d(0, 0, 0, 1));
+//        }
     }
 
     public void update(Behavior player) {

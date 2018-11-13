@@ -16,18 +16,18 @@ public class Tree extends Structure {
         priority = 5;
         BlockType leaf = getLeafType();
         double craziness = .5;
+        Vec3d scale = new Vec3d(1, 1, leaf.gameName.equals("leavesRed") ? 1 : .5);
 
         if (sc.random.nextDouble() < .0) {
             constructCanopy(0, 0, (int) height, (2 + height) * .75, craziness, leaf);
         } else {
-            constructOval(new Vec3d(0, 0, (int) height), new Vec3d(2, 2, 1), leaf);
+            constructOval(new Vec3d(0, 0, (int) height), scale.mul(2), leaf);
             int numOvals = 15 + sc.random.nextInt(5);
             for (int i = 0; i < numOvals; i++) {
-                double x = (sc.random.nextDouble() * 10 - 5) * height / 20;
-                double y = (sc.random.nextDouble() * 10 - 5) * height / 20;
-                double z = (sc.random.nextDouble() * 5 - 2.5) * height / 20 + height;
+                Vec3d v = new Vec3d(sc.random.nextDouble(), sc.random.nextDouble(), sc.random.nextDouble());
+                v = v.mul(10).sub(5).mul(height / 20).mul(scale).add(new Vec3d(0, 0, height));
                 double size = (sc.random.nextDouble() * 4 + 3) * height / 20;
-                constructOval(new Vec3d(x, y, z), new Vec3d(size, size, size / 2), leaf);
+                constructOval(v, scale.mul(size), leaf);
             }
         }
 //        while (sc.random.nextDouble() < .75) {
@@ -59,13 +59,13 @@ public class Tree extends Structure {
         }
     }
 
-    public void constructOval(Vec3d pos, Vec3d size, BlockType bt) {
+    public void constructOval(Vec3d pos, Vec3d size, BlockType leaf) {
         for (int x = floor(pos.x - size.x); x < pos.x + size.x; x++) {
             for (int y = floor(pos.y - size.y); y < pos.y + size.y; y++) {
                 double l = pos.sub(new Vec3d(x, y, pos.z)).div(size).length();
                 if (l < 1) {
                     double z = Math.sqrt(1 - l * l) * size.z;
-                    blocks.setRange(x, y, floor(pos.z - z), ceil(pos.z + z), bt);
+                    blocks.setRange(x, y, floor(pos.z - z), ceil(pos.z + z), leaf);
                 }
             }
         }

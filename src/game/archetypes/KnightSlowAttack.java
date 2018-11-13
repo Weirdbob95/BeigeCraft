@@ -12,16 +12,15 @@ import util.math.SplineAnimation;
 import util.math.Vec3d;
 import world.World;
 
-public class KnightFastAttack extends Ability.TimedAbility {
+public class KnightSlowAttack extends Ability.TimedAbility {
 
     public final CreatureBehavior creature = user.get(CreatureBehavior.class);
     public final HeldItemController heldItemController = user.get(HeldItemController.class);
     public final World world = user.get(PhysicsBehavior.class).world;
 
     public final WeaponAttack weaponAttack;
-    public boolean isLeft = Math.random() < .5;
 
-    public KnightFastAttack(Behavior user) {
+    public KnightSlowAttack(Behavior user) {
         super(user);
         weaponAttack = new WeaponAttack();
         weaponAttack.attacker = creature;
@@ -35,7 +34,7 @@ public class KnightFastAttack extends Ability.TimedAbility {
 
     @Override
     public double duration() {
-        return heldItemController.heldItemType.attackDuration;
+        return heldItemController.heldItemType.attackDuration * .8;
     }
 
     @Override
@@ -49,9 +48,9 @@ public class KnightFastAttack extends Ability.TimedAbility {
         Vec3d facing = heldItemController.eye.facing;
         Vec3d side = facing.cross(new Vec3d(0, 0, 1)).normalize();
         Vec3d up = side.cross(facing);
-        Vec3d normSwordPos = facing.add(side.mul(isLeft ? -1 : 1)).add(up).normalize();
+        Vec3d normSwordPos = facing.add(up).normalize();
 
-        double slashAngle = 1;
+        double slashAngle = 1.2;
         Vec3d slashRotation = normSwordPos.cross(facing).setLength(slashAngle);
         Vec3d startPos = Quaternion.fromAngleAxis(slashRotation).inverse().applyTo(facing);
         Vec3d endPos = Quaternion.fromAngleAxis(slashRotation).applyTo(facing);

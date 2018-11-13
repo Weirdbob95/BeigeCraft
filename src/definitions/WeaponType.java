@@ -13,17 +13,25 @@ public class WeaponType {
         FIST.modelTip = new Vec3dBean(-8, 2, 4);
         FIST.ext1 = 1;
         FIST.ext2 = 2.5;
-        FIST.slashDuration = .15;
-        FIST.weight = 2;
-        FIST.slashiness = .2;
+        FIST.attackDuration = .5;
+        FIST.knockback = 2;
+        FIST.hand1 = 0;
+        FIST.hand2 = 0;
     }
 
     public String modelName;
     public Vec3dBean modelTip;
     public double ext1, ext2;
-    public double slashDuration;
-    public double weight;
-    public double slashiness;
+    public double attackDuration;
+    public double knockback;
+    public double hand1 = Double.NaN, hand2 = Double.NaN;
+    public Vec3dBean handlePos;
+    public Vec3dBean restingPos;
+    public double slashiness = 1;
+
+    public Vec3d getHandlePos() {
+        return handlePos.toVec3d();
+    }
 
     public Model getModel() {
         return Model.load(modelName);
@@ -31,5 +39,9 @@ public class WeaponType {
 
     public Vec3d getModelTip() {
         return modelTip.toVec3d();
+    }
+
+    public Vec3d getRestingPos() {
+        return restingPos.toVec3d();
     }
 }

@@ -51,7 +51,7 @@ public abstract class Main {
                     blur1.drawToSelf(f.colorBuffer2, blurShader);
                 }
 
-                Framebuffer.clearWindow(new Vec4d(.5, .7, 1, 1));
+                Framebuffer.clearWindow(new Vec4d(.4, .7, 1, 1));
                 Framebuffer.drawToWindow(f.colorBuffer, simpleShader);
 
                 if (BLOOM) {

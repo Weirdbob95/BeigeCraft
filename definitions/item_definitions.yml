@@ -26,12 +26,14 @@ texture: item_sword.png
 maxStackSize: 1
 weapon:
     modelName: sword.vox
-    modelTip: {x: 32, y: 16, z: 16}
-    ext1: 2.5
-    ext2: 5
-    slashDuration: .2
-    weight: .5
-    slashiness: 1
+    modelTip: {x: 32, y: 4, z: 4}
+    ext1: 1
+    ext2: 3.75
+    attackDuration: .5
+    knockback: 1
+    hand1: 1.75
+    handlePos: {x: .5, y: -.5, z: -1.5}
+    restingPos: {x: 0, y: -.25, z: .25}
 ---
 gameName: dagger
 displayName: Dagger
@@ -40,11 +42,13 @@ maxStackSize: 1
 weapon:
     modelName: dagger.vox
     modelTip: {x: 16, y: 4, z: 4}
-    ext1: 1.5
+    ext1: 1
     ext2: 3
-    slashDuration: .15
-    weight: .25
-    slashiness: 1
+    attackDuration: .4
+    knockback: 1
+    hand1: .75
+    handlePos: {x: .5, y: -.5, z: -1.5}
+    restingPos: {x: 0, y: -.25, z: -.25}
 ---
 gameName: hammer
 displayName: Hammer
@@ -54,10 +58,13 @@ weapon:
     modelName: hammer.vox
     modelTip: {x: 32, y: 8, z: 8}
     ext1: 1.5
-    ext2: 3
-    slashDuration: .4
-    weight: 2.5
-    slashiness: 3
+    ext2: 3.5
+    attackDuration: .8
+    knockback: 4
+    hand1: 1.2
+    hand2: 2
+    handlePos: {x: 1, y: -.125, z: -1}
+    restingPos: {x: 0, y: -.25, z: 0}
 ---
 gameName: spear
 displayName: Spear
@@ -68,9 +75,12 @@ weapon:
     modelTip: {x: 64, y: 4, z: 4}
     ext1: 3.5
     ext2: 6
-    slashDuration: .25
-    weight: 1
-    slashiness: .1
+    attackDuration: .7
+    knockback: 1
+    hand1: 2
+    hand2: 2.5
+    handlePos: {x: 1, y: -.125, z: -1}
+    restingPos: {x: 0, y: -.25, z: 0}
 ---
 gameName: greataxe
 displayName: Greataxe
@@ -79,8 +89,11 @@ maxStackSize: 1
 weapon:
     modelName: greataxe.vox
     modelTip: {x: 48, y: 16, z: 16}
-    ext1: 2
-    ext2: 4
-    slashDuration: .4
-    weight: 1
-    slashiness: 3
+    ext1: 1.25
+    ext2: 3.5
+    attackDuration: .7
+    knockback: 1
+    hand1: 1.5
+    hand2: 2.5
+    handlePos: {x: .5, y: -.5, z: -1.5}
+    restingPos: {x: 0, y: -.5, z: .5}

@@ -1,11 +1,17 @@
 package game.abilities;
 
 import engine.Behavior;
+import engine.Queryable.Modifier;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Ability {
 
     public final AbilityController user;
     public double timer;
+
+    private final List<Modifier> modifiers = new LinkedList();
     private boolean finished;
 
     public Ability(Behavior user) {
@@ -13,11 +19,16 @@ public class Ability {
     }
 
     public void finish(boolean interrupted) {
+        modifiers.forEach(Modifier::remove);
         finished = true;
     }
 
     public double priority() {
         return 0;
+    }
+
+    public void register(Modifier... a) {
+        modifiers.addAll(Arrays.asList(a));
     }
 
     public void start() {

@@ -4,7 +4,8 @@ import engine.Behavior;
 import game.abilities.AbilityController;
 import game.abilities.Stun;
 import game.archetypes.KnightFastAttack;
-import game.combat.WeaponAttack;
+import game.archetypes.KnightPrepareAttack;
+import game.archetypes.KnightSlowAttack;
 import game.items.HeldItemController;
 import graphics.Model;
 import graphics.Sprite;
@@ -21,9 +22,6 @@ public class Skeletor extends Behavior {
     public final HeldItemController heldItemController = require(HeldItemController.class);
     public final AbilityController abilityController = require(AbilityController.class);
 
-    public boolean timerOn;
-    public double attackTimer;
-
     @Override
     public void createInner() {
         monster.model.model = Model.load("skeleton_armless.vox");
@@ -34,10 +32,12 @@ public class Skeletor extends Behavior {
 
     @Override
     public void render() {
-        WeaponAttack wa = WeaponAttack.getFromAbility(abilityController.currentAbility());
-        if (wa != null && wa.isParryable) {
-//            Vec4d color = !wa.wantToParryThis.isEmpty() ? new Vec4d(.5, 1, .5, 1) : new Vec4d(1, .5 + clamp(attackTimer * .5 / .4, 0, .5), .5, 1);
-//            Sprite.load("item_sword.png").drawBillboard(monster.position.position.add(new Vec3d(0, 0, 2.5)), new Vec2d(1, 1), color);
+        if (abilityController.currentAbility() instanceof KnightPrepareAttack) {
+            Sprite.load("item_sword.png").drawBillboard(monster.position.position.add(new Vec3d(0, 0, 2.5)), new Vec2d(1, 1), new Vec4d(.8, .8, .2, 1));
+        }
+        if (abilityController.currentAbility() instanceof KnightFastAttack
+                || abilityController.currentAbility() instanceof KnightSlowAttack) {
+            Sprite.load("item_sword.png").drawBillboard(monster.position.position.add(new Vec3d(0, 0, 2.5)), new Vec2d(1, 1), new Vec4d(.9, .4, .2, 1));
         }
         if (abilityController.currentAbility() instanceof Stun) {
             Sprite.load("swirl.png").drawBillboard(monster.position.position.add(new Vec3d(0, 0, 2.5)), new Vec2d(1, 1), new Vec4d(.8, .8, .2, 1));
@@ -46,27 +46,14 @@ public class Skeletor extends Behavior {
 
     @Override
     public void update(double dt) {
-        attackTimer -= dt;
         if (monster.goal != null) {
             heldItemController.eye.lookAt(monster.goal);
-            if (!timerOn) {
-                if (Math.random() < 2 * dt) {
-                    abilityController.tryAbility(new KnightFastAttack(this));
-                    timerOn = true;
-                    attackTimer = .7;
+            if (Math.random() < 4 * dt) {
+                if (abilityController.currentAbility() instanceof KnightPrepareAttack) {
+                    abilityController.finishAbility();
+                } else {
+                    abilityController.tryAbility(new KnightPrepareAttack(this));
                 }
-//                if (Math.random() < 4 * dt) {
-//                    if (abilityController.currentAbility == DO_NOTHING) {
-//                        abilityController.attemptAbility(new WeaponChargeAbility(this));
-//                    } else if (abilityController.currentAbility instanceof WeaponChargeAbility) {
-//                        timerOn = true;
-//                        attackTimer = .4;
-//                        WeaponAttack.getFromAbility(abilityController.currentAbility).isParryable = true;
-//                    }
-//                }
-            }
-            if (timerOn && attackTimer <= 0) {
-                timerOn = false;
             }
         }
     }

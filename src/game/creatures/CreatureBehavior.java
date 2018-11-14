@@ -8,6 +8,7 @@ import behaviors.VelocityBehavior;
 import engine.Behavior;
 import engine.Queryable;
 import engine.Queryable.Property;
+import game.ParticleBurst;
 import game.combat.ParryEvent;
 import game.combat.Status;
 import java.util.Collection;
@@ -15,6 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import util.math.Vec3d;
+import util.math.Vec4d;
 
 public class CreatureBehavior extends Behavior {
 
@@ -48,6 +50,13 @@ public class CreatureBehavior extends Behavior {
         currentHealth.setBaseValue(currentHealth.getBaseValue() - damage);
         if (currentHealth.get() <= 0) {
             getRoot().destroy();
+
+            ParticleBurst pb = new ParticleBurst();
+            pb.position.position = position.position;
+            pb.setLifetime(1);
+            pb.color = new Vec4d(.8, .1, .1, 1);
+            pb.spawn(100, 2, 15);
+            pb.create();
         }
     }
 

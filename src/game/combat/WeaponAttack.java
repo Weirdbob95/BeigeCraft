@@ -38,9 +38,6 @@ public class WeaponAttack {
             world.setBlock(pos, null);
             ParticleBurst pb = new ParticleBurst();
             pb.position.position = pos;
-            pb.acceleration.acceleration = new Vec3d(0, 0, -16);
-            pb.lifetime.lifetime = .2;
-            pb.maxLifetime = .2;
             pb.color = new Vec4d(.1, .4, .1, 1);
             pb.spawn(10, 5, 10);
             pb.create();
@@ -77,9 +74,7 @@ public class WeaponAttack {
     public void particleBurst(Vec3d pos, Vec4d color) {
         ParticleBurst pb = new ParticleBurst();
         pb.position.position = pos;
-        pb.acceleration.acceleration = new Vec3d(0, 0, -16);
-        pb.lifetime.lifetime = .15;
-        pb.maxLifetime = .15;
+        pb.setLifetime(.15);
         pb.color = color;
         pb.spawn(10, 5, 10);
         pb.create();

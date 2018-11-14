@@ -22,9 +22,14 @@ public class ParticleBurst extends Behavior {
     public final AccelerationBehavior acceleration = require(AccelerationBehavior.class);
     public final LifetimeBehavior lifetime = require(LifetimeBehavior.class);
 
-    public double maxLifetime;
-    public List<Vec3d> particles = new LinkedList();
     public Vec4d color = new Vec4d(1, 1, 1, 1);
+    private double maxLifetime;
+    private final List<Vec3d> particles = new LinkedList();
+
+    @Override
+    public void createInner() {
+        acceleration.acceleration = new Vec3d(0, 0, -20);
+    }
 
     @Override
     public void render() {
@@ -32,6 +37,11 @@ public class ParticleBurst extends Behavior {
             Vec3d pos = position.position.add(p.mul(maxLifetime - lifetime.lifetime));
             SINGLE_VOXEL.render(pos, Quaternion.IDENTITY, 1 / 16., SINGLE_VOXEL.center(), color);
         }
+    }
+
+    public void setLifetime(double maxLifetime) {
+        this.maxLifetime = maxLifetime;
+        lifetime.lifetime = maxLifetime;
     }
 
     public void spawn(int numParticles, double minParticleVelocity, double maxParticleVelocity) {

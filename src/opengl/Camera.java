@@ -3,7 +3,6 @@ package opengl;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4d;
 import org.joml.Matrix4f;
-import org.joml.Vector2d;
 import org.joml.Vector3d;
 import util.math.Quaternion;
 import util.math.Vec2d;
@@ -20,7 +19,7 @@ public interface Camera {
 
     public static class Camera2d implements Camera {
 
-        public Vector2d position = new Vector2d(0, 0);
+        public Vec2d position = new Vec2d(0, 0);
         public double rotation = 0;
         public double zoom = 1;
 
